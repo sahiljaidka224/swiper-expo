@@ -12,7 +12,8 @@ export default function CallsLayout() {
           title: "Calls",
           headerLargeTitle: true,
           headerShadowVisible: false,
-          // headerBlurEffect: 'regular',
+          // headerBlurEffect: "regular",
+          // headerTransparent: true,
           headerStyle: { backgroundColor: Colors.background },
           headerSearchBarOptions: {
             placeholder: "Search",

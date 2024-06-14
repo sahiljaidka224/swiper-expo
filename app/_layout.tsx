@@ -57,7 +57,7 @@ function BaseLayout() {
     console.log({ isSignedIn });
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace("/(tabs)/calls");
+      router.replace("/(tabs)/chats");
     } else if (!isSignedIn) {
       router.replace("/");
     }
