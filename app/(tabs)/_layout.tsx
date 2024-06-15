@@ -1,9 +1,11 @@
 import Colors from "@/constants/Colors";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function TabsRootLayout() {
+  const segments = useSegments();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Tabs
@@ -21,9 +23,10 @@ export default function TabsRootLayout() {
         }}
       >
         <Tabs.Screen
-          name="updates"
+          name="watchlist"
           options={{
-            title: "Updates",
+            title: "Watchlist",
+            headerShown: false,
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="update" size={size} color={color} />
             ),
@@ -56,6 +59,10 @@ export default function TabsRootLayout() {
             tabBarIcon: ({ size, color }) => (
               <Ionicons name="chatbubbles" size={size} color={color} />
             ),
+            tabBarStyle: {
+              backgroundColor: Colors.background,
+              display: segments[2] === "[id]" ? "none" : "flex",
+            },
           }}
         />
         <Tabs.Screen
