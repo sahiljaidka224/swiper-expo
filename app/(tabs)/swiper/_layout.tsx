@@ -1,20 +1,18 @@
+import Colors from "@/constants/Colors";
 import { Stack } from "expo-router";
 
-export default function WatchlistLayout() {
+export default function SwiperLayout() {
   return (
     <Stack>
       <Stack.Screen
         name="index"
         options={{
-          title: "Watchlist",
-          headerLargeTitle: true,
+          title: "Swiper",
+          headerLargeTitle: false,
           headerShadowVisible: false,
           headerBlurEffect: "regular",
           headerTransparent: true,
-          // headerStyle: { backgroundColor: Colors.background },
-          headerSearchBarOptions: {
-            placeholder: "Search",
-          },
+          headerStyle: { backgroundColor: Colors.background },
         }}
       />
     </Stack>

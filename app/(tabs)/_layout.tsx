@@ -43,11 +43,12 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="communities"
+          name="swiper"
           options={{
-            title: "Communities",
+            title: "Swiper",
+            headerShown: false,
             tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="people" size={size} color={color} />
+              <MaterialIcons name="car-rental" size={size} color={color} />
             ),
           }}
         />
