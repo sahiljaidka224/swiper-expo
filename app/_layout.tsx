@@ -7,6 +7,8 @@ import "react-native-reanimated";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { View } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { SWRConfig } from "swr";
+import { fetcher } from "@/utils/fetcher";
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const tokenCache = {
@@ -85,8 +87,11 @@ function BaseLayout() {
 
 export default function RootLayoutNav() {
   return (
+    <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
     <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY ?? ""} tokenCache={tokenCache}>
       <BaseLayout />
     </ClerkProvider>
+    </SWRConfig>
+
   );
 }

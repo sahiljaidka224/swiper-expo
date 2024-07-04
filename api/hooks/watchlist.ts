@@ -1,0 +1,55 @@
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
+
+const getCarsInWatchlist = async (url: string) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVVVJRCI6IjRkMzA2NjcwLWU3MzMtMTFlZS05NWJiLWQ5MGI4ZGJkMjQzZCIsImlhdCI6MTcxNzk4NjYzOSwiZXhwIjoxNzQ5NTIyNjM5fQ.0jvY69fyIhZb-y58lehfQuJzk_armyEHADyvwpBIR1Q",
+    },
+  });
+
+  return response.json();
+};
+
+const removeCarFromWatchlist = async (url: string, { arg }: { arg: { carId: string } }) => {
+  const response = await fetch(`${url}${arg.carId}/follow`, {
+    method: "DELETE",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVVVJRCI6IjRkMzA2NjcwLWU3MzMtMTFlZS05NWJiLWQ5MGI4ZGJkMjQzZCIsImlhdCI6MTcxNzk4NjYzOSwiZXhwIjoxNzQ5NTIyNjM5fQ.0jvY69fyIhZb-y58lehfQuJzk_armyEHADyvwpBIR1Q",
+    },
+  });
+
+  return response.json();
+};
+
+export function useGetWatchlist() {
+  const { data, error, isLoading } = useSWR(
+    "https://backend-swiper.datalinks.nl/car/followed?1=1&order_by=dateCreate&order_direction=desc",
+    getCarsInWatchlist
+  );
+
+  return {
+    cars: data?.data ?? [],
+    isLoading,
+    error,
+  };
+}
+
+export function useRemoveCarFromWatchlist() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/car/",
+    removeCarFromWatchlist
+  );
+
+  return {
+    trigger,
+    newCars: data,
+    isMutating,
+    error,
+  };
+}
