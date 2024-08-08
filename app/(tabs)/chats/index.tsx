@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, FlatList } from "react-native";
+import { View, ScrollView, FlatList } from "react-native";
 import chats from "@/assets/data/chats.json";
 import { defaultStyles } from "@/constants/Styles";
 import ChatRow from "@/components/ChatRow";
@@ -9,6 +9,7 @@ export default function Chats() {
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={{ paddingBottom: 40, backgroundColor: "#fff" }}
     >
+      {/* <CometChatConversationsWithMessages /> */}
       <FlatList
         scrollEnabled={false}
         data={chats}
@@ -17,7 +18,7 @@ export default function Chats() {
           <View style={[defaultStyles.separator, { marginLeft: 90 }]} />
         )}
         renderItem={({ item }) => <ChatRow {...item} />}
-      />
+      /> 
     </ScrollView>
   );
 }

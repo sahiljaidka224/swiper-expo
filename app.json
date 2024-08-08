@@ -14,14 +14,19 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.galaxies.swiper"
+      "bundleIdentifier": "com.galaxies.swiper",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Test",
+        "NSMicrophoneUsageDescription": "Test"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.galaxies.swiper"
+      "package": "com.galaxies.swiper",
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "VIBRATE", "INTERNET"]
     },
     "web": {
       "bundler": "metro",

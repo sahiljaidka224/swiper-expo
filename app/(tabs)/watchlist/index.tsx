@@ -109,7 +109,7 @@ export default function WatchlistPage() {
                     <Ionicons name="remove-circle" size={24} color={Colors.red} />
                   </AnimatedTouchableOpacity> */}
                   <Image
-                    source={{ uri: item.images[0].url }}
+                    source={{ uri: item.images[0]?.url }}
                     style={{
                       width: 125,
                       height: "75%",

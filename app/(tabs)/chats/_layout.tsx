@@ -11,6 +11,7 @@ export default function ChatsLayout() {
         options={{
           title: "Chats",
           headerLargeTitle: true,
+          // headerShown: false,
           headerBlurEffect: "regular",
           headerTransparent: true,
           // headerStyle: { backgroundColor: "#fff" },
