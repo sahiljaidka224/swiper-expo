@@ -17,6 +17,12 @@ export default function WatchlistLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: "",
+        }}
+      />
     </Stack>
   );
 }

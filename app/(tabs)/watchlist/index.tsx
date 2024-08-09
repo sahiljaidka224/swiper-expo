@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -19,7 +19,7 @@ import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-re
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const transition = CurvedTransition.delay(100);
-const AnimatedLink = Animated.createAnimatedComponent(Link);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function WatchlistPage() {
   const { cars, isLoading, error: getError } = useGetWatchlist();
@@ -83,29 +83,34 @@ export default function WatchlistPage() {
                 entering={FadeInUp.delay(index * 10)}
                 exiting={FadeOutUp}
               >
-                <Animated.View style={styles.itemContainer}>
+                <AnimatedPressable
+                  style={styles.itemContainer}
+                  onPress={() =>
+                    router.push({ pathname: `/(tabs)/watchlist/[id]`, params: { id: item.carId } })
+                  }
+                >
                   <Image source={{ uri: item.images[0]?.url }} style={styles.itemCarImage} />
                   <View style={styles.detailsContainer}>
                     <Text
                       style={styles.itemCarTitle}
                     >{`${item.year} ${item.make} ${item.model}`}</Text>
-                    <DetailsText text={`· ${item.transmission}`} />
-                    <DetailsText text={`· ${item.body}`} />
+                    <DetailsText text={`• ${item.transmission}`} />
+                    <DetailsText text={`• ${item.body}`} />
                     <DetailsText
-                      text={`· ${
+                      text={`• ${
                         item.odometer && item.odometer > 0
                           ? formatNumberWithCommas(Number(item.odometer))
                           : ""
                       } km`}
                     />
-                    <DetailsText text={`· ${item.capacity} ${item.fuelType}`} />
+                    <DetailsText text={`• ${item.capacity} ${item.fuelType}`} />
                     <Text style={styles.itemPriceText}>{`${
                       item.price && item.price > 0
                         ? `$${formatNumberWithCommas(item.price)}`
                         : "Enquire"
                     }`}</Text>
                   </View>
-                </Animated.View>
+                </AnimatedPressable>
                 <View style={styles.itemButtonsContainer}>
                   <TouchableOpacity onPress={() => onDelete(item)} style={styles.iconContainer}>
                     <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
@@ -132,12 +137,9 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    padding: 15,
+    padding: 10,
   },
   itemContainer: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
     flexDirection: "row",
     gap: 10,
   },
@@ -150,20 +152,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: "10%",
   },
   itemCarImage: {
-    minWidth: 125,
+    minWidth: 130,
     width: "40%",
-    height: 125,
+    height: 130,
     borderRadius: 8,
     objectFit: "cover",
     borderWidth: 1,
     borderColor: Colors.lightGray,
   },
   itemCarTitle: {
-    fontSize: 18,
+    fontSize: 20,
     textTransform: "capitalize",
-    fontWeight: "600",
     fontFamily: "SF_Pro_Display_Bold",
     lineHeight: 22,
+    color: Colors.textDark,
   },
   itemPriceText: {
     fontSize: 18,
@@ -190,9 +192,10 @@ const styles = StyleSheet.create({
   },
   detailsContainer: { flex: 1, gap: 3, marginLeft: 5 },
   detailText: {
-    fontSize: 14,
+    fontSize: 16,
     textTransform: "capitalize",
     fontFamily: "SF_Pro_Display_Light",
     lineHeight: 22,
+    color: Colors.textDark,
   },
 });

@@ -12,4 +12,6 @@ export default {
   textPrimary: "#fff",
   iconGray: "#999999",
   lightGrayBackground: "#F9F9F9",
+  textLight: "#999999",
+  textDark: "#333333",
 };
