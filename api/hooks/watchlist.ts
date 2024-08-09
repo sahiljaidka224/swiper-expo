@@ -27,19 +27,22 @@ const removeCarFromWatchlist = async (url: string, { arg }: { arg: { carId: stri
   return response.json();
 };
 
-export function useGetWatchlist() {
+export function useGetWatchlist(page: number = 1, limit: number = 35) {
+  const from = page * limit;
   const { data, error, isLoading, mutate } = useSWR(
-    "https://backend-swiper.datalinks.nl/car/followed?1=1&order_by=dateCreate&order_direction=desc",
+    `https://backend-swiper.datalinks.nl/car/followed?1=1&from=${from}&order_by=dateCreate&order_direction=desc`,
     getCarsInWatchlist
   );
 
   const refresh = () => mutate();
+  const fetchMore = (newPage: number) => mutate();
 
   return {
     cars: data?.data ?? [],
     isLoading,
     error,
     refresh,
+    fetchMore,
   };
 }
 

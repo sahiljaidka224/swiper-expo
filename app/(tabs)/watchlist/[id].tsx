@@ -100,7 +100,7 @@ export default function WatchlistCarDetailPage() {
               <DescriptionView title="Registration" value={car?.rego} uppercase />
 
               <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
-              <DescriptionView title="Registration State" value={car?.regoState} />
+              <DescriptionView title="Registration State" value={car?.regoState} uppercase />
               <DescriptionView title="Year of manufacture" value={car?.year} />
               <DescriptionView title="Compliance Date" value={car?.compliance} />
               <DescriptionView title="Colour" value={car?.colour} />
