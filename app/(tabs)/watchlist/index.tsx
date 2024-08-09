@@ -17,6 +17,9 @@ import {
 } from "react-native";
 import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-reanimated";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as Linking from "expo-linking";
+
+const placeholderImage = require("@/assets/images/no-image.png");
 
 const transition = CurvedTransition.delay(100);
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -89,21 +92,23 @@ export default function WatchlistPage() {
                     router.push({ pathname: `/(tabs)/watchlist/[id]`, params: { id: item.carId } })
                   }
                 >
-                  <Image source={{ uri: item.images[0]?.url }} style={styles.itemCarImage} />
+                  <Image
+                    defaultSource={placeholderImage}
+                    source={{ uri: item.images[0]?.url }}
+                    style={styles.itemCarImage}
+                  />
                   <View style={styles.detailsContainer}>
                     <Text
                       style={styles.itemCarTitle}
                     >{`${item.year} ${item.make} ${item.model}`}</Text>
-                    <DetailsText text={`• ${item.transmission}`} />
-                    <DetailsText text={`• ${item.body}`} />
-                    <DetailsText
-                      text={`• ${
-                        item.odometer && item.odometer > 0
-                          ? formatNumberWithCommas(Number(item.odometer))
-                          : ""
-                      } km`}
-                    />
-                    <DetailsText text={`• ${item.capacity} ${item.fuelType}`} />
+                    {item.transmission ? <DetailsText text={`• ${item.transmission}`} /> : null}
+                    {item.body ? <DetailsText text={`• ${item.body}`} /> : null}
+                    {item.odometer ? (
+                      <DetailsText text={`• ${formatNumberWithCommas(Number(item.odometer))} km`} />
+                    ) : null}
+                    {item.capacity && item.fuelType ? (
+                      <DetailsText text={`• ${item.capacity} ${item.fuelType}`} />
+                    ) : null}
                     <Text style={styles.itemPriceText}>{`${
                       item.price && item.price > 0
                         ? `$${formatNumberWithCommas(item.price)}`
@@ -117,7 +122,17 @@ export default function WatchlistPage() {
                   </TouchableOpacity>
                   {/* // TODO: after comet chat is integrated completely */}
                   <Button title="Message" onPress={() => {}} />
-                  <Button title="Call" onPress={() => {}} />
+                  <Button
+                    title="Call"
+                    onPress={async () => {
+                      if (!item?.organisation?.phoneNumber) return;
+                      try {
+                        await Linking.openURL(`tel:${item?.organisation?.phoneNumber}`);
+                      } catch (error) {
+                        console.warn(`Unable to initiate call ${error}`);
+                      }
+                    }}
+                  />
                 </View>
               </Animated.View>
             )}
@@ -137,11 +152,12 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    padding: 10,
+    padding: 15,
   },
   itemContainer: {
     flexDirection: "row",
     gap: 10,
+    minHeight: 150,
   },
   itemSeperatorContainer: {
     paddingHorizontal: 10,
@@ -190,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGrayBackground,
     paddingHorizontal: 16,
   },
-  detailsContainer: { flex: 1, gap: 3, marginLeft: 5 },
+  detailsContainer: { flex: 1, gap: 2, marginLeft: 5 },
   detailText: {
     fontSize: 16,
     textTransform: "capitalize",

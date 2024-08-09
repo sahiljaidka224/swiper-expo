@@ -13,9 +13,22 @@ import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import Button from "@/components/Button";
 
+import PagerView from "react-native-pager-view";
+import { useState } from "react";
+import * as Linking from "expo-linking";
+
+const placeholderImage = require("@/assets/images/no-image-large.png");
+
 export default function WatchlistCarDetailPage() {
   const { id } = useLocalSearchParams();
   const { car, isLoading, error } = useGetCarDetails(id as string);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+
+  const images =
+    car?.images.filter(
+      (value: { imageIndex: number }, index: any, self: any[]) =>
+        index === self.findIndex((t) => t.imageIndex === value.imageIndex)
+    ) ?? [];
 
   return (
     <View style={styles.container}>
@@ -26,7 +39,53 @@ export default function WatchlistCarDetailPage() {
         {isLoading && <ActivityIndicator color={Colors.primary} size="large" />}
         {car && (
           <>
-            <Image source={{ uri: car?.images[0]?.url }} style={styles.itemCarImage} />
+            <View>
+              {images.length === 0 ? (
+                <Image
+                  defaultSource={placeholderImage}
+                  style={[styles.itemCarImage, { objectFit: "cover" }]}
+                />
+              ) : (
+                <PagerView
+                  style={[styles.container, styles.pagerViewContainer]}
+                  initialPage={0}
+                  onPageSelected={(e) => setSelectedIndex(e.nativeEvent.position)}
+                >
+                  {images.map(({ url, imageIndex }: { url: string; imageIndex: number }) => {
+                    return (
+                      <View key={`${imageIndex}`} style={styles.imageContainer}>
+                        <Image source={{ uri: url }} style={styles.itemCarImage} />
+                      </View>
+                    );
+                  })}
+                </PagerView>
+              )}
+
+              {car?.price && car?.price > 0 ? (
+                <View style={styles.priceContainer}>
+                  <Text style={styles.price}>{`$${formatNumberWithCommas(car?.price)}`}</Text>
+                </View>
+              ) : null}
+              <View style={styles.carouselContainer}>
+                {images.map(
+                  ({ imageIndex }: { url: string; imageIndex: number }, index: number) => {
+                    return (
+                      <View
+                        key={`${imageIndex}`}
+                        style={[
+                          styles.carousel,
+                          {
+                            width: selectedIndex === index ? 16 : 8,
+                            backgroundColor:
+                              selectedIndex === index ? Colors.primary : Colors.background,
+                          },
+                        ]}
+                      />
+                    );
+                  }
+                )}
+              </View>
+            </View>
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
               {car?.odometer && (
@@ -54,7 +113,7 @@ export default function WatchlistCarDetailPage() {
               {car?.body && <DescriptionView title="Body Style" value={car?.body} />}
               {car?.capacity && <DescriptionView title="Capacity" value={car?.capacity} />}
               {car?.fuelType && <DescriptionView title="Fuel" value={car?.fuelType} />}
-              {car?.series && <DescriptionView title="Series" value={car?.series} uppercase />}
+              {car?.series && <DescriptionView title="Series" value={car?.series} />}
               {car?.vin && <DescriptionView title="VIN" value={car?.vin} uppercase />}
               {car?.engineNo && (
                 <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
@@ -66,7 +125,17 @@ export default function WatchlistCarDetailPage() {
               />
               <View style={styles.buttonContainer}>
                 <Button title="Message" onPress={() => {}} />
-                <Button title="Call" onPress={() => {}} />
+                <Button
+                  title="Call"
+                  onPress={async () => {
+                    if (!car?.primaryContact?.phoneNumber) return;
+                    try {
+                      await Linking.openURL(`tel:${car?.primaryContact?.phoneNumber}`);
+                    } catch (error) {
+                      console.warn(`Unable to initiate call ${error}`);
+                    }
+                  }}
+                />
               </View>
             </View>
           </>
@@ -152,18 +221,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     paddingVertical: 8,
+    gap: 10,
   },
   descriptionTitle: {
     fontFamily: "SF_Pro_Display_Light",
     fontSize: 18,
     color: Colors.gray,
     lineHeight: 22,
+    textAlign: "left",
   },
   descriptionValue: {
     fontFamily: "SF_Pro_Display_Light",
     fontSize: 18,
     color: Colors.textDark,
     lineHeight: 22,
+    flexWrap: "wrap",
+    textAlign: "right",
+    overflow: "hidden",
+    maxWidth: 250,
   },
   contactCardContainer: {
     flexDirection: "row",
@@ -206,5 +281,34 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     gap: 10,
+  },
+  pagerViewContainer: { width: "100%", height: 280 },
+  imageContainer: { justifyContent: "center", alignItems: "center" },
+  carouselContainer: {
+    position: "absolute",
+    bottom: 12,
+    justifyContent: "center",
+    flexDirection: "row",
+    width: "100%",
+  },
+  carousel: {
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 1,
+  },
+  priceContainer: {
+    position: "absolute",
+    right: "2%",
+    top: 5,
+    padding: 5,
+    backgroundColor: Colors.primary,
+    borderRadius: 5,
+    minWidth: 100,
+  },
+  price: {
+    color: Colors.textPrimary,
+    textAlign: "center",
+    fontFamily: "SF_Pro_Display_Bold",
+    fontSize: 18,
   },
 });
