@@ -38,6 +38,10 @@ function BaseLayout() {
   const { isLoaded, isSignedIn } = useAuth();
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SF_Pro_Display_Bold: require("../assets/fonts/SF-Pro-Display-Bold.otf"),
+    SF_Pro_Display_Light: require("../assets/fonts/SF-Pro-Display-Light.otf"),
+    SF_Pro_Display_Medium: require("../assets/fonts/SF-Pro-Display-Medium.otf"),
+    SF_Pro_Display_Regular: require("../assets/fonts/SF-Pro-Display-Regular.otf"),
     ...FontAwesome.font,
   });
 
@@ -88,10 +92,9 @@ function BaseLayout() {
 export default function RootLayoutNav() {
   return (
     <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY ?? ""} tokenCache={tokenCache}>
-      <BaseLayout />
-    </ClerkProvider>
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY ?? ""} tokenCache={tokenCache}>
+        <BaseLayout />
+      </ClerkProvider>
     </SWRConfig>
-
   );
 }

@@ -1,9 +1,9 @@
 import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlist";
+import Button from "@/components/Button";
 import Colors from "@/constants/Colors";
-import { defaultStyles } from "@/constants/Styles";
 import { formatNumberWithCommas } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -12,35 +12,26 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  StyleSheet,
+  Pressable,
 } from "react-native";
-import Animated, {
-  CurvedTransition,
-  FadeInUp,
-  FadeOutUp,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-reanimated";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const transition = CurvedTransition.delay(100);
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 const AnimatedLink = Animated.createAnimatedComponent(Link);
 
 export default function WatchlistPage() {
   const { cars, isLoading, error: getError } = useGetWatchlist();
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const editing = useSharedValue(-30);
-
-  console.log({ newCars, isMutating, isLoading });
 
   useEffect(() => {
     if (!isLoading && cars) {
-      console.log("cars");
       setWatchlistData(cars);
     }
   }, [cars]);
+
   const onDelete = (item: any) => {
     setWatchlistData(watchListData.filter((i) => i.carId !== item.carId));
     try {
@@ -57,31 +48,17 @@ export default function WatchlistPage() {
     }
   };
 
-  const onEdit = () => {
-    let editingNew = !isEditing;
-    editing.value = editingNew ? 0 : -30;
-    setIsEditing(editingNew);
-  };
-
-  const animatedRowStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: withTiming(editing.value) }],
-    };
-  });
-
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      {/* <Stack.Screen
+    <View style={styles.container}>
+      <Stack.Screen
         options={{
-          headerLeft: () => (
-            <TouchableOpacity onPress={onEdit}>
-              <Text style={{ color: Colors.primary, fontSize: 18 }}>
-                {isEditing ? "Done" : "Edit"}
-              </Text>
-            </TouchableOpacity>
+          headerRight: () => (
+            <Pressable onPress={() => {}}>
+              <MaterialIcons name="sort" size={24} color={Colors.iconGray} />
+            </Pressable>
           ),
         }}
-      /> */}
+      />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -95,33 +72,22 @@ export default function WatchlistPage() {
             scrollEnabled={false}
             data={watchListData}
             itemLayoutAnimation={transition}
+            ItemSeparatorComponent={() => (
+              <View style={styles.itemSeperatorContainer}>
+                <View style={styles.itemSeperator} />
+              </View>
+            )}
             renderItem={({ item, index }) => (
               <Animated.View
-                style={defaultStyles.block}
+                style={styles.itemWrapper}
                 entering={FadeInUp.delay(index * 10)}
                 exiting={FadeOutUp}
               >
-                <Animated.View style={[defaultStyles.item]}>
-                  {/* <AnimatedTouchableOpacity
-                    onPress={() => onDelete(item)}
-                    style={[animatedRowStyles]}
-                  >
-                    <Ionicons name="remove-circle" size={24} color={Colors.red} />
-                  </AnimatedTouchableOpacity> */}
-                  <Image
-                    source={{ uri: item.images[0]?.url }}
-                    style={{
-                      width: 125,
-                      height: "75%",
-                      borderRadius: 10,
-                      objectFit: "cover",
-                      borderWidth: 1,
-                      borderColor: Colors.lightGray,
-                    }}
-                  />
-                  <View style={{ flex: 1, gap: 3, marginLeft: 5 }}>
+                <Animated.View style={styles.itemContainer}>
+                  <Image source={{ uri: item.images[0]?.url }} style={styles.itemCarImage} />
+                  <View style={styles.detailsContainer}>
                     <Text
-                      style={{ fontSize: 18, textTransform: "capitalize", fontWeight: "600" }}
+                      style={styles.itemCarTitle}
                     >{`${item.year} ${item.make} ${item.model}`}</Text>
                     <DetailsText text={`· ${item.transmission}`} />
                     <DetailsText text={`· ${item.body}`} />
@@ -129,44 +95,24 @@ export default function WatchlistPage() {
                       text={`· ${
                         item.odometer && item.odometer > 0
                           ? formatNumberWithCommas(Number(item.odometer))
-                          : "-"
-                      } KMs`}
+                          : ""
+                      } km`}
                     />
                     <DetailsText text={`· ${item.capacity} ${item.fuelType}`} />
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: Colors.primary,
-                        marginTop: 10,
-                        fontWeight: "600",
-                      }}
-                    >{`${
+                    <Text style={styles.itemPriceText}>{`${
                       item.price && item.price > 0
                         ? `$${formatNumberWithCommas(item.price)}`
                         : "Enquire"
                     }`}</Text>
                   </View>
-                  {/* <Ionicons name="chevron-forward" size={20} color={Colors.primary} /> */}
                 </Animated.View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-around",
-                    paddingVertical: 10,
-                    paddingHorizontal: 30,
-                    alignItems: "center",
-                    gap: 20,
-                  }}
-                >
-                  <TouchableOpacity onPress={() => onDelete(item)}>
-                    <Ionicons name="trash-outline" color={Colors.primary} size={26} />
+                <View style={styles.itemButtonsContainer}>
+                  <TouchableOpacity onPress={() => onDelete(item)} style={styles.iconContainer}>
+                    <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
                   </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Ionicons name="call-outline" color={Colors.primary} size={26} />
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Ionicons name="send-outline" color={Colors.primary} size={26} />
-                  </TouchableOpacity>
+                  {/* // TODO: after comet chat is integrated completely */}
+                  <Button title="Message" onPress={() => {}} />
+                  <Button title="Call" onPress={() => {}} />
                 </View>
               </Animated.View>
             )}
@@ -178,5 +124,75 @@ export default function WatchlistPage() {
 }
 
 function DetailsText({ text }: { text: string }) {
-  return <Text style={{ fontSize: 12, textTransform: "capitalize" }}>{text}</Text>;
+  return <Text style={styles.detailText}>{text}</Text>;
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.background },
+  itemWrapper: {
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    padding: 15,
+  },
+  itemContainer: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    gap: 10,
+  },
+  itemSeperatorContainer: {
+    paddingHorizontal: 10,
+  },
+  itemSeperator: {
+    borderBottomColor: Colors.borderGray,
+    borderBottomWidth: 1,
+    paddingHorizontal: "10%",
+  },
+  itemCarImage: {
+    minWidth: 125,
+    width: "40%",
+    height: 125,
+    borderRadius: 8,
+    objectFit: "cover",
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+  },
+  itemCarTitle: {
+    fontSize: 18,
+    textTransform: "capitalize",
+    fontWeight: "600",
+    fontFamily: "SF_Pro_Display_Bold",
+    lineHeight: 22,
+  },
+  itemPriceText: {
+    fontSize: 18,
+    color: Colors.primary,
+    marginTop: 10,
+    fontWeight: "600",
+    fontFamily: "SF_Pro_Display_Bold",
+  },
+  itemButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: 15,
+    paddingBottom: 5,
+    alignItems: "center",
+    gap: 10,
+  },
+  iconContainer: {
+    borderRadius: 25,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: Colors.borderGray,
+    backgroundColor: Colors.lightGrayBackground,
+    paddingHorizontal: 16,
+  },
+  detailsContainer: { flex: 1, gap: 3, marginLeft: 5 },
+  detailText: {
+    fontSize: 14,
+    textTransform: "capitalize",
+    fontFamily: "SF_Pro_Display_Light",
+    lineHeight: 22,
+  },
+});
