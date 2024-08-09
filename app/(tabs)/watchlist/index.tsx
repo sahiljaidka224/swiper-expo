@@ -25,7 +25,7 @@ const transition = CurvedTransition.delay(100);
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function WatchlistPage() {
-  const { cars, isLoading, error: getError } = useGetWatchlist();
+  const { cars, isLoading, error: getError, refresh } = useGetWatchlist();
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
 
@@ -70,6 +70,7 @@ export default function WatchlistPage() {
         <Animated.View layout={transition}>
           <Animated.FlatList
             refreshing={isLoading}
+            onRefresh={refresh}
             skipEnteringExitingAnimations
             keyExtractor={(item) => item.carId}
             scrollEnabled={false}
@@ -80,6 +81,15 @@ export default function WatchlistPage() {
                 <View style={styles.itemSeperator} />
               </View>
             )}
+            ListFooterComponent={() =>
+              isLoading && cars?.length > 0 ? (
+                <ActivityIndicator size="large" color={Colors.primary} />
+              ) : null
+            }
+            onEndReached={() => {
+              console.log("endddd");
+            }}
+            onEndReachedThreshold={0.5}
             renderItem={({ item, index }) => (
               <Animated.View
                 style={styles.itemWrapper}

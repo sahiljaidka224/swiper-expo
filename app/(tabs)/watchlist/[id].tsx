@@ -18,6 +18,7 @@ import { useState } from "react";
 import * as Linking from "expo-linking";
 
 const placeholderImage = require("@/assets/images/no-image-large.png");
+const userPlaceholderImage = require("@/assets/images/user-placeholder.png");
 
 export default function WatchlistCarDetailPage() {
   const { id } = useLocalSearchParams();
@@ -88,36 +89,28 @@ export default function WatchlistCarDetailPage() {
             </View>
             <View style={styles.detailsContainer}>
               <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
-              {car?.odometer && (
-                <DescriptionView
-                  title="Mileage"
-                  value={`${formatNumberWithCommas(car?.odometer)} km`}
-                  uppercase
-                />
-              )}
-              {car?.transmission && (
-                <DescriptionView title="Transmission" value={car?.transmission} />
-              )}
-              {car?.rego && <DescriptionView title="Registration" value={car?.rego} uppercase />}
-              {car?.regoExpiry && (
-                <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
-              )}
-              {car?.regoState && (
-                <DescriptionView title="Registration State" value={car?.regoState} />
-              )}
-              {car?.year && <DescriptionView title="Year of manufacture" value={car?.year} />}
-              {car?.compliance && (
-                <DescriptionView title="Compliance Date" value={car?.compliance} />
-              )}
-              {car?.colour && <DescriptionView title="Colour" value={car?.colour} />}
-              {car?.body && <DescriptionView title="Body Style" value={car?.body} />}
-              {car?.capacity && <DescriptionView title="Capacity" value={car?.capacity} />}
-              {car?.fuelType && <DescriptionView title="Fuel" value={car?.fuelType} />}
-              {car?.series && <DescriptionView title="Series" value={car?.series} />}
-              {car?.vin && <DescriptionView title="VIN" value={car?.vin} uppercase />}
-              {car?.engineNo && (
-                <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
-              )}
+
+              <DescriptionView
+                title="Mileage"
+                value={`${formatNumberWithCommas(car?.odometer)} km`}
+                uppercase
+              />
+
+              <DescriptionView title="Transmission" value={car?.transmission} />
+              <DescriptionView title="Registration" value={car?.rego} uppercase />
+
+              <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
+              <DescriptionView title="Registration State" value={car?.regoState} />
+              <DescriptionView title="Year of manufacture" value={car?.year} />
+              <DescriptionView title="Compliance Date" value={car?.compliance} />
+              <DescriptionView title="Colour" value={car?.colour} />
+              <DescriptionView title="Body Style" value={car?.body} />
+              <DescriptionView title="Capacity" value={car?.capacity} />
+              <DescriptionView title="Fuel" value={car?.fuelType} />
+              <DescriptionView title="Series" value={car?.series} />
+              <DescriptionView title="VIN" value={car?.vin} uppercase />
+
+              <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
               <ContactCard
                 name={car?.primaryContact?.displayName ?? ""}
                 organisationName={car?.organisation?.name ?? ""}
@@ -154,6 +147,7 @@ function DescriptionView({
   value: string;
   uppercase?: boolean;
 }) {
+  if (!value) return null;
   return (
     <View style={styles.descriptionContainer}>
       <Text style={styles.descriptionTitle}>{title}:</Text>
@@ -190,6 +184,7 @@ function Avatar({ userId }: { userId: string }) {
   return (
     <View>
       <Image
+        defaultSource={userPlaceholderImage}
         style={styles.avatarImage}
         source={{ uri: `https://swiperstorageaccount.blob.core.windows.net/avatars/${userId}.png` }}
       />
@@ -272,6 +267,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     flexWrap: "wrap",
     textAlign: "justify",
+    textTransform: "capitalize",
   },
   avatarImage: {
     width: 50,
