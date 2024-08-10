@@ -12,9 +12,9 @@ export default function WatchlistLayout() {
           headerBlurEffect: "regular",
           headerTransparent: true,
           // headerStyle: { backgroundColor: Colors.background },
-          headerSearchBarOptions: {
-            placeholder: "Search",
-          },
+          // headerSearchBarOptions: {
+          //   placeholder: "Search",
+          // },
         }}
       />
       <Stack.Screen

@@ -36,9 +36,9 @@ export function useGetWatchlist(
   const [page, setPage] = useState(initialPage);
   const from = page * limit;
   const { data, error, isLoading, mutate } = useSWR(
-    `https://backend-swiper.datalinks.nl/car/${
-      context === "watchlist" ? "followed" : "stock"
-    }?1=1&from=${from}&order_by=dateCreate&order_direction=desc`,
+    `https://backend-swiper.datalinks.nl/car/${context === "watchlist" ? "followed" : "stock"}?1=1${
+      from > 35 ? `&from=${from}` : ""
+    }&order_by=dateCreate&order_direction=desc`,
     getCarsInWatchlist
   );
 

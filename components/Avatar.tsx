@@ -5,7 +5,7 @@ const userPlaceholderImage = require("@/assets/images/user-placeholder.png");
 
 function Avatar({ userId }: { userId: string }) {
   return (
-    <View>
+    <View style={styles.avatarContainer}>
       <Image
         defaultSource={userPlaceholderImage}
         style={styles.avatarImage}
@@ -19,8 +19,12 @@ export default React.memo(Avatar);
 
 const styles = StyleSheet.create({
   avatarImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    minHeight: 50,
+    minWidth: 50,
+    aspectRatio: 1,
+    borderRadius: 999999,
+  },
+  avatarContainer: {
+    flex: 1,
   },
 });

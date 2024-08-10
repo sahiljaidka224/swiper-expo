@@ -2,6 +2,7 @@ import Colors from "@/constants/Colors";
 import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import Avatar from "./Avatar";
+import { router } from "expo-router";
 
 function ContactCard({
   userId,
@@ -12,9 +13,14 @@ function ContactCard({
   name: string;
   organisationName: string;
 }) {
+  const onPress = () => {
+    router.push({ pathname: `/(stock)/userId`, params: { userId } });
+  };
   return (
-    <Pressable style={styles.contactCardContainer}>
-      <Avatar userId={userId} />
+    <Pressable style={styles.contactCardContainer} onPress={onPress}>
+      <View style={styles.avatarContainer}>
+        <Avatar userId={userId} />
+      </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.contactName}>{name}</Text>
         <Text style={styles.organisationName}>{organisationName}</Text>
@@ -26,6 +32,7 @@ function ContactCard({
 export default React.memo(ContactCard);
 
 const styles = StyleSheet.create({
+  avatarContainer: { width: 50, height: 50, borderRadius: 25 },
   contactCardContainer: {
     flexDirection: "row",
     gap: 10,
@@ -57,7 +64,7 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     lineHeight: 22,
     flexWrap: "wrap",
-    textAlign: "justify",
+    textAlign: "left",
     textTransform: "capitalize",
   },
 });

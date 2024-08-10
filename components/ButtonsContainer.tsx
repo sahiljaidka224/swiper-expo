@@ -11,9 +11,16 @@ interface ButtonsContainerProps {
   onMessage: () => void;
   phoneNumber: string | null;
   carId: string;
+  buttonsType?: "primary" | "secondary";
 }
 
-function ButtonsContainer({ onMessage, onDelete, phoneNumber, carId }: ButtonsContainerProps) {
+function ButtonsContainer({
+  onMessage,
+  onDelete,
+  phoneNumber,
+  carId,
+  buttonsType = "primary",
+}: ButtonsContainerProps) {
   const onDeletePress = (carId: string) => {
     if (onDelete) {
       onDelete(carId);
@@ -37,8 +44,8 @@ function ButtonsContainer({ onMessage, onDelete, phoneNumber, carId }: ButtonsCo
         </TouchableOpacity>
       )}
       {/* // TODO: after comet chat is integrated completely */}
-      <Button title="Message" onPress={onMessage} />
-      <Button title="Call" onPress={() => onCallPress(phoneNumber)} />
+      <Button title="Message" onPress={onMessage} type={buttonsType} />
+      <Button title="Call" onPress={() => onCallPress(phoneNumber)} type={buttonsType} />
     </View>
   );
 }
