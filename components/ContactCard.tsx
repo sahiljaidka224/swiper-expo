@@ -3,6 +3,7 @@ import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import Avatar from "./Avatar";
 import { router } from "expo-router";
+import { useSegments } from "expo-router";
 
 function ContactCard({
   userId,
@@ -13,8 +14,12 @@ function ContactCard({
   name: string;
   organisationName: string;
 }) {
+  const segments = useSegments();
   const onPress = () => {
-    router.push({ pathname: `/(stock)/userId`, params: { userId } });
+    router.push({
+      pathname: `/${segments.includes("(watchlist)") ? "(watchlist)" : "(stock)"}/user/[userId]`,
+      params: { id: userId },
+    });
   };
   return (
     <Pressable style={styles.contactCardContainer} onPress={onPress}>

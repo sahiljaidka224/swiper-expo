@@ -63,7 +63,7 @@ function BaseLayout() {
     console.log({ isSignedIn });
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace("/(tabs)/watchlist");
+      router.replace("/(tabs)/(watchlist)");
     } else if (!isSignedIn) {
       router.replace("/");
     }

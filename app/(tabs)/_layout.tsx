@@ -33,7 +33,7 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="watchlist"
+          name="(watchlist)"
           options={{
             title: "",
             headerShown: false,
@@ -57,7 +57,7 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="stock"
+          name="(stock)"
           options={{
             title: "",
             headerShown: false,

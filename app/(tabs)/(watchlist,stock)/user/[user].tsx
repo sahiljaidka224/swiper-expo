@@ -7,8 +7,8 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default function UserProfile() {
-  const { userId } = useLocalSearchParams();
-  const { user, isLoading, error } = useGetUserDetails(userId as string);
+  const { id } = useLocalSearchParams();
+  const { user, isLoading, error } = useGetUserDetails(id as string);
 
   return (
     <View style={styles.container}>
@@ -16,7 +16,7 @@ export default function UserProfile() {
       <View style={styles.userContainer}>
         {isLoading ? <ActivityIndicator size="large" color={Colors.primary} /> : null}
         <View style={styles.avatarContainer}>
-          <Avatar userId={userId as string} />
+          <Avatar userId={id as string} />
         </View>
         <Text style={styles.nameText}>{user?.displayName}</Text>
         <ButtonsContainer
@@ -72,5 +72,4 @@ const styles = StyleSheet.create({
 
     elevation: 5,
   },
-  organisationContainer: {},
 });

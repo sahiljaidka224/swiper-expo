@@ -10,7 +10,7 @@ const placeholderImage = require("@/assets/images/no-image.png");
 
 function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist" }) {
   const onAnimatePress = (carId: string) => {
-    router.push({ pathname: `/(tabs)/${context}/[id]`, params: { id: carId } });
+    router.push({ pathname: `/(tabs)/(${context})/car/[id]`, params: { id: carId } });
   };
 
   return (

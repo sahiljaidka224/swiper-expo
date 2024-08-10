@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
 
-export default function WatchlistLayout() {
+export default function MyStockLayout() {
   return (
     <Stack>
       <Stack.Screen
         name="index"
         options={{
-          title: "Watchlist",
+          title: "My Stock",
           headerLargeTitle: true,
           headerShadowVisible: false,
           headerBlurEffect: "regular",
@@ -18,7 +18,13 @@ export default function WatchlistLayout() {
         }}
       />
       <Stack.Screen
-        name="[id]"
+        name="car/[id]"
+        options={{
+          title: "",
+        }}
+      />
+      <Stack.Screen
+        name="user/[user]"
         options={{
           title: "",
         }}

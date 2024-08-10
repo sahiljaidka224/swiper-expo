@@ -14,7 +14,6 @@ const getUserDetails = async (url: string) => {
 };
 
 export function useGetUserDetails(userId: string) {
-  console.log({ userId });
   const { data, error, isLoading } = useSWR(
     `https://backend-swiper.datalinks.nl/user/${userId}`,
     getUserDetails
