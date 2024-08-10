@@ -1,5 +1,4 @@
 import Colors from "@/constants/Colors";
-import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-reanimated";
@@ -8,12 +7,14 @@ import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlis
 import CarOverview from "./CarOverview";
 import ButtonsContainer from "./ButtonsContainer";
 
-interface CarsListProps {}
+interface CarsListProps {
+  context: "stock" | "watchlist";
+}
 
 const transition = CurvedTransition.delay(100);
 
-export function CarsList({}: CarsListProps) {
-  const { cars, isLoading, error: getError, refresh, fetchMore } = useGetWatchlist();
+export function CarsList({ context }: CarsListProps) {
+  const { cars, isLoading, error: getError, refresh, fetchMore } = useGetWatchlist(context);
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -27,10 +28,6 @@ export function CarsList({}: CarsListProps) {
       }
     }
   }, [cars]);
-
-  const onAnimatePress = (carId: string) => {
-    router.push({ pathname: `/(tabs)/watchlist/[id]`, params: { id: carId } });
-  };
 
   const onMessagePress = () => {};
 
@@ -68,7 +65,7 @@ export function CarsList({}: CarsListProps) {
           entering={FadeInUp.delay(index * 10)}
           exiting={FadeOutUp}
         >
-          <CarOverview car={item} />
+          <CarOverview car={item} context={context} />
           <ButtonsContainer
             carId={item?.carId}
             onMessage={onMessagePress}
@@ -78,7 +75,7 @@ export function CarsList({}: CarsListProps) {
         </Animated.View>
       );
     },
-    [onAnimatePress, onDeletePress, watchListData]
+    [onDeletePress, watchListData]
   );
 
   return (
@@ -98,7 +95,7 @@ export function CarsList({}: CarsListProps) {
         windowSize={10}
         ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
-        onEndReached={loadMore}
+        onEndReached={context === "stock" ? loadMore : null}
         onEndReachedThreshold={0.5}
         renderItem={renderItem}
         // ListEmptyComponent={ListEmpty}

@@ -5,7 +5,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { CarsList } from "@/components/CarsList";
 
-export default function WatchlistPage() {
+export default function MyStockPage() {
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -21,7 +21,7 @@ export default function WatchlistPage() {
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ paddingBottom: 40 }}
       > */}
-      <CarsList context="watchlist" />
+      <CarsList context="stock" />
       {/* </ScrollView> */}
     </View>
   );

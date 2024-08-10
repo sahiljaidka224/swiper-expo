@@ -23,29 +23,9 @@ export default function TabsRootLayout() {
         }}
       >
         <Tabs.Screen
-          name="watchlist"
-          options={{
-            title: "Watchlist",
-            headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="update" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="calls"
-          options={{
-            title: "Calls",
-            headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="phone-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="swiper"
           options={{
-            title: "Swiper",
+            title: "",
             headerShown: false,
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="car-rental" size={size} color={color} />
@@ -53,9 +33,19 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
+          name="watchlist"
+          options={{
+            title: "",
+            headerShown: false,
+            tabBarIcon: ({ size, color }) => (
+              <MaterialIcons name="update" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="chats"
           options={{
-            title: "Chats",
+            title: "",
             headerShown: false,
             tabBarIcon: ({ size, color }) => (
               <Ionicons name="chatbubbles" size={size} color={color} />
@@ -67,9 +57,29 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
+          name="stock"
+          options={{
+            title: "",
+            headerShown: false,
+            tabBarIcon: ({ size, color }) => (
+              <MaterialIcons name="update" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="calls"
+          options={{
+            title: "",
+            headerShown: false,
+            tabBarIcon: ({ size, color }) => (
+              <MaterialCommunityIcons name="phone-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="settings"
           options={{
-            title: "Settings",
+            title: "",
             headerShown: false,
             tabBarIcon: ({ size, color }) => <Ionicons name="cog" size={size} color={color} />,
           }}

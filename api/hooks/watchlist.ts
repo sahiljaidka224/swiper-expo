@@ -1,3 +1,4 @@
+import { useState } from "react";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
@@ -27,15 +28,25 @@ const removeCarFromWatchlist = async (url: string, { arg }: { arg: { carId: stri
   return response.json();
 };
 
-export function useGetWatchlist(page: number = 1, limit: number = 35) {
+export function useGetWatchlist(
+  context: "stock" | "watchlist",
+  initialPage: number = 1,
+  limit: number = 35
+) {
+  const [page, setPage] = useState(initialPage);
   const from = page * limit;
   const { data, error, isLoading, mutate } = useSWR(
-    `https://backend-swiper.datalinks.nl/car/followed?1=1&from=${from}&order_by=dateCreate&order_direction=desc`,
+    `https://backend-swiper.datalinks.nl/car/${
+      context === "watchlist" ? "followed" : "stock"
+    }?1=1&from=${from}&order_by=dateCreate&order_direction=desc`,
     getCarsInWatchlist
   );
 
   const refresh = () => mutate();
-  const fetchMore = (newPage: number) => mutate();
+  const fetchMore = (newPage: number) => {
+    setPage(newPage);
+    mutate();
+  };
 
   return {
     cars: data?.data ?? [],

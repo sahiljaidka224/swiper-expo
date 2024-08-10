@@ -1,5 +1,6 @@
 export default {
   primary: "#1063FD",
+  primaryLight: "#CFE0FF",
   muted: "#3A5A92",
   background: "#fff",
   gray: "#6E6E73",

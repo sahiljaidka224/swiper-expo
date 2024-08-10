@@ -8,9 +8,9 @@ import Animated from "react-native-reanimated";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
 
-function CarOverview({ car }: { car: any }) {
+function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist" }) {
   const onAnimatePress = (carId: string) => {
-    router.push({ pathname: `/(tabs)/watchlist/[id]`, params: { id: carId } });
+    router.push({ pathname: `/(tabs)/${context}/[id]`, params: { id: carId } });
   };
 
   return (
@@ -28,10 +28,16 @@ function CarOverview({ car }: { car: any }) {
         {(car?.capacity || car?.fuelType) && (
           <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
         )}
-
-        <Text style={styles.itemPriceText}>{`${
-          car?.price && car?.price > 0 ? `$${formatNumberWithCommas(car.price)}` : "Enquire"
-        }`}</Text>
+        <View style={styles.priceContainer}>
+          <Text style={styles.itemPriceText}>{`${
+            car?.price && car?.price > 0 ? `$${formatNumberWithCommas(car.price)}` : "Enquire"
+          }`}</Text>
+          {car?.daysInStock ? (
+            <View style={styles.daysInStockContainer}>
+              <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
+            </View>
+          ) : null}
+        </View>
       </View>
     </AnimatedPressable>
   );
@@ -61,7 +67,6 @@ const styles = StyleSheet.create({
   itemPriceText: {
     fontSize: 18,
     color: Colors.primary,
-    marginTop: 10,
     fontWeight: "600",
     fontFamily: "SF_Pro_Display_Bold",
   },
@@ -81,5 +86,21 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Light",
     lineHeight: 22,
     color: Colors.textDark,
+  },
+  priceContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  daysInStockContainer: {
+    backgroundColor: Colors.primaryLight,
+    padding: 5,
+    borderRadius: 20,
+  },
+  daysInStockText: {
+    color: Colors.primary,
+    fontFamily: "SF_Pro_Display_Medium",
+    fontSize: 12,
   },
 });
