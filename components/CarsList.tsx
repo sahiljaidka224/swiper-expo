@@ -5,7 +5,8 @@ import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-re
 
 import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlist";
 import CarOverview from "./CarOverview";
-import ButtonsContainer from "./ButtonsContainer";
+import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
+import StockButtonContainer from "./StockButtonContainer";
 
 interface CarsListProps {
   context: "stock" | "watchlist";
@@ -57,6 +58,8 @@ export function CarsList({ context }: CarsListProps) {
     }
   };
 
+  const onSendToPhoneContacts = () => {};
+
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       return (
@@ -66,12 +69,16 @@ export function CarsList({ context }: CarsListProps) {
           exiting={FadeOutUp}
         >
           <CarOverview car={item} context={context} />
-          <ButtonsContainer
-            carId={item?.carId}
-            onMessage={onMessagePress}
-            phoneNumber={item?.organisation?.phoneNumber}
-            onDelete={onDeletePress}
-          />
+          {context === "watchlist" ? (
+            <WatchlistButtonsContainer
+              carId={item?.carId}
+              onMessage={onMessagePress}
+              phoneNumber={item?.organisation?.phoneNumber}
+              onDelete={onDeletePress}
+            />
+          ) : (
+            <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
+          )}
         </Animated.View>
       );
     },

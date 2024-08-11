@@ -1,6 +1,5 @@
 import React from "react";
-import * as Linking from "expo-linking";
-
+import * as SMS from "expo-sms";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Button from "./Button";
@@ -8,57 +7,49 @@ import Colors from "@/constants/Colors";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
-  onMessage: () => void;
-  phoneNumber: string | null;
+  onPushToSwiperContacts: () => void;
   carId: string;
-  buttonsType?: "primary" | "secondary";
 }
 
-function ButtonsContainer({
-  onMessage,
-  onDelete,
-  phoneNumber,
-  carId,
-  buttonsType = "primary",
-}: ButtonsContainerProps) {
-  const onDeletePress = (carId: string) => {
-    if (onDelete) {
+function StockButtonsContainer({ onPushToSwiperContacts, onDelete, carId }: ButtonsContainerProps) {
+  const onDeletePress = () => {
+    if (onDelete && carId && carId.trim() !== "") {
       onDelete(carId);
     }
   };
 
-  const onCallPress = async (phoneNumber: string | null) => {
-    if (!phoneNumber) return;
-    try {
-      await Linking.openURL(`tel:${phoneNumber}`);
-    } catch (error) {
-      console.warn(`Unable to initiate call ${error}`);
+  const onSMSToPhoneContacts = async () => {
+    const isAvailable = await SMS.isAvailableAsync();
+    if (isAvailable) {
+      // do your SMS stuff here
+    } else {
+      // misfortune... there's no SMS available on this device
+      console.log("not available");
     }
   };
 
   return (
     <View style={styles.itemButtonsContainer}>
       {onDelete && (
-        <TouchableOpacity onPress={() => onDeletePress(carId)} style={styles.iconContainer}>
+        <TouchableOpacity onPress={onDeletePress} style={styles.iconContainer}>
           <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
         </TouchableOpacity>
       )}
       {/* // TODO: after comet chat is integrated completely */}
-      <Button title="Message" onPress={onMessage} type={buttonsType} />
-      <Button title="Call" onPress={() => onCallPress(phoneNumber)} type={buttonsType} />
+      <Button title="Push to Swiper Users" onPress={onPushToSwiperContacts} />
+      <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
     </View>
   );
 }
 
-export default React.memo(ButtonsContainer);
+export default React.memo(StockButtonsContainer);
 
 const styles = StyleSheet.create({
   itemButtonsContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     paddingTop: 15,
     paddingBottom: 5,
-    alignItems: "center",
     gap: 10,
   },
   iconContainer: {

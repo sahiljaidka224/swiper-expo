@@ -1,5 +1,5 @@
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, usePathname } from "expo-router";
+import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
 import { useGetCarDetails } from "@/api/hooks/car-detail";
 import Colors from "@/constants/Colors";
 
@@ -7,6 +7,7 @@ import CarDetail from "@/components/CarDetail";
 import Carousel from "@/components/Carousel";
 
 export default function CarDetailPage() {
+  const segments = useSegments();
   const { id } = useLocalSearchParams();
   const { car, isLoading, error } = useGetCarDetails(id as string);
   const images =
@@ -25,7 +26,10 @@ export default function CarDetailPage() {
         {car && (
           <>
             <Carousel images={images} price={car?.price} />
-            <CarDetail car={car} />
+            <CarDetail
+              car={car}
+              context={segments.includes("(watchlist)") ? "watchlist" : "stock"}
+            />
           </>
         )}
       </ScrollView>

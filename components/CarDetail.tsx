@@ -2,14 +2,16 @@ import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
-import ButtonsContainer from "./ButtonsContainer";
+import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import ContactCard from "./ContactCard";
+import StockButtonContainer from "./StockButtonContainer";
 
 interface CarDetailProps {
   car: any;
+  context: "watchlist" | "stock";
 }
 
-function CarDetail({ car }: CarDetailProps) {
+function CarDetail({ car, context }: CarDetailProps) {
   return (
     <View style={styles.detailsContainer}>
       <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
@@ -31,16 +33,23 @@ function CarDetail({ car }: CarDetailProps) {
       <DescriptionView title="Series" value={car?.series} />
       <DescriptionView title="VIN" value={car?.vin} uppercase />
       <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
-      <ContactCard
-        name={car?.primaryContact?.displayName ?? ""}
-        organisationName={car?.organisation?.name ?? ""}
-        userId={car?.primaryContact?.userId ?? ""}
-      />
-      <ButtonsContainer
-        onMessage={() => {}}
-        phoneNumber={car?.primaryContact?.phoneNumber}
-        carId={car?.carId}
-      />
+
+      {context === "stock" ? (
+        <StockButtonContainer carId="" onPushToSwiperContacts={() => {}} />
+      ) : (
+        <>
+          <ContactCard
+            name={car?.primaryContact?.displayName ?? ""}
+            organisationName={car?.organisation?.name ?? ""}
+            userId={car?.primaryContact?.userId ?? ""}
+          />
+          <WatchlistButtonsContainer
+            onMessage={() => {}}
+            phoneNumber={car?.primaryContact?.phoneNumber}
+            carId={car?.carId}
+          />
+        </>
+      )}
     </View>
   );
 }

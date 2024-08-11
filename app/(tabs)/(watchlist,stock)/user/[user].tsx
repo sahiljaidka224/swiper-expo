@@ -1,6 +1,6 @@
 import { useGetUserDetails } from "@/api/hooks/user";
 import Avatar from "@/components/Avatar";
-import ButtonsContainer from "@/components/ButtonsContainer";
+import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import OrganisationCard from "@/components/OrganisationContactCard";
 import Colors from "@/constants/Colors";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -19,7 +19,7 @@ export default function UserProfile() {
           <Avatar userId={id as string} />
         </View>
         <Text style={styles.nameText}>{user?.displayName}</Text>
-        <ButtonsContainer
+        <WatchlistButtonsContainer
           onMessage={() => {}}
           carId=""
           phoneNumber={user?.phoneNumber}
