@@ -32,6 +32,10 @@ export { ErrorBoundary } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 
+if (__DEV__) {
+  require("../ReactotronConfig");
+}
+
 function BaseLayout() {
   const router = useRouter();
   const segments = useSegments();
