@@ -151,7 +151,7 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
         flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
       }}
     >
-      {this.renderRightAction("Archive", Colors.muted, 192, progress)}
+      {this.renderRightAction("Delete", Colors.muted, 192, progress)}
     </View>
   );
 
@@ -172,12 +172,6 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
         enableTrackpadTwoFingerGesture
         rightThreshold={40}
         renderRightActions={this.renderRightActions}
-        onSwipeableOpen={(direction) => {
-          console.log(`Opening swipeable from the ${direction}`);
-        }}
-        onSwipeableClose={(direction) => {
-          console.log(`Closing swipeable to the ${direction}`);
-        }}
       >
         {children}
       </Swipeable>

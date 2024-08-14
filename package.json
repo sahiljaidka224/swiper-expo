@@ -50,7 +50,8 @@
     "react-native-svg": "^15.5.0",
     "react-native-web": "~0.19.10",
     "rn-swiper-list": "^2.0.2",
-    "swr": "^2.2.5"
+    "swr": "^2.2.5",
+    "expo-asset": "~10.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

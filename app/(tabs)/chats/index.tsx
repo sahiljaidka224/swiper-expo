@@ -4,9 +4,21 @@ import ChatRow from "@/components/ChatRow";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
 import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
 import ErrorView from "@/components/Error";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 export default function Chats() {
-  const { conversationList, error, loading } = useGetConversations();
+  const { conversationList, error, loading, fetchConversations } = useGetConversations();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!loading) fetchConversations();
+
+      return () => {
+        //
+      }
+    }, [])
+  );
 
   return (
     <ScrollView
