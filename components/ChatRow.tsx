@@ -27,11 +27,17 @@ export default function ChatRow({ conversation }: ChatRowProps) {
   const isRead = Boolean(lastMessage.getReadAt());
   const isDelivered = Boolean(lastMessage.getDeliveredAt());
   const isSent = Boolean(lastMessageSentAt);
+  const isOutgoingMsg = isOutgoingMessage(senderUID, userUID);
 
-  const metadata = lastMessage.getMetadata() as { organisation_from: string };
+  const metadata = lastMessage.getMetadata() as {
+    organisation_from: string;
+    organisation_to: string;
+  };
   let organisationFromName = "";
   if (metadata) {
-    organisationFromName = metadata["organisation_from"] ?? "";
+    organisationFromName = isOutgoingMsg
+      ? metadata["organisation_to"]
+      : metadata["organisation_from"];
   }
 
   return (
@@ -46,7 +52,7 @@ export default function ChatRow({ conversation }: ChatRowProps) {
               <Text style={styles.nameText}>{userName}</Text>
               <Text style={styles.orgNameText}>{organisationFromName}</Text>
               <View style={styles.msgContainer}>
-                {isSent && isOutgoingMessage(senderUID, userUID) && (
+                {isSent && isOutgoingMsg && (
                   <Ionicons
                     name={isRead || isDelivered ? "checkmark-done-outline" : "checkmark-outline"}
                     size={18}
