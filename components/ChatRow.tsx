@@ -1,61 +1,106 @@
 import Colors from "@/constants/Colors";
-import { format } from "date-fns";
 import { Link } from "expo-router";
-import {
-  Image,
-  Text,
-  TouchableHighlight,
-  View,
-  Animated,
-  StyleSheet,
-  I18nManager,
-} from "react-native";
+import { Text, TouchableHighlight, View, Animated, StyleSheet, I18nManager } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { Component, PropsWithChildren } from "react";
 
 import { RectButton } from "react-native-gesture-handler";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
+import Avatar from "./Avatar";
+import { formatTimestamp, isOutgoingMessage } from "@/utils/cometchat";
 
 interface ChatRowProps {
-  id: string;
-  from: string;
-  date: string;
-  img: string;
-  msg: string;
-  read: boolean;
-  unreadCount: number;
+  conversation: CometChat.Conversation;
 }
 
-export default function ChatRow({ id, from, date, img, msg, read, unreadCount }: ChatRowProps) {
+export default function ChatRow({ conversation }: ChatRowProps) {
+  const conversationWith = conversation.getConversationWith() as CometChat.User;
+  const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
+    conversation?.getLastMessage();
+  const userUID = conversationWith.getUid();
+  const userName = conversationWith.getName();
+  const lastMessageSentAt = lastMessage.getSentAt();
+  const sender = lastMessage.getSender();
+  const senderUID = sender.getUid();
+  const isRead = Boolean(lastMessage.getReadAt());
+  const isDelivered = Boolean(lastMessage.getDeliveredAt());
+  const isSent = Boolean(lastMessageSentAt);
+
+  const metadata = lastMessage.getMetadata() as { organisation_from: string };
+  let organisationFromName = "";
+  if (metadata) {
+    organisationFromName = metadata["organisation_from"] ?? "";
+  }
+
   return (
     <AppleStyleSwipeableRow>
-      <Link href={`/(tabs)/chats/${id}`} asChild>
-        <TouchableHighlight activeOpacity={0.6} underlayColor={Colors.lightGray}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 14,
-              paddingLeft: 20,
-              paddingVertical: 10,
-            }}
-          >
-            <Image source={{ uri: img }} style={{ width: 50, height: 50, borderRadius: 25 }} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>{from}</Text>
-              <Text style={{ fontSize: 16, color: "#888" }}>
-                {msg.length > 40 ? `${msg.substring(0, 40)}...` : msg}
-              </Text>
+      <Link href={`/(tabs)/chats/${userUID}`} asChild>
+        <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
+          <View style={styles.container}>
+            <View style={styles.avatarContainer}>
+              <Avatar userId={userUID} />
             </View>
-            <Text style={{ color: Colors.gray, paddingRight: 20, alignSelf: "flex-start" }}>
-              {format(date, "MM.dd.yyyy")}
-            </Text>
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>{userName}</Text>
+              <Text style={styles.orgNameText}>{organisationFromName}</Text>
+              <View style={styles.msgContainer}>
+                {isSent && isOutgoingMessage(senderUID, userUID) && (
+                  <Ionicons
+                    name={isRead || isDelivered ? "checkmark-done-outline" : "checkmark-outline"}
+                    size={18}
+                    color={isRead ? Colors.primary : Colors.iconGray}
+                  />
+                )}
+                <MessageText lastMessage={lastMessage} />
+              </View>
+            </View>
+            <Text style={styles.timeStampContainer}>{formatTimestamp(lastMessageSentAt)}</Text>
           </View>
         </TouchableHighlight>
       </Link>
     </AppleStyleSwipeableRow>
   );
+}
+
+function MessageText({
+  lastMessage,
+}: {
+  lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage;
+}) {
+  const lastMessageType = lastMessage.getType();
+  let messageText = "";
+  switch (lastMessageType) {
+    case "image":
+      messageText = "Image";
+      return (
+        <>
+          <Ionicons name="image-outline" size={18} color="black" />
+          <Text style={styles.msgText}>{messageText}</Text>
+        </>
+      );
+    case "video":
+      messageText = "Video";
+      return (
+        <>
+          <Ionicons name="videocam-outline" size={18} color="black" />
+          <Text style={styles.msgText}>{messageText}</Text>
+        </>
+      );
+    default:
+      if (lastMessage instanceof CometChat.TextMessage) {
+        messageText = lastMessage.getText();
+      }
+
+      return (
+        <>
+          <Text style={styles.msgText} numberOfLines={2}>
+            {messageText.length > 80 ? `${messageText}...` : messageText}
+          </Text>
+        </>
+      );
+  }
 }
 
 class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
@@ -100,8 +145,7 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
         flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
       }}
     >
-      {this.renderRightAction("More", "#C8C7CD", 192, progress)}
-      {this.renderRightAction("Archive", Colors.muted, 128, progress)}
+      {this.renderRightAction("Archive", Colors.muted, 192, progress)}
     </View>
   );
 
@@ -151,5 +195,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     justifyContent: "center",
+  },
+  avatarContainer: {
+    width: 55,
+    height: 55,
+  },
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 10,
+    paddingVertical: 12,
+  },
+  textContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  nameText: {
+    fontSize: 18,
+    fontFamily: "SF_Pro_Display_Medium",
+    color: Colors.textDark,
+    lineHeight: 21,
+    textTransform: "capitalize",
+  },
+  orgNameText: {
+    fontSize: 16,
+    color: Colors.textLight,
+    fontFamily: "SF_Pro_Display_Light",
+    textTransform: "capitalize",
+  },
+  msgText: {
+    fontSize: 16,
+    color: Colors.textDark,
+    fontFamily: "SF_Pro_Display_Regular",
+  },
+  msgContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 3,
+  },
+  timeStampContainer: {
+    color: Colors.gray,
+    top: 10,
+    alignSelf: "flex-start",
+    position: "absolute",
+    right: 10,
   },
 });

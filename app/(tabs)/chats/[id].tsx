@@ -1,6 +1,5 @@
-import { ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, View, Text } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import messageData from "@/assets/data/messages.json";
 import {
   Bubble,
   GiftedChat,
@@ -12,29 +11,24 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { useGetMessages } from "@/hooks/cometchat/messages";
+import { Stack, useLocalSearchParams } from "expo-router";
+import Avatar from "@/components/Avatar";
 
 export default function ChatDetailsPage() {
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const { id } = useLocalSearchParams();
+  const { messages: chatMessages, error, loading } = useGetMessages(id as string);
+  const [messages, setMessages] = useState<IMessage[]>();
   const insets = useSafeAreaInsets();
   const [text, setText] = useState<string>("");
 
   useEffect(() => {
     setMessages([
-      ...messageData.map((message) => {
-        return {
-          _id: message.id,
-          text: message.msg,
-          createdAt: new Date(message.date),
-          user: {
-            _id: message.from,
-            name: message.from ? "You" : "Bob",
-          },
-        };
-      }),
+      ...chatMessages.reverse(),
       {
         _id: 0,
         system: true,
-        text: "All your base are belong to us",
+        text: "All your messages are encrypted and secured",
         createdAt: new Date(),
         user: {
           _id: 0,
@@ -42,7 +36,7 @@ export default function ChatDetailsPage() {
         },
       },
     ]);
-  }, []);
+  }, [chatMessages]);
 
   const onSend = useCallback((messages: IMessage[]) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
@@ -53,14 +47,37 @@ export default function ChatDetailsPage() {
       source={require("@/assets/images/pattern.png")}
       style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
     >
+      <Stack.Screen
+        // name="[id]"
+        options={{
+          headerTitle: () => (
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                paddingBottom: 4,
+                alignItems: "center",
+                flex: 1,
+              }}
+            >
+              <View style={{ width: 40, height: 40 }}>
+                <Avatar userId={id as string} />
+              </View>
+              <Text style={{ fontSize: 16, fontWeight: "500" }}>Domenic Ruberto</Text>
+            </View>
+          ),
+        }}
+      />
       <GiftedChat
         messages={messages}
         onSend={(messages: IMessage[]) => onSend(messages)}
-        user={{ _id: 1 }}
+        user={{ _id: 1, name: "Domenic" }}
         onInputTextChanged={setText}
         bottomOffset={insets.bottom}
         renderAvatar={null}
+        minInputToolbarHeight={50}
         maxComposerHeight={100}
+        keyboardShouldPersistTaps="handled"
         renderSystemMessage={(props) => (
           <SystemMessage {...props} textStyle={{ color: Colors.gray }} />
         )}

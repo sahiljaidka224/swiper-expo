@@ -9,6 +9,7 @@ import { View } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { SWRConfig } from "swr";
 import { fetcher } from "@/utils/fetcher";
+import { cometChatInit } from "@/hooks/cometchat";
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const tokenCache = {
@@ -67,7 +68,47 @@ function BaseLayout() {
     console.log({ isSignedIn });
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace("/(tabs)/(watchlist)");
+      (async () => {
+        const isSuccess = await cometChatInit();
+        console.log({ isSuccess });
+        if (isSuccess) {
+          router.replace("/(tabs)/chats");
+        }
+      })();
+      // let appSetting = new CometChat.AppSettingsBuilder()
+      //   .subscribePresenceForAllUsers()
+      //   .setRegion(process.env.EXPO_PUBLIC_COMET_CHAT_APP_REGION ?? "")
+      //   .autoEstablishSocketConnection(true)
+      //   .build();
+
+      // CometChat.init(process.env.EXPO_PUBLIC_COMET_CHAT_APP_ID, appSetting).then(
+      //   () => {
+      //     console.log("Initialization completed successfully");
+      //     CometChat.getLoggedinUser().then(
+      //       (user: CometChat.User | null) => {
+      //         if (!user) {
+      //           CometChat.login(
+      //             "4d306670-e733-11ee-95bb-d90b8dbd243d",
+      //             process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY
+      //           ).then(
+      //             (user: CometChat.User) => {
+      //               console.log("Login Successful:", { user });
+      //             },
+      //             (error: CometChat.CometChatException) => {
+      //               console.log("Login failed with exception:", { error });
+      //             }
+      //           );
+      //         }
+      //       },
+      //       (error: CometChat.CometChatException) => {
+      //         console.log("Some Error Occured", { error });
+      //       }
+      //     );
+      //   },
+      //   (error) => {
+      //     console.log("Initialization failed with error:", error);
+      //   }
+      // );
     } else if (!isSignedIn) {
       router.replace("/");
     }
