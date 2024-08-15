@@ -36,7 +36,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      ["expo-asset", { "assets": "./assets/images/pattern.png" }]
+      ["expo-asset", { "assets": ["./assets/images/pattern.png"] }],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with other users.",
+          "cameraPermission": "The app uses camera so you can easily share stock with other users."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

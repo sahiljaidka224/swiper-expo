@@ -35,7 +35,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
 
       {context === "stock" ? (
-        <StockButtonContainer carId="" onPushToSwiperContacts={() => {}} />
+        <StockButtonContainer carId="" onPushToSwiperContacts={() => {}} showSMSOption />
       ) : (
         <>
           <ContactCard

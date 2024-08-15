@@ -2,8 +2,9 @@ import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, Image, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { Image } from "expo-image";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
@@ -16,7 +17,7 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
   return (
     <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
       <Image
-        defaultSource={placeholderImage}
+        placeholder={placeholderImage}
         source={{ uri: car?.images[0]?.url }}
         style={styles.itemCarImage}
       />

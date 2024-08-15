@@ -7,12 +7,14 @@ import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlis
 import CarOverview from "./CarOverview";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import StockButtonContainer from "./StockButtonContainer";
+import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
 
 interface CarsListProps {
   context: "stock" | "watchlist";
 }
 
 const transition = CurvedTransition.delay(100);
+const ITEM_HEIGHT = 400;
 
 export function CarsList({ context }: CarsListProps) {
   const { cars, isLoading, error: getError, refresh, fetchMore } = useGetWatchlist(context);
@@ -22,11 +24,12 @@ export function CarsList({ context }: CarsListProps) {
 
   useEffect(() => {
     if (!isLoading && cars) {
-      if (page === 1) {
-        setWatchlistData(cars);
-      } else {
-        setWatchlistData((prevData) => [...prevData, ...cars]);
-      }
+      setWatchlistData(cars);
+
+      // if (page === 1) {
+      // } else {
+      //   setWatchlistData((prevData) => [...prevData, ...cars]);
+      // }
     }
   }, [cars]);
 
@@ -54,7 +57,7 @@ export function CarsList({ context }: CarsListProps) {
   const loadMore = () => {
     if (!isLoading && cars?.length > 0) {
       setPage(page + 1);
-      fetchMore(page + 1);
+      fetchMore();
     }
   };
 
@@ -86,33 +89,45 @@ export function CarsList({ context }: CarsListProps) {
   );
 
   return (
-    <Animated.View layout={transition}>
-      <Animated.FlatList
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ paddingBottom: 40 }}
-        refreshing={isLoading}
-        onRefresh={refresh}
-        skipEnteringExitingAnimations
-        keyExtractor={(item) => item.carId}
-        scrollEnabled={true}
-        data={watchListData}
-        itemLayoutAnimation={transition}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        windowSize={10}
-        ItemSeparatorComponent={ItemSeperator}
-        ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
-        onEndReached={context === "stock" ? loadMore : null}
-        onEndReachedThreshold={0.5}
-        renderItem={renderItem}
-        // ListEmptyComponent={ListEmpty}
-        // getItemLayout={(_, index) => ({
-        //   length: ITEM_HEIGHT,
-        //   offset: ITEM_HEIGHT * index,
-        //   index,
-        // })}
-      />
-    </Animated.View>
+    <>
+      <Animated.View layout={transition}>
+        {isLoading && (!cars || cars.length === 0) && (
+          <View style={{ marginTop: 150 }}>
+            <CarOverviewLoader />
+            <CarOverviewLoader />
+            <CarOverviewLoader />
+            <CarOverviewLoader />
+            <CarOverviewLoader />
+          </View>
+        )}
+
+        <Animated.FlatList
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{ paddingBottom: 40 }}
+          refreshing={isLoading}
+          onRefresh={refresh}
+          skipEnteringExitingAnimations
+          keyExtractor={(item) => item.carId}
+          scrollEnabled={true}
+          data={watchListData}
+          itemLayoutAnimation={transition}
+          initialNumToRender={15}
+          maxToRenderPerBatch={15}
+          windowSize={15}
+          ItemSeparatorComponent={ItemSeperator}
+          ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
+          onEndReached={context === "stock" ? loadMore : null}
+          onEndReachedThreshold={0.5}
+          renderItem={renderItem}
+          // ListEmptyComponent={ListEmpty} // TODO: List Empty
+          // getItemLayout={(_, index) => ({
+          //   length: ITEM_HEIGHT,
+          //   offset: ITEM_HEIGHT * index,
+          //   index,
+          // })}
+        />
+      </Animated.View>
+    </>
   );
 }
 

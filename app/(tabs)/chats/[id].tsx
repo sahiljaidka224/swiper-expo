@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, View, Text } from "react-native";
+import { ImageBackground, StyleSheet, View, Text, Pressable, Platform } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Bubble,
@@ -18,6 +18,7 @@ import Avatar from "@/components/Avatar";
 import { Image } from "expo-image";
 import { useGetUserDetails } from "@/api/hooks/user";
 import { useAssets } from "expo-asset";
+import * as ImagePicker from "expo-image-picker";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 
@@ -31,9 +32,10 @@ export default function ChatDetailsPage() {
     fetchMessages,
     hasMore,
   } = useGetMessages(id as string);
-  const {sendMessage} = useSendMessage();
+  const { sendMessage, sendMediaMessage } = useSendMessage();
   const [messages, setMessages] = useState<IMessage[]>();
   const insets = useSafeAreaInsets();
+
   const [text, setText] = useState<string>("");
 
   useEffect(() => {
@@ -52,9 +54,73 @@ export default function ChatDetailsPage() {
     ]);
   }, [chatMessages]);
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: 10,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      let files = [];
+      for (let file of result.assets) {
+        const uri = file.uri;
+        let name: string | null = "";
+        let type: string | undefined = "";
+
+        if (Platform.OS === "ios" && file.fileName !== undefined) {
+          name = file.fileName;
+          type = file.type;
+        } else {
+          type = file.type;
+          name = "Camera_001.jpeg";
+        }
+
+        if (type === "video") {
+          type = "video/quicktime";
+          name = "Camera_002.mov";
+        }
+        // TODO: handle video
+
+        let tempFile = {
+          name: name,
+          type: Platform.OS === "android" ? file.type : type,
+          uri: Platform.OS === "android" ? file.uri : file.uri.replace("file://", ""),
+          size: file.fileSize,
+        };
+
+        files.push(tempFile);
+
+        onSend(
+          [
+            {
+              _id: file.fileName ?? file.assetId ?? Math.floor(Math.random() * 1000),
+              text: "",
+              image: type === "image" ? uri : undefined,
+              video: type === "video" ? uri : undefined,
+              createdAt: new Date(),
+              user: {
+                _id: 1,
+                name: "Bob",
+              },
+            },
+          ],
+          ""
+        );
+      }
+
+      sendMediaMessage(id as string, files);
+    }
+  };
+
   const onSend = useCallback((messages: IMessage[], text: string) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
-    sendMessage(id as string, text)
+    if (text.trimEnd().length > 0) sendMessage(id as string, text);
   }, []);
 
   return (
@@ -81,7 +147,7 @@ export default function ChatDetailsPage() {
         infiniteScroll
         loadEarlier={hasMore}
         isLoadingEarlier={loading}
-        // renderMessageImage={MessageImage}
+        renderMessageImage={MessageImage}
         onLoadEarlier={() => {
           fetchMessages();
         }}
@@ -101,7 +167,9 @@ export default function ChatDetailsPage() {
             )}
             {text.length === 0 && (
               <>
-                <Ionicons name="camera-outline" color={Colors.primary} size={28} />
+                <Pressable onPress={pickImage}>
+                  <Ionicons name="camera-outline" color={Colors.primary} size={28} />
+                </Pressable>
                 <Ionicons name="mic-outline" color={Colors.primary} size={28} />
               </>
             )}
@@ -148,7 +216,7 @@ const Header = ({ userId }: { userId: string }) => {
 
 const MessageImage = (props: MessageImageProps<IMessage>) => {
   return (
-    <View style={{ borderRadius: 20, padding: 2, height: 150, width: 250 }}>
+    <View style={{ borderRadius: 30, padding: 5, height: 175, width: 250 }}>
       <Image
         source={props.currentMessage?.image}
         contentFit="cover"

@@ -9,9 +9,15 @@ interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
   onPushToSwiperContacts: () => void;
   carId: string;
+  showSMSOption?: boolean;
 }
 
-function StockButtonsContainer({ onPushToSwiperContacts, onDelete, carId }: ButtonsContainerProps) {
+function StockButtonsContainer({
+  onPushToSwiperContacts,
+  onDelete,
+  carId,
+  showSMSOption = false,
+}: ButtonsContainerProps) {
   const onDeletePress = () => {
     if (onDelete && carId && carId.trim() !== "") {
       onDelete(carId);
@@ -37,7 +43,9 @@ function StockButtonsContainer({ onPushToSwiperContacts, onDelete, carId }: Butt
       )}
       {/* // TODO: after comet chat is integrated completely */}
       <Button title="Push to Swiper Users" onPress={onPushToSwiperContacts} />
-      <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
+      {showSMSOption && (
+        <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
+      )}
     </View>
   );
 }

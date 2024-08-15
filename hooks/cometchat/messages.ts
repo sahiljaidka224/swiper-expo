@@ -101,7 +101,14 @@ export const useGetMessages = (toId: string) => {
 export const useSendMessage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
-  const [message, setMessage] = useState<CometChat.BaseMessage | CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage | CometChat.InteractiveMessage | null>(null);
+  const [message, setMessage] = useState<
+    | CometChat.BaseMessage
+    | CometChat.TextMessage
+    | CometChat.MediaMessage
+    | CometChat.CustomMessage
+    | CometChat.InteractiveMessage
+    | null
+  >(null);
 
   const sendMessage = async (receiverID: string, messageText: string) => {
     setLoading(true);
@@ -112,7 +119,7 @@ export const useSendMessage = () => {
     try {
       const response = await CometChat.sendMessage(textMessage);
       setMessage(response);
-      console.log("Message sent successfully:", response);
+      // console.log("Message sent successfully:", response);
     } catch (error) {
       setError(error as CometChat.CometChatException);
       console.log("Message sending failed with error:", error);
@@ -121,5 +128,31 @@ export const useSendMessage = () => {
     }
   };
 
-  return { sendMessage, loading, error, message };
+  const sendMediaMessage = async (
+    receiverID: string,
+    files: {
+      name: string | null;
+      uri: string;
+      type: string | undefined;
+      size: number | undefined;
+    }[]
+  ) => {
+    setLoading(true);
+    setError(null);
+
+    const mediaMessage = new CometChat.MediaMessage(receiverID, files, "image", "user");
+
+    try {
+      const response = await CometChat.sendMediaMessage(mediaMessage);
+      setMessage(response);
+      // console.log("Media message sent successfully", response);
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
+      console.log("Media message sending failed with error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendMessage, loading, error, message, sendMediaMessage };
 };

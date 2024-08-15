@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
@@ -29,6 +29,51 @@ const removeCarFromWatchlist = async (url: string, { arg }: { arg: { carId: stri
 };
 
 export function useGetWatchlist(
+  context: "stock" | "watchlist",
+  initialPage: number = 1,
+  limit: number = 35
+) {
+  const [page, setPage] = useState(initialPage);
+  const [cars, setCars] = useState<any[]>([]); // Store all fetched cars here
+  const { data, error, isLoading, mutate } = useSWR(
+    `https://backend-swiper.datalinks.nl/car/${
+      context === "watchlist" ? "followed" : "stock"
+    }?from=${(page - 1) * limit}&limit=${limit}&order_by=dateCreate&order_direction=desc`,
+    getCarsInWatchlist
+  );
+
+  // Update cars list when data is fetched
+  useEffect(() => {
+    if (data?.data) {
+      if (page === 1) {
+        setCars(data.data); // For the first page, overwrite cars
+      } else {
+        setCars((prevCars) => [...prevCars, ...data.data]); // Append new cars for subsequent pages
+      }
+    }
+  }, [data, page]);
+
+  // Function to refresh the data (e.g., pull to refresh)
+  const refresh = () => {
+    setPage(1); // Reset to the first page
+    mutate(); // Fetch new data
+  };
+
+  // Function to fetch more data (e.g., infinite scrolling or pagination)
+  const fetchMore = () => {
+    setPage((prevPage) => prevPage + 1); // Increment page
+  };
+
+  return {
+    cars,
+    isLoading,
+    error,
+    refresh,
+    fetchMore,
+  };
+}
+
+export function useGetWatchlist1(
   context: "stock" | "watchlist",
   initialPage: number = 1,
   limit: number = 35

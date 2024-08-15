@@ -1,8 +1,9 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { useState } from "react";
-import { StyleSheet, View, Image, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import PagerView from "react-native-pager-view";
+import { Image } from "expo-image";
 
 const placeholderImage = require("@/assets/images/no-image-large.png");
 
@@ -17,7 +18,7 @@ export default function Carousel({ images, price }: CarouselProps) {
     <View>
       {images.length === 0 ? (
         <Image
-          defaultSource={placeholderImage}
+          placeholder={placeholderImage}
           style={[styles.itemCarImage, { objectFit: "cover" }]}
         />
       ) : (

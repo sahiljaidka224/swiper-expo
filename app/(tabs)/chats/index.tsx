@@ -15,8 +15,8 @@ export default function Chats() {
       if (!loading) fetchConversations();
 
       return () => {
-        //
-      }
+        console.log("This route is now unfocused.");
+      };
     }, [])
   );
 
