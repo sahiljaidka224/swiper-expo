@@ -52,7 +52,8 @@
     "rn-swiper-list": "^2.0.2",
     "swr": "^2.2.5",
     "expo-asset": "~10.0.10",
-    "expo-image-picker": "~15.0.7"
+    "expo-image-picker": "~15.0.7",
+    "@shopify/flash-list": "1.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
