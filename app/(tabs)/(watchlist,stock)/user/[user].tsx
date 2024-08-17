@@ -20,10 +20,10 @@ export default function UserProfile() {
         </View>
         <Text style={styles.nameText}>{user?.displayName}</Text>
         <WatchlistButtonsContainer
-          onMessage={() => {}}
           carId=""
           phoneNumber={user?.phoneNumber}
           buttonsType="secondary"
+          userId={id as string}
         />
       </View>
       {user?.organisations?.map((org: any) => {

@@ -5,20 +5,23 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Button from "./Button";
 import Colors from "@/constants/Colors";
+import { router } from "expo-router";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
-  onMessage: () => void;
+  onMessage?: () => void;
   phoneNumber: string | null;
   carId: string;
   buttonsType?: "primary" | "secondary";
+  userId?: string | null;
 }
 
 function WatchlistButtonsContainer({
-  onMessage,
   onDelete,
+  onMessage,
   phoneNumber,
   carId,
+  userId,
   buttonsType = "primary",
 }: ButtonsContainerProps) {
   const onDeletePress = () => {
@@ -36,6 +39,15 @@ function WatchlistButtonsContainer({
     }
   };
 
+  const onMessagePress = () => {
+    if (!userId && onMessage) {
+      onMessage();
+    }
+    if (userId && userId.trimEnd() !== "") {
+      router.push(`/(tabs)/chats/${userId}`);
+    }
+  };
+
   return (
     <View style={styles.itemButtonsContainer}>
       {onDelete && (
@@ -44,8 +56,8 @@ function WatchlistButtonsContainer({
         </TouchableOpacity>
       )}
       {/* // TODO: after comet chat is integrated completely */}
-      <Button title="Message" onPress={onMessage} type={buttonsType} />
-      <Button title="Call" onPress={onCallPress} type={buttonsType} />
+      <Button title="Call" onPress={onCallPress} type={"secondary"} />
+      <Button title="Message" onPress={onMessagePress} type={buttonsType} />
     </View>
   );
 }

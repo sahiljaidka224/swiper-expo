@@ -104,7 +104,7 @@ export function CarsList({ context }: CarsListProps) {
         <FlashList
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={{ paddingBottom: 40 }}
-          refreshing={isLoading}
+          refreshing={isLoading && cars.length > 0}
           onRefresh={refresh}
           keyExtractor={(item) => item.carId}
           scrollEnabled={true}
