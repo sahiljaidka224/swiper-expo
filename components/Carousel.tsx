@@ -1,9 +1,11 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
+import Modal from "./Modal";
+import { ScrollView } from "react-native-gesture-handler";
 
 const placeholderImage = require("@/assets/images/no-image-large.png");
 
@@ -14,6 +16,8 @@ interface CarouselProps {
 
 export default function Carousel({ images, price }: CarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isModalOpen, setModal] = useState<boolean>(false);
+
   return (
     <View>
       {images.length === 0 ? (
@@ -29,9 +33,16 @@ export default function Carousel({ images, price }: CarouselProps) {
         >
           {images.map(({ url, imageIndex }: { url: string; imageIndex: number }) => {
             return (
-              <View key={`${imageIndex}`} style={styles.imageContainer}>
+              <TouchableOpacity
+                key={`${imageIndex}`}
+                style={styles.imageContainer}
+                activeOpacity={0.75}
+                onPress={() => {
+                  setModal(true);
+                }}
+              >
                 <Image source={{ uri: url }} style={styles.itemCarImage} />
-              </View>
+              </TouchableOpacity>
             );
           })}
         </PagerView>
@@ -58,6 +69,20 @@ export default function Carousel({ images, price }: CarouselProps) {
           );
         })}
       </View>
+      <Modal isVisible={isModalOpen} onClose={() => setModal(false)}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{ paddingBottom: 20, backgroundColor: "#fff" }}
+        >
+          {images.map(({ url, imageIndex }: { url: string; imageIndex: number }) => {
+            return (
+              <View key={`${imageIndex}`} style={styles.imageContainer}>
+                <Image source={{ uri: url }} style={styles.itemCarImage} />
+              </View>
+            );
+          })}
+        </ScrollView>
+      </Modal>
     </View>
   );
 }
