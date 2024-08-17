@@ -20,6 +20,7 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
         placeholder={placeholderImage}
         source={{ uri: car?.images[0]?.url }}
         style={styles.itemCarImage}
+        recyclingKey={car?.images[0]?.carImageId}
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
@@ -31,7 +32,11 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
         )}
         <View style={styles.priceContainer}>
           <Text style={styles.itemPriceText}>{`${
-            car?.price && car?.price > 0 ? `$${formatNumberWithCommas(car.price)}` : "Enquire"
+            car?.price && car?.price > 0
+              ? `$${formatNumberWithCommas(car.price)}`
+              : context === "watchlist"
+              ? "Enquire"
+              : ""
           }`}</Text>
           {car?.daysInStock ? (
             <View style={styles.daysInStockContainer}>

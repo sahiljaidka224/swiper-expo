@@ -19,6 +19,7 @@ import { Image } from "expo-image";
 import { useGetUserDetails } from "@/api/hooks/user";
 import { useAssets } from "expo-asset";
 import * as ImagePicker from "expo-image-picker";
+import { ResizeMode, Video } from "expo-av";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 
@@ -118,6 +119,21 @@ export default function ChatDetailsPage() {
     }
   };
 
+  const MessageVideo = (props: any) => {
+    const { currentMessage } = props;
+    return (
+      <View style={styles.mediaContainer}>
+        <Video
+          resizeMode={ResizeMode.CONTAIN}
+          useNativeControls
+          shouldPlay={false}
+          source={{ uri: currentMessage.video }}
+          style={styles.video}
+        />
+      </View>
+    );
+  };
+
   const onSend = useCallback((messages: IMessage[], text: string) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
     if (text.trimEnd().length > 0) sendMessage(id as string, text);
@@ -148,6 +164,7 @@ export default function ChatDetailsPage() {
         loadEarlier={hasMore}
         isLoadingEarlier={loading}
         renderMessageImage={MessageImage}
+        renderMessageVideo={MessageVideo}
         onLoadEarlier={() => {
           fetchMessages();
         }}
@@ -216,7 +233,7 @@ const Header = ({ userId }: { userId: string }) => {
 
 const MessageImage = (props: MessageImageProps<IMessage>) => {
   return (
-    <View style={{ borderRadius: 30, padding: 5, height: 175, width: 250 }}>
+    <View style={styles.mediaContainer}>
       <Image
         source={props.currentMessage?.image}
         contentFit="cover"
@@ -245,4 +262,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 14,
   },
+  video: { width: "100%", height: "100%", borderRadius: 5 },
+  mediaContainer: { borderRadius: 30, padding: 5, height: 175, width: 250 },
 });
