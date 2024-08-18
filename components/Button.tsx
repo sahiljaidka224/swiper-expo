@@ -31,10 +31,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     flex: 1,
+    justifyContent: "center",
   },
   text: {
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "SF_Pro_Display_Regular",
     textAlign: "center",
   },

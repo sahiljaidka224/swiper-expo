@@ -235,6 +235,7 @@ const MessageImage = (props: MessageImageProps<IMessage>) => {
   return (
     <View style={styles.mediaContainer}>
       <Image
+        priority="high"
         source={props.currentMessage?.image}
         contentFit="cover"
         style={{ width: "100%", height: "100%", borderRadius: 5 }}

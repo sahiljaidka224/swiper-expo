@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -69,6 +69,8 @@ export default function TabsRootLayout() {
         <Tabs.Screen
           name="calls"
           options={{
+            href: null,
+
             title: "",
             headerShown: false,
             tabBarIcon: ({ size, color }) => (
@@ -79,9 +81,18 @@ export default function TabsRootLayout() {
         <Tabs.Screen
           name="settings"
           options={{
+            href: null,
             title: "",
             headerShown: false,
             tabBarIcon: ({ size, color }) => <Ionicons name="cog" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="(add-stock)"
+          options={{
+            title: "",
+            headerShown: false,
+            tabBarIcon: ({ size, color }) => <Feather name="camera" size={size} color={color} />,
           }}
         />
       </Tabs>
