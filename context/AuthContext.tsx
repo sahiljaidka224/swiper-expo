@@ -6,6 +6,10 @@ interface User {
   id: string;
   phoneNumber: string;
   profileComplete: boolean;
+  org?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface AuthContextType {
@@ -13,6 +17,7 @@ interface AuthContextType {
   user: User | null;
   isAuthLoading: boolean;
   login: (token: string, user: User) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -45,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserInfo(user);
 
     await SecureStore.setItemAsync("authToken", authToken);
-    await SecureStore.setItemAsync("username", JSON.stringify(user));
+    await SecureStore.setItemAsync("user", JSON.stringify(user));
   };
 
   const logout = async () => {
@@ -53,11 +58,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserInfo(null);
 
     await SecureStore.deleteItemAsync("authToken");
-    await SecureStore.deleteItemAsync("username");
+    await SecureStore.deleteItemAsync("user");
+  };
+
+  const updateUser = async (user: User) => {
+    setUserInfo(user);
+
+    await SecureStore.setItemAsync("user", JSON.stringify(user));
   };
 
   return (
-    <AuthContext.Provider value={{ token, user: userInfo, isAuthLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ token, user: userInfo, isAuthLoading, login, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

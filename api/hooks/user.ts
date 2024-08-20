@@ -1,8 +1,21 @@
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 import useSWR from "swr";
 import useSWRMutation from "swr/dist/mutation";
 
 const getUserDetails = async (url: string, { arg }: { arg: { token: string } }) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+  });
+
+  return response.json();
+};
+
+const getUserOrgDetails = async (url: string, { arg }: { arg: { token: string } }) => {
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -74,5 +87,37 @@ export function useLoginWithPhone() {
     isMutating,
     error,
     userInfo: data?.data ?? null,
+  };
+}
+
+export function useGetUserOrgDetails() {
+  const { token, user, updateUser } = useAuth();
+  const fetchUrl =
+    user && user.id ? `https://backend-swiper.datalinks.nl/organisation/userid/${user?.id}` : "";
+
+  const {
+    data,
+    isLoading: isUserOrgDataLoading,
+    error: userOrgDataError,
+  } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
+    getUserOrgDetails(url, { arg: { token } })
+  );
+
+  useEffect(() => {
+    if (!isUserOrgDataLoading && data && data.data && user) {
+      updateUser({
+        ...user,
+        org: {
+          id: data.data.organisationId ?? "",
+          name: data.data.name ?? "",
+        },
+      });
+    }
+  }, [isUserOrgDataLoading, data]);
+
+  return {
+    userOrgData: data?.data,
+    isUserOrgDataLoading,
+    userOrgDataError,
   };
 }

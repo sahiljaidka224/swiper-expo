@@ -14,20 +14,16 @@ const getSwiperCars = async (url: string, { arg }: { arg: { token: string } }) =
   return response.json();
 };
 
-export function useGetSwiperCars(
-  initialPage: number = 1,
-  limit: number = 5,
-  orgId: string = "tma"
-) {
-  const { token } = useAuth();
+export function useGetSwiperCars(initialPage: number = 1, limit: number = 5) {
+  const { user, token } = useAuth();
   const [page, setPage] = useState(initialPage);
   const from = page * limit;
-  // TODO: update orgId
-  const fetchUrl = `https://backend-swiper.datalinks.nl/car/swiper?count=false&noOrganisationId=${orgId}&includeSeen=false${
-    from > 5 ? `&from=${from}` : ""
-  }`;
+
+  const fetchUrl = `https://backend-swiper.datalinks.nl/car/swiper?count=false&noOrganisationId=${
+    user?.org?.id
+  }&includeSeen=false${from > 5 ? `&from=${from}` : ""}`;
   const { data, error, isLoading, mutate, isValidating } = useSWR(
-    token ? [fetchUrl, token] : null,
+    token && user?.org?.id ? [fetchUrl, token] : null,
     ([url, token]) => getSwiperCars(url, { arg: { token } })
   );
 

@@ -1,8 +1,10 @@
+import { useAuth } from "@/context/AuthContext";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { IMessage } from "react-native-gifted-chat";
 
 export const useGetMessages = (toId: string) => {
+  const { user } = useAuth();
   const messageRequest = useRef<CometChat.MessagesRequest | null>(null);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
@@ -35,7 +37,7 @@ export const useGetMessages = (toId: string) => {
         const sender = m.getSender();
         const messageType = m.getType();
         const data = m.getData();
-        const from = "4d306670-e733-11ee-95bb-d90b8dbd243d" === sender.getUid(); // TODO: needs to be current logged in user
+        const from = user?.id === sender.getUid();
         const sentAt = m.getSentAt();
         const received = m.getReadAt();
 

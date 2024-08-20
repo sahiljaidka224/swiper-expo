@@ -8,9 +8,11 @@ import { router, Stack, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import Colors from "@/constants/Colors";
+import { useGetUserOrgDetails } from "@/api/hooks/user";
 
 export default function Chats() {
   const { conversationList, error, loading, fetchConversations } = useGetConversations();
+  useGetUserOrgDetails();
 
   useFocusEffect(
     useCallback(() => {

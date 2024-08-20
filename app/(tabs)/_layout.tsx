@@ -79,15 +79,6 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="settings"
-          options={{
-            href: null,
-            title: "",
-            headerShown: false,
-            tabBarIcon: ({ size, color }) => <Ionicons name="cog" size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
           name="(add-stock)"
           options={{
             title: "",
