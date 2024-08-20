@@ -15,7 +15,6 @@ export async function cometChatInit(userId: string) {
       if (!user) {
         await CometChat.login(userId, process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY);
 
-        console.log("logggg");
         return true;
       } else {
         return true;

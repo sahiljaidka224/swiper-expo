@@ -27,7 +27,6 @@ export default function UserProfile() {
         />
       </View>
       {user?.organisations?.map((org: any) => {
-        console.log({ org });
         return (
           <OrganisationCard
             key={org?.organisationId}

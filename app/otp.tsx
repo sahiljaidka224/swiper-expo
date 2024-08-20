@@ -45,7 +45,6 @@ const phoneNumberMask = [
 export default function OTPPage() {
   const { error, loginWithPhone, userInfo, isMutating } = useLoginWithPhone();
   const { login } = useAuth();
-  console.log({ userInfo });
 
   const [phoneNumber, setPhoneNumber] = useState<{ masked: string; unmasked: string }>({
     masked: "",
@@ -75,7 +74,7 @@ export default function OTPPage() {
     try {
       loginWithPhone({ phoneNumber: phoneNumber.unmasked, password });
     } catch (error) {
-      console.log("Error while sending OTP", error);
+      console.log("Error while login", error);
     }
   };
 

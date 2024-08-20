@@ -37,9 +37,9 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
               ? `$${formatNumberWithCommas(car.price)}`
               : context === "watchlist"
               ? "Enquire"
-              : ""
+              : "No Price"
           }`}</Text>
-          {car?.daysInStock ? (
+          {typeof car?.daysInStock === "number" ? (
             <View style={styles.daysInStockContainer}>
               <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
             </View>

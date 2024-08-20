@@ -16,7 +16,6 @@ interface CarsListProps {
 }
 
 const transition = CurvedTransition.delay(100);
-const ITEM_HEIGHT = 400;
 
 export function CarsList({ context }: CarsListProps) {
   const { token } = useAuth();
@@ -28,11 +27,6 @@ export function CarsList({ context }: CarsListProps) {
   useEffect(() => {
     if (!isLoading && cars) {
       setWatchlistData(cars);
-
-      // if (page === 1) {
-      // } else {
-      //   setWatchlistData((prevData) => [...prevData, ...cars]);
-      // }
     }
   }, [cars]);
 

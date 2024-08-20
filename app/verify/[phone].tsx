@@ -2,7 +2,7 @@ import Colors from "@/constants/Colors";
 import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Platform, Alert } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 
 import {
   CodeField,
@@ -43,7 +43,6 @@ export default function PhonePage() {
 
       await setActive!({ session: signIn!.createdSessionId });
     } catch (err) {
-      console.log("error", JSON.stringify(err, null, 2));
       if (isClerkAPIResponseError(err)) {
         Alert.alert("Error", err.errors[0].message);
       }
@@ -55,7 +54,6 @@ export default function PhonePage() {
       await signUp?.attemptPhoneNumberVerification({ code });
       await setActive!({ session: signUp?.createdSessionId });
     } catch (err) {
-      console.log("error", JSON.stringify(err, null, 2));
       if (isClerkAPIResponseError(err)) {
         Alert.alert("Error", err.errors[0].message);
       }
