@@ -16,7 +16,7 @@ type SegmentedControlProps = {
 const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
   ({ options, selectedOption, onOptionPress }) => {
     const internalPadding = 6;
-    const segmentedControlWidth = 180;
+    const segmentedControlWidth = 300;
 
     const itemWidth = (segmentedControlWidth - internalPadding) / options.length;
 
@@ -72,8 +72,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    height: 34,
+    height: 40,
     backgroundColor: Palette.baseGray05,
+    justifyContent: "center",
   },
   activeBox: {
     position: "absolute",
@@ -84,7 +85,8 @@ const styles = StyleSheet.create({
   },
   labelContainer: { justifyContent: "center", alignItems: "center" },
   label: {
-    fontSize: 14,
+    fontSize: 18,
+    fontFamily: "SF_Pro_Display_Regular",
   },
 });
 

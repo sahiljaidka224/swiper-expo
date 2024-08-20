@@ -1,26 +1,33 @@
 import Colors from "@/constants/Colors";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
 
 type ButtonProps = {
   title: string;
   onPress: () => void;
-  type?: "primary" | "secondary";
+  type?: "primary" | "secondary" | "disabled";
+  disabled?: boolean;
+  isLoading?: boolean;
 };
 
-export default function Button({ title, onPress, type = "primary" }: ButtonProps) {
+export default function Button({ title, onPress, type = "primary", isLoading }: ButtonProps) {
   return (
     <Pressable
-      style={[
-        styles.container,
-        { backgroundColor: type === "primary" ? Colors.primary : Colors.primaryLight },
-      ]}
+      disabled={type === "disabled"}
+      style={[styles.container, styles[type]]}
       onPress={onPress}
     >
-      <Text
-        style={[styles.text, { color: type === "primary" ? Colors.textPrimary : Colors.textDark }]}
-      >
-        {title}
-      </Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#fff" />
+      ) : (
+        <Text
+          style={[
+            styles.text,
+            { color: type === "primary" ? Colors.textPrimary : Colors.textDark },
+          ]}
+        >
+          {title}
+        </Text>
+      )}
     </Pressable>
   );
 }
@@ -32,6 +39,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flex: 1,
     justifyContent: "center",
+  },
+  primary: {
+    backgroundColor: Colors.primary,
+  },
+  secondary: {
+    backgroundColor: Colors.primaryLight,
+  },
+  disabled: {
+    backgroundColor: Colors.borderGray,
   },
   text: {
     color: Colors.textPrimary,

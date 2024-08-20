@@ -1,11 +1,11 @@
-import { Text, View, TextInput, StyleSheet, Pressable } from "react-native";
+import { Text, View, TextInput, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import Colors from "@/constants/Colors";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
+import { useMakeList } from "@/api/hooks/car-search";
 
-const make = ["ACT", "NSW", "NT", "QLD", "WA", "TAS", "SA", "VIC"];
 const transmission = ["Automatic", "Manual"];
 
 type FormData = {
@@ -18,11 +18,13 @@ type FormData = {
 
 export default function ManualModeForm() {
   const { showActionSheetWithOptions } = useActionSheet();
+  const { makeList, error, loading: makeListLoading } = useMakeList();
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<FormData>({
     defaultValues: {
       make: "Make",
@@ -31,6 +33,10 @@ export default function ManualModeForm() {
       transmission: transmission[0],
     },
   });
+  const make = watch("make");
+  const model = watch("model");
+  const year = watch("year");
+
   const onSubmit = (data: any) => console.log(data);
 
   const openActionSheet = (options: string[], fieldName: "make" | "transmission") => {
@@ -58,10 +64,19 @@ export default function ManualModeForm() {
           defaultValue="Make"
           render={({ field: { value } }) => (
             <Pressable
-              onPress={() => openActionSheet([...make, "Cancel"], "make")}
+              onPress={() =>
+                openActionSheet(
+                  [...(makeList ?? []).map((m: { make: string }) => m?.make), "Cancel"],
+                  "make"
+                )
+              }
               style={styles.regoSelector}
             >
-              <Text style={styles.regoText}>{value ? value : "Open Action Sheet"}</Text>
+              {makeListLoading ? (
+                <ActivityIndicator size="small" color={"#fff"} />
+              ) : (
+                <Text style={styles.regoText}>{value ? value : "Make"}</Text>
+              )}
               <AntDesign name="caretdown" size={16} color={Colors.iconGray} />
             </Pressable>
           )}
@@ -96,7 +111,7 @@ export default function ManualModeForm() {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
-            style={styles.textInput}
+            style={[styles.textInput]}
           />
         )}
         name="odometer"
@@ -131,7 +146,11 @@ export default function ManualModeForm() {
           </Pressable>
         )}
       />
-      <Button title="Next" onPress={handleSubmit(onSubmit)} />
+      <Button
+        title="Next"
+        onPress={handleSubmit(onSubmit)}
+        type={make === "Make" || !model || !year ? "disabled" : "primary"}
+      />
     </View>
   );
 }

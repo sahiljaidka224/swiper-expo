@@ -12,7 +12,7 @@ export default function Chats() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!loading) fetchConversations();
+      fetchConversations();
 
       return () => {
         console.log("This route is now unfocused.");

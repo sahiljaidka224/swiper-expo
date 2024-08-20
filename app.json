@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
-        "NSCameraUsageDescription": "Test",
+        "NSCameraUsageDescription": "The app accesses your camera to let you share photos with other users.",
         "NSMicrophoneUsageDescription": "Test"
       }
     },

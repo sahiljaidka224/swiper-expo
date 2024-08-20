@@ -8,7 +8,7 @@ import StockButtonContainer from "./StockButtonContainer";
 
 interface CarDetailProps {
   car: any;
-  context: "watchlist" | "stock";
+  context: "watchlist" | "stock" | null;
 }
 
 function CarDetail({ car, context }: CarDetailProps) {
@@ -17,7 +17,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
       <DescriptionView
         title="Mileage"
-        value={`${formatNumberWithCommas(car?.odometer)} km`}
+        value={car?.odometer ? `${formatNumberWithCommas(car?.odometer)} km` : ""}
         uppercase
       />
       <DescriptionView title="Transmission" value={car?.transmission} />
@@ -36,7 +36,7 @@ function CarDetail({ car, context }: CarDetailProps) {
 
       {context === "stock" ? (
         <StockButtonContainer carId="" onPushToSwiperContacts={() => {}} showSMSOption />
-      ) : (
+      ) : context === "watchlist" ? (
         <>
           <ContactCard
             name={car?.primaryContact?.displayName ?? ""}
@@ -49,7 +49,7 @@ function CarDetail({ car, context }: CarDetailProps) {
             carId={car?.carId}
           />
         </>
-      )}
+      ) : null}
     </View>
   );
 }

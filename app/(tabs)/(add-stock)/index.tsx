@@ -1,22 +1,14 @@
 import AddStock from "@/components/AddStock";
-import Button from "@/components/Button";
 import ManualForm from "@/components/ManualModeForm";
 import RegoForm from "@/components/RegoForm";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import Colors from "@/constants/Colors";
 import { useState } from "react";
 import { ScrollView, View, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 
+const options = ["Rego Lookup", "Manual Mode"];
 export default function AddStockPage() {
-  const [mode, setMode] = useState<"rego" | "manual">("rego");
-
-  const changeMode = () => {
-    if (mode === "rego") {
-      setMode("manual");
-      return;
-    }
-
-    if (mode === "manual") setMode("rego");
-  };
+  const [mode, setMode] = useState<string>("Rego Lookup");
 
   return (
     <KeyboardAvoidingView
@@ -28,12 +20,17 @@ export default function AddStockPage() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         <AddStock />
+
         <View style={{ flex: 1, padding: 12 }}>
-          {mode === "rego" ? <RegoForm /> : <ManualForm />}
-          <Button
-            title={mode === "rego" ? "Don't have Rego? Add Manually" : "Switch to Rego Mode"}
-            onPress={changeMode}
-          />
+          <View
+            style={{
+              alignItems: "center",
+              marginBottom: 12,
+            }}
+          >
+            <SegmentedControl options={options} selectedOption={mode} onOptionPress={setMode} />
+          </View>
+          {mode === "Rego Lookup" ? <RegoForm /> : <ManualForm />}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
