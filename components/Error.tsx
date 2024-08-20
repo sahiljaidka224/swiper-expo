@@ -2,7 +2,7 @@ import Colors from "@/constants/Colors";
 import { StyleSheet, Text } from "react-native";
 
 export default function ErrorView() {
-  return <Text style={styles.error}>Something went wrong, Please try again later!</Text>;
+  return <Text style={styles.error}>Something went wrong, Please try again!</Text>;
 }
 
 const styles = StyleSheet.create({

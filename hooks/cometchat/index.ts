@@ -1,6 +1,6 @@
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 
-export async function cometChatInit() {
+export async function cometChatInit(userId: string) {
   let appSetting = new CometChat.AppSettingsBuilder()
     .subscribePresenceForAllUsers()
     .setRegion(process.env.EXPO_PUBLIC_COMET_CHAT_APP_REGION ?? "")
@@ -13,10 +13,7 @@ export async function cometChatInit() {
 
     try {
       if (!user) {
-        await CometChat.login(
-          "4d306670-e733-11ee-95bb-d90b8dbd243d",
-          process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY
-        );
+        await CometChat.login(userId, process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY);
 
         console.log("logggg");
         return true;

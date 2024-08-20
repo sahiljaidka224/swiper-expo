@@ -24,6 +24,13 @@ export default function ChatsLayout() {
           headerStyle: { backgroundColor: Colors.background },
         }}
       />
+      <Stack.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          headerStyle: { backgroundColor: Colors.background },
+        }}
+      />
     </Stack>
   );
 }

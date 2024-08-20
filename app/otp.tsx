@@ -1,7 +1,6 @@
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,76 +10,77 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaskInput from "react-native-mask-input";
 import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
+import { useLoginWithPhone } from "@/api/hooks/user";
+import ErrorView from "@/components/Error";
+import { useAuth } from "@/context/AuthContext";
+
+const phoneNumberMask = [
+  // "(",
+  // "+",
+  // "6",
+  // "1",
+  // ")",
+  "(",
+  "0",
+  /\d/,
+  ")",
+  " ",
+  /\d/,
+  /\d/,
+  /\d/,
+  " ",
+  /\d/,
+  /\d/,
+  /\d/,
+  " ",
+  /\d/,
+  /\d/,
+];
 
 export default function OTPPage() {
-  const { signUp, setActive } = useSignUp();
-  const { signIn } = useSignIn();
-  const [loading, setLoading] = useState(false);
+  const { error, loginWithPhone, userInfo, isMutating } = useLoginWithPhone();
+  const { login } = useAuth();
+  console.log({ userInfo });
+
   const [phoneNumber, setPhoneNumber] = useState<{ masked: string; unmasked: string }>({
     masked: "",
     unmasked: "",
   });
+  const [password, setPassword] = useState<string>("");
   const router = useRouter();
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 0;
   const { bottom } = useSafeAreaInsets();
 
+  useEffect(() => {
+    if (!isMutating && userInfo) {
+      if (userInfo && userInfo?.token) {
+        login(userInfo.token, {
+          id: userInfo?.userId,
+          name: `${userInfo?.firstName} ${userInfo?.lastName}`,
+          phoneNumber: userInfo?.phoneNumber,
+          profileComplete: userInfo?.profileWizardComplete,
+        });
+      }
+    }
+  }, [userInfo, isMutating]);
+
   const openLink = () => {};
 
   const sendOTP = async () => {
-    setLoading(true);
-    console.log({ phoneNumber });
     try {
-      await signUp?.create({ phoneNumber: phoneNumber.unmasked });
-
-      signUp?.preparePhoneNumberVerification();
-      router.push(`/verify/${phoneNumber}`);
+      loginWithPhone({ phoneNumber: phoneNumber.unmasked, password });
     } catch (error) {
       console.log("Error while sending OTP", error);
-      if (isClerkAPIResponseError(error)) {
-        if (error.errors[0].code === "form_identifier_exists") {
-          console.log("Clear SignUP error - user exists");
-          await trySignIn();
-        } else {
-          setLoading(false);
-          Alert.alert("Error", error.errors[0].message);
-        }
-      }
     }
   };
 
-  const trySignIn = async () => {
-    console.log("trySignIn", phoneNumber);
-
-    try {
-      const { supportedFirstFactors } = await signIn!.create({
-        identifier: phoneNumber.unmasked,
-      });
-
-      // TODO: fix any
-      const firstPhoneFactor: any = supportedFirstFactors.find((factor: any) => {
-        return factor.strategy === "phone_code";
-      });
-
-      const { phoneNumberId } = firstPhoneFactor;
-
-      await signIn!.prepareFirstFactor({
-        strategy: "phone_code",
-        phoneNumberId,
-      });
-
-      router.push(`/verify/${phoneNumber}?signin=true`);
-      setLoading(false);
-    } catch (error) {
-      console.log("Error while trying to signIn OTP page", error);
-      setLoading(false);
-      if (isClerkAPIResponseError(error)) {
-        Alert.alert("Error", error.errors[0].message);
-      }
-    }
+  const isInputValid = () => {
+    return phoneNumber.unmasked.length === 10 && password.length >= 6;
   };
 
   return (
@@ -90,19 +90,19 @@ export default function OTPPage() {
       behavior="padding"
     >
       <View style={styles.container}>
-        {loading && (
+        {/* {loading && (
           <View style={[StyleSheet.absoluteFill, styles.loading]}>
             <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={{ padding: 10, fontSize: 18 }}>Sending code...</Text>
           </View>
-        )}
+        )} */}
+        {error && <ErrorView />}
         <Text style={styles.description}>
           Swiper will need to verify your account. Carrier charges may apply.
         </Text>
         <View style={styles.list}>
           <View style={styles.listItem}>
             <Text style={styles.listItemText}>Australia</Text>
-            <Ionicons name="chevron-forward" size={20} color={Colors.gray} />
           </View>
           <View style={styles.seperator} />
 
@@ -111,30 +111,19 @@ export default function OTPPage() {
             value={phoneNumber.masked}
             keyboardType="numeric"
             autoFocus
-            placeholder="+61 your phone number"
+            placeholder="04 131 313 13"
             onChangeText={(masked, unmasked) => {
-              setPhoneNumber({ masked, unmasked: `+61 ${unmasked}` });
+              setPhoneNumber({ masked, unmasked: `0${unmasked.replaceAll(" ", "")}` });
             }}
-            mask={[
-              "(",
-              "+",
-              "6",
-              "1",
-              ")",
-              " ",
-              /\d/,
-              /\d/,
-              " ",
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              "-",
-              /\d/,
-              /\d/,
-              /\d/,
-            ]}
+            mask={phoneNumberMask}
+          />
+          <View style={styles.seperator} />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            onChangeText={setPassword}
           />
         </View>
         <Text style={styles.legal}>
@@ -152,17 +141,15 @@ export default function OTPPage() {
         <View style={{ flex: 1 }} />
 
         <TouchableOpacity
-          style={[
-            styles.button,
-            phoneNumber.masked !== "" ? styles.enabled : null,
-            { marginBottom: bottom },
-          ]}
-          disabled={phoneNumber.masked === ""}
+          style={[styles.button, isInputValid() ? styles.enabled : null, { marginBottom: bottom }]}
+          disabled={!isInputValid() && !isMutating}
           onPress={sendOTP}
         >
-          <Text style={[styles.buttonText, phoneNumber.masked !== "" ? styles.enabled : null]}>
-            Next
-          </Text>
+          {isMutating ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={[styles.buttonText, isInputValid() ? styles.enabled : null]}>Next</Text>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -226,14 +213,16 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.gray,
     fontSize: 22,
-    fontWeight: "500",
+    fontFamily: "SF_Pro_Display_Medium",
   },
   input: {
     backgroundColor: "#fff",
     width: "100%",
     fontSize: 16,
+    fontFamily: "SF_Pro_Display_Regular",
     padding: 6,
     marginTop: 10,
+    marginVertical: 6,
   },
   loading: {
     ...StyleSheet.absoluteFillObject,

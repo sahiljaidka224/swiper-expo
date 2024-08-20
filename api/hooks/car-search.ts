@@ -1,12 +1,12 @@
+import { useAuth } from "@/context/AuthContext";
 import useSWR from "swr";
 
-const fetchMakeList = async () => {
-  const response = await fetch("https://backend-swiper.datalinks.nl/cardb", {
+const fetchMakeList = async (url: string, { arg }: { arg: { token: string } }) => {
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVVVJRCI6IjRkMzA2NjcwLWU3MzMtMTFlZS05NWJiLWQ5MGI4ZGJkMjQzZCIsImlhdCI6MTcxNzk4NjYzOSwiZXhwIjoxNzQ5NTIyNjM5fQ.0jvY69fyIhZb-y58lehfQuJzk_armyEHADyvwpBIR1Q",
+      Authorization: `Bearer ${arg.token}`,
     },
   });
 
@@ -18,9 +18,11 @@ const fetchMakeList = async () => {
 };
 
 export const useMakeList = () => {
-  const { data, error, isLoading } = useSWR("make-list", fetchMakeList, {
-    revalidateOnFocus: false,
-  });
+  const { token } = useAuth();
+  const fetchUrl = "https://backend-swiper.datalinks.nl/cardb";
+  const { data, error, isLoading } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
+    fetchMakeList(url, { arg: { token } })
+  );
 
   return {
     makeList: data?.data ?? [],

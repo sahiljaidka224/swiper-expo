@@ -9,6 +9,7 @@ import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import StockButtonContainer from "./StockButtonContainer";
 import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
 import { FlashList } from "@shopify/flash-list";
+import { useAuth } from "@/context/AuthContext";
 
 interface CarsListProps {
   context: "stock" | "watchlist";
@@ -18,6 +19,7 @@ const transition = CurvedTransition.delay(100);
 const ITEM_HEIGHT = 400;
 
 export function CarsList({ context }: CarsListProps) {
+  const { token } = useAuth();
   const { cars, isLoading, error: getError, refresh, fetchMore } = useGetWatchlist(context);
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export function CarsList({ context }: CarsListProps) {
       setWatchlistData((prevData) => prevData.filter((i) => i.carId !== carId));
       try {
         trigger(
-          { carId: carId },
+          { carId: carId, token: token },
           {
             revalidate: true,
           }

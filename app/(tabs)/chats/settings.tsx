@@ -1,7 +1,7 @@
 import BoxedIcon from "@/components/BoxedIcon";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, ScrollView, FlatList, TouchableOpacity } from "react-native";
 
@@ -65,7 +65,7 @@ const support = [
 ];
 
 export default function Settings() {
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -87,7 +87,7 @@ export default function Settings() {
           </View>
         ))}
 
-        <TouchableOpacity onPress={() => signOut()}>
+        <TouchableOpacity onPress={() => logout()}>
           <Text
             style={{
               color: Colors.primary,
