@@ -1,5 +1,6 @@
+import { MessageIcon, PushCarIcon, StockIcon, SwiperIcon, WatchListIcon } from "@/components/Icons";
 import Colors from "@/constants/Colors";
-import { Feather, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -11,6 +12,7 @@ export default function TabsRootLayout() {
       <Tabs
         screenOptions={{
           tabBarStyle: {
+            paddingTop: 20,
             backgroundColor: Colors.background,
           },
           tabBarActiveTintColor: Colors.primary,
@@ -27,9 +29,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="car-rental" size={size} color={color} />
-            ),
+            tabBarIcon: ({ size, color }) => <SwiperIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -37,9 +37,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="update" size={size} color={color} />
-            ),
+            tabBarIcon: ({ size, color }) => <WatchListIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -47,10 +45,9 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <Ionicons name="chatbubbles" size={size} color={color} />
-            ),
+            tabBarIcon: ({ color }) => <MessageIcon color={color} />,
             tabBarStyle: {
+              paddingTop: 20,
               backgroundColor: Colors.background,
               display: segments[2] === "[id]" ? "none" : "flex",
             },
@@ -61,9 +58,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialIcons name="update" size={size} color={color} />
-            ),
+            tabBarIcon: ({ size, color }) => <StockIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -83,7 +78,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => <Feather name="camera" size={size} color={color} />,
+            tabBarIcon: ({ size, color }) => <PushCarIcon color={color} />,
           }}
         />
       </Tabs>

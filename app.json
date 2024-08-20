@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "swiper-expo",
-    "slug": "swiper-expo",
+    "name": "swiper",
+    "slug": "swiper",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,13 +10,13 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#1063FD"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
-        "NSCameraUsageDescription": "The app accesses your camera to let you share photos with other users.",
+        "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
         "NSMicrophoneUsageDescription": "Test"
       }
     },

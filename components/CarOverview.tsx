@@ -21,6 +21,7 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
         source={{ uri: car?.images[0]?.url }}
         style={styles.itemCarImage}
         recyclingKey={car?.images[0]?.carImageId}
+        placeholderContentFit="fill"
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     minWidth: 130,
     width: "40%",
     height: 130,
-    borderRadius: 8,
+    borderRadius: 15,
     objectFit: "cover",
     borderWidth: 1,
     borderColor: Colors.lightGray,

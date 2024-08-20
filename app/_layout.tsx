@@ -53,8 +53,8 @@ function BaseLayout() {
           router.replace("/(tabs)/chats");
         }
       })();
-    } else if (!token) {
-      // router.replace("/");
+    } else if (!token && inTabsGroup) {
+      router.replace("/");
     }
   }, [token, isAuthLoading]);
 
