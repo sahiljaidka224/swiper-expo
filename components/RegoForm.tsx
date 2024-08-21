@@ -5,10 +5,9 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useCarDetailsFromNedVis } from "@/api/hooks/car-detail";
-import CarDetail from "./CarDetail";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-const states = ["ACT", "NSW", "NT", "QLD", "WA", "TAS", "SA", "VIC"];
+const states = ["ACT", "NSW", "NT", "QLD", "SA", "VIC", "WA", "TAS"];
 const transmission = ["Automatic", "Manual"];
 
 type FormData = {
@@ -18,8 +17,7 @@ type FormData = {
   transmission: string;
 };
 
-export default function RegoForm() {
-  const [carDetails, setCarDetails] = useState<any | null>();
+export default function RegoForm({ setCarDetails }: { setCarDetails: (details: any) => void }) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { carData, error, fetchCarDetails, loading } = useCarDetailsFromNedVis();
   const {
@@ -42,8 +40,13 @@ export default function RegoForm() {
   const state = watch("state");
 
   useEffect(() => {
-    if (carData && !loading) {
-      setCarDetails(carData[0]);
+    if (carData && !loading && carData.length > 0) {
+      setCarDetails({
+        ...carData[0],
+        odometer: getValues("odometer"),
+        transmission: getValues("transmission"),
+        regoState: getValues("state"),
+      });
     }
   }, [carData]);
 
@@ -68,35 +71,6 @@ export default function RegoForm() {
       }
     );
   };
-
-  if (carDetails) {
-    return (
-      <>
-        <CarDetail
-          car={{
-            make: carDetails?.make,
-            model: carDetails?.model,
-            year: carDetails?.year_of_manufacture,
-            rego: carDetails?.plate?.number,
-            regoExpiry: carDetails?.registration?.expiry_date,
-            compliance: carDetails?.compliance_plate,
-            colour: carDetails?.colour,
-            body: carDetails?.body_type,
-            vin: carDetails?.vin,
-            engineNo: carDetails?.engineNo,
-            odometer: getValues("odometer"),
-          }}
-          context={null}
-        />
-        <View style={{ marginBottom: 10 }}>
-          <Button title="Back" onPress={() => setCarDetails(null)} type="secondary" />
-        </View>
-        <View style={{ marginBottom: 10 }}>
-          <Button title="Next" onPress={() => {}} />
-        </View>
-      </>
-    );
-  }
 
   return (
     <View style={styles.container}>

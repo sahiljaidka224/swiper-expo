@@ -1,15 +1,17 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import welcomePage from "@/assets/images/welcome.png";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Colors from "@/constants/Colors";
 import { Link } from "expo-router";
-const welcome_image = Image.resolveAssetSource(welcomePage).uri;
+import Text from "@/components/Text";
+
+const welcomePage = require("@/assets/images/welcome.png");
+const welcomeImage = Image.resolveAssetSource(welcomePage).uri;
 
 export default function Index() {
   const openLink = () => {};
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: welcome_image }} style={styles.welcome} />
+      <Image source={{ uri: welcomeImage }} style={styles.welcome} />
       <Text style={styles.headline}>Welcome to Swiper</Text>
       <Text style={styles.description}>
         Read our{" "}
@@ -46,14 +48,15 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 24,
-    fontWeight: "bold",
     marginVertical: 20,
+    fontFamily: "SF_Pro_Display_Bold",
   },
   description: {
     fontSize: 14,
     textAlign: "center",
     marginBottom: 80,
     color: Colors.gray,
+    fontFamily: "SF_Pro_Display_Medium",
   },
   link: {
     color: Colors.primary,
@@ -65,6 +68,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 22,
     color: Colors.primary,
-    fontWeight: "bold",
+    fontFamily: "SF_Pro_Display_Bold",
   },
 });

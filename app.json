@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -26,7 +26,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.galaxies.swiper",
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "VIBRATE", "INTERNET"]
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.VIBRATE",
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -36,7 +42,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      ["expo-asset", { "assets": ["./assets/images/pattern.png"] }],
+      [
+        "expo-asset",
+        {
+          "assets": ["./assets/images/pattern.png"]
+        }
+      ],
       [
         "expo-image-picker",
         {
@@ -48,6 +59,15 @@
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5f962059-a2ff-4ffa-991b-4720bc4def7f"
+      }
+    },
+    "owner": "sjaidka224"
   }
 }

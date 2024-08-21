@@ -2,22 +2,53 @@ import * as ImagePicker from "expo-image-picker";
 
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
-import { useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
+const options = ["Gallery", "Camera", "Cancel"];
 
-export default function AddStock() {
-  const [selectedImages, setSelectedImages] = useState<
-    {
-      name: string | null;
-      type: string | undefined;
-      uri: string;
-      size: number | undefined;
-    }[]
-  >([]);
+interface SelectedImage {
+  name: string | null;
+  type: string | undefined;
+  uri: string;
+  size: number | undefined;
+}
+
+export default function AddStock({
+  selectedImages,
+  setSelectedImages,
+}: {
+  selectedImages: SelectedImage[];
+  setSelectedImages: (selImage: SelectedImage[]) => void;
+}) {
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  const onShowActionSheet = () => {
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      (buttonIndex) => {
+        if (buttonIndex !== cancelButtonIndex) {
+          if (buttonIndex === 0) {
+            onAddImagePress();
+            return;
+          }
+
+          if (buttonIndex === 1) {
+            Alert.alert("Coming soon..", "This feature will be available soon!");
+            return;
+          }
+        }
+      }
+    );
+  };
 
   const onAddImagePress = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -63,14 +94,15 @@ export default function AddStock() {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.bannerImageContainer} onPress={onAddImagePress}>
+      <Pressable style={styles.bannerImageContainer} onPress={onShowActionSheet}>
         <Image
           style={
             selectedImages.length > 0 ? styles.bannerImageSelected : styles.bannerImagePlaceholder
           }
           placeholder={addCarPlaceholder}
-          source={{ uri: selectedImages[0]?.uri ?? undefined }}
+          source={{ uri: selectedImages.length > 0 ? selectedImages[0].uri : undefined }}
           contentFit={selectedImages.length > 0 ? "cover" : "contain"}
+          recyclingKey={selectedImages.length > 0 ? selectedImages[0].name : undefined}
         />
       </Pressable>
       <View style={styles.smallImagesContainer}>
@@ -86,7 +118,7 @@ export default function AddStock() {
                     height: 95,
                     marginRight: 10,
                   }}
-                  onPress={onAddImagePress}
+                  onPress={onShowActionSheet}
                 >
                   <Image
                     style={styles.smallImage}

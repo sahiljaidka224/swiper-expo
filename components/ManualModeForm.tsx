@@ -16,7 +16,11 @@ type FormData = {
   transmission: string;
 };
 
-export default function ManualModeForm() {
+export default function ManualModeForm({
+  setCarDetails,
+}: {
+  setCarDetails: (details: any) => void;
+}) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { makeList, error, loading: makeListLoading } = useMakeList();
   const {
@@ -37,7 +41,12 @@ export default function ManualModeForm() {
   const model = watch("model");
   const year = watch("year");
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = (data: FormData) => {
+    setCarDetails({
+      ...data,
+      year_of_manufacture: data.year,
+    });
+  };
 
   const openActionSheet = (options: string[], fieldName: "make" | "transmission") => {
     const cancelButtonIndex = options.length - 1;

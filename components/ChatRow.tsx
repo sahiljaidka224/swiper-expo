@@ -1,11 +1,11 @@
 import Colors from "@/constants/Colors";
 import { Link } from "expo-router";
-import { Text, TouchableHighlight, View, Animated, StyleSheet, I18nManager } from "react-native";
+import { TouchableHighlight, View, Animated, StyleSheet, I18nManager } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { Component, PropsWithChildren } from "react";
 
 import { RectButton } from "react-native-gesture-handler";
-
+import Text from "@/components/Text";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
@@ -102,7 +102,7 @@ function MessageText({
       return (
         <>
           <Text style={styles.msgText} numberOfLines={1}>
-            {messageText.length > 40 ? `${messageText.slice(0, 40)}...` : messageText}
+            {messageText}
           </Text>
         </>
       );
@@ -227,6 +227,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textDark,
     fontFamily: "SF_Pro_Display_Regular",
+    flex: 1,
+    marginRight: 10,
   },
   msgContainer: {
     flexDirection: "row",

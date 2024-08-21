@@ -6,18 +6,16 @@ import {
   Platform,
   StyleSheet,
   View,
-  Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaskInput from "react-native-mask-input";
-import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import { useLoginWithPhone } from "@/api/hooks/user";
 import ErrorView from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
+import Text from "@/components/Text";
 
 const phoneNumberMask = [
   // "(",
@@ -51,7 +49,6 @@ export default function OTPPage() {
     unmasked: "",
   });
   const [password, setPassword] = useState<string>("");
-  const router = useRouter();
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 0;
   const { bottom } = useSafeAreaInsets();
 
@@ -70,7 +67,7 @@ export default function OTPPage() {
 
   const openLink = () => {};
 
-  const sendOTP = async () => {
+  const loginUsingPhone = async () => {
     try {
       loginWithPhone({ phoneNumber: phoneNumber.unmasked, password });
     } catch (error) {
@@ -111,6 +108,7 @@ export default function OTPPage() {
             keyboardType="numeric"
             autoFocus
             placeholder="04 131 313 13"
+            placeholderTextColor={Colors.textLight}
             onChangeText={(masked, unmasked) => {
               setPhoneNumber({ masked, unmasked: `0${unmasked.replaceAll(" ", "")}` });
             }}
@@ -123,6 +121,7 @@ export default function OTPPage() {
             placeholder="Password"
             secureTextEntry
             onChangeText={setPassword}
+            placeholderTextColor={Colors.textLight}
           />
         </View>
         <Text style={styles.legal}>
@@ -142,7 +141,7 @@ export default function OTPPage() {
         <TouchableOpacity
           style={[styles.button, isInputValid() ? styles.enabled : null, { marginBottom: bottom }]}
           disabled={!isInputValid() && !isMutating}
-          onPress={sendOTP}
+          onPress={loginUsingPhone}
         >
           {isMutating ? (
             <ActivityIndicator color="#fff" />
@@ -166,6 +165,8 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: Colors.gray,
+    fontFamily: "SF_Pro_Display_Regular",
+    textAlign: "center",
   },
   list: {
     backgroundColor: "#fff",
@@ -183,6 +184,7 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 18,
     color: Colors.primary,
+    fontFamily: "SF_Pro_Display_Regular",
   },
   seperator: {
     width: "100%",
@@ -197,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     color: "#000",
+    fontFamily: "SF_Pro_Display_Regular",
   },
   button: {
     width: "100%",
@@ -222,6 +225,7 @@ const styles = StyleSheet.create({
     padding: 6,
     marginTop: 10,
     marginVertical: 6,
+    letterSpacing: 0.5,
   },
   loading: {
     ...StyleSheet.absoluteFillObject,

@@ -9,7 +9,7 @@ export default function AddStockLayout() {
           name="index"
           options={{
             title: "Add Stock",
-            headerLargeTitle: true,
+            headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
             headerTransparent: true,

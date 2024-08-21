@@ -22,6 +22,7 @@
     "@react-native-clipboard/clipboard": "^1.13.2",
     "@react-navigation/native": "^6.0.2",
     "@shopify/flash-list": "1.6.4",
+    "axios": "^1.7.4",
     "date-fns": "^3.6.0",
     "expo": "~51.0.17",
     "expo-asset": "~10.0.10",

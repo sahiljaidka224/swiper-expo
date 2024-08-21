@@ -7,14 +7,10 @@ export default function WatchlistLayout() {
         name="index"
         options={{
           title: "Watchlist",
-          headerLargeTitle: true,
+          headerLargeTitle: false,
           headerShadowVisible: false,
           headerBlurEffect: "regular",
           headerTransparent: true,
-          // headerStyle: { backgroundColor: Colors.background },
-          // headerSearchBarOptions: {
-          //   placeholder: "Search",
-          // },
         }}
       />
       <Stack.Screen
