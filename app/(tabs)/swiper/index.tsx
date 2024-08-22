@@ -3,18 +3,16 @@ import ContactCard from "@/components/ContactCard";
 import Colors from "@/constants/Colors";
 import { BlurView } from "expo-blur";
 import React, { useRef, useCallback, useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
+import { Image } from "expo-image";
+import { router, Stack } from "expo-router";
+import { AntDesign } from "@expo/vector-icons";
 
-
+const blurhash =
+  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 interface Car {
   badge: string;
@@ -52,7 +50,7 @@ interface Car {
 }
 
 export default function SwiperPage() {
-  const { cars, isLoading, fetchMore, error , isValidating} = useGetSwiperCars();
+  const { cars, isLoading, fetchMore, error, isValidating } = useGetSwiperCars();
   const insets = useSafeAreaInsets();
   const ref = useRef<SwiperCardRefType>();
   const [watchListData, setWatchlistData] = useState<Car[]>([]);
@@ -71,47 +69,68 @@ export default function SwiperPage() {
     }
   };
 
-  const handleSwipe = (cardIndex: number) => {
-    const newData = watchListData.filter((_, index) => index !== cardIndex);
-    // setWatchlistData(newData);
-    if (cardIndex === watchListData.length - 3) {
-      loadMore();
-    }
-  };
+  const handleSwipe = useCallback(
+    (cardIndex: number) => {
+      console.log({ cardIndex });
+      // setWatchlistData((prevData) => prevData.filter((_, index) => index !== cardIndex));
+
+      if (cardIndex === 6) {
+        loadMore();
+      }
+    },
+    [watchListData, loadMore]
+  );
 
   const renderCard = useCallback((item: Car) => {
+    const badges = [
+      { data: item?.transmission, uppercase: false },
+      { data: item?.fuelType, uppercase: false },
+      { data: item?.series, uppercase: true },
+      { data: item?.badge, uppercase: false },
+      { data: item?.rego, uppercase: true },
+      { data: item?.capacity, uppercase: false },
+      { data: item?.odometer, uppercase: false },
+    ];
+
     return (
       <View style={styles.renderCardContainer}>
         <Image
           source={{ uri: item?.images[0]?.url }}
           style={styles.renderCardImage}
-          resizeMode="cover"
+          contentFit="cover"
+          priority="high"
+          recyclingKey={item?.images[0]?.carId}
+          placeholder={{ blurhash }}
+          placeholderContentFit="cover"
         />
         <Image
+          placeholder={{ blurhash }}
           source={{ uri: item?.images[0]?.url }}
-          style={styles.renderCardImage}
-          resizeMode="cover"
+          style={styles.renderCardPlaceholder}
+          contentFit="cover"
+          recyclingKey={item?.images[0]?.carId}
         />
-
-        <BlurView intensity={50} tint="prominent" style={styles.absoluteCenteredView}>
-          <Text style={styles.detailsText}>{`${item.year} ${item.make} ${item.model}`}</Text>
+        <BlurView intensity={90} tint="prominent" style={styles.absoluteCenteredView}>
+          <Text style={styles.detailsText}>{`${item?.year} ${item?.make} ${item?.model}`}</Text>
           <View style={styles.badgeWrapper}>
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{item?.transmission}</Text>
-            </View>
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{item?.fuelType}</Text>
-            </View>
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{item?.series}</Text>
-            </View>
+            {badges.map((badge, index) => {
+              if (!badge.data || String(badge.data).trim() === "") {
+                return null;
+              }
 
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{item?.badge}</Text>
-            </View>
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{item?.rego}</Text>
-            </View>
+              return (
+                <View style={styles.badgeContainer} key={index}>
+                  <Text
+                    style={[
+                      styles.badgeText,
+                      { textTransform: badge?.uppercase ? "uppercase" : "capitalize" },
+                    ]}
+                  >
+                    {badge.data}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
           <ContactCard
             name={item?.primaryContact?.displayName}
@@ -151,6 +170,15 @@ export default function SwiperPage() {
 
   return (
     <GestureHandlerRootView style={[styles.container, { marginTop: insets.top + 30 }]}>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Pressable onPress={() => router.push("/swiper/search")}>
+              <AntDesign name="search1" size={24} color={Colors.iconGray} />
+            </Pressable>
+          ),
+        }}
+      />
       <View style={styles.subContainer}>
         {!isLoading && watchListData.length > 0 ? (
           <Swiper
@@ -165,14 +193,13 @@ export default function SwiperPage() {
             OverlayLabelLeft={OverlayLabelLeft}
           />
         ) : (
-          isLoading || isValidating && watchListData.length === 0 && <ActivityIndicator size="large" color={Colors.primary} />
+          (isLoading || isValidating) &&
+          watchListData.length === 0 && <ActivityIndicator size="large" color={Colors.primary} />
         )}
       </View>
     </GestureHandlerRootView>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -198,6 +225,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
+  renderCardPlaceholder: {
+    height: "50%",
+    width: "100%",
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+  },
   subContainer: {
     flex: 1,
     alignItems: "center",
@@ -218,26 +251,28 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingVertical: 10,
     overflow: "hidden",
     flex: 1,
   },
   detailsText: {
-    color: Colors.textPrimary,
-    fontSize: 20,
+    color: Colors.textDark,
+    fontSize: 24,
+    marginVertical: 10,
     fontFamily: "SF_Pro_Display_Bold",
     textTransform: "capitalize",
+    marginLeft: 10,
   },
   badgeWrapper: {
     margin: 5,
     display: "flex",
     flexDirection: "row",
-    flexWrap: "wrap", 
-    gap: 10
+    flexWrap: "wrap",
+    gap: 10,
   },
   badgeContainer: {
     paddingVertical: 5,
-    paddingHorizontal: 10, 
+    paddingHorizontal: 10,
     borderRadius: 10,
     backgroundColor: Colors.primary,
     alignSelf: "flex-start",
@@ -246,5 +281,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontFamily: "SF_Pro_Display_Medium",
     textTransform: "capitalize",
+    fontSize: 16,
   },
 });

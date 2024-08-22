@@ -30,3 +30,23 @@ export const useMakeList = () => {
     error,
   };
 };
+
+export const useModelList = () => {
+  const { token } = useAuth();
+  const fetchUrl = "https://backend-swiper.datalinks.nl/cardb?make=";
+  const { data, error, isLoading, mutate } = useSWR(
+    token ? [fetchUrl, token] : null,
+    ([url, token]) => fetchMakeList(url, { arg: { token } })
+  );
+
+  const triggerFetch = async (make: string) => {
+    mutate(`${fetchUrl}${make}`);
+  };
+
+  return {
+    modelList: data?.data ?? [],
+    loading: isLoading,
+    error,
+    triggerFetch,
+  };
+};
