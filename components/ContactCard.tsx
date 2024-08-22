@@ -15,11 +15,16 @@ function ContactCard({
   organisationName: string;
 }) {
   const segments = useSegments();
-  const pathnames = usePathname();
-  console.log({ segments, pathnames });
   const onPress = () => {
+    let path = "(followed)";
+    if (segments.includes("(stock)")) {
+      path = "(stock)";
+    }
+    if (segments.includes("(swiper)")) {
+      path = "(swiper)";
+    }
     router.push({
-      pathname: `/${segments.includes("(followed)") ? "(followed)" : "(stock)"}/user/[userId]`,
+      pathname: `/${path}/user/[userId]`,
       params: { id: userId },
     });
   };

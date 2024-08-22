@@ -10,6 +10,7 @@ import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -71,7 +72,6 @@ export default function SwiperPage() {
 
   const handleSwipe = useCallback(
     (cardIndex: number) => {
-      console.log({ cardIndex });
       // setWatchlistData((prevData) => prevData.filter((_, index) => index !== cardIndex));
 
       if (cardIndex === 6) {
@@ -137,6 +137,12 @@ export default function SwiperPage() {
             organisationName={item?.organisation?.name}
             userId={item?.primaryContact?.userId}
           />
+          <WatchlistButtonsContainer
+            carId={item?.carId}
+            phoneNumber={item?.organisation?.phoneNumber}
+            userId={item?.primaryContact?.userId}
+            buttonsType="primary"
+          />
         </BlurView>
       </View>
     );
@@ -173,7 +179,7 @@ export default function SwiperPage() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable onPress={() => router.push("/swiper/search")}>
+            <Pressable onPress={() => router.push("/(swiper)/search")}>
               <AntDesign name="search1" size={24} color={Colors.iconGray} />
             </Pressable>
           ),
@@ -220,13 +226,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   renderCardImage: {
-    height: "50%",
+    height: "45%",
     width: "100%",
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
   renderCardPlaceholder: {
-    height: "50%",
+    height: "55%",
     width: "100%",
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   absoluteCenteredView: {
-    height: "50%",
+    height: "55%",
     position: "absolute",
     bottom: 0,
     left: 0,

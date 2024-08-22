@@ -22,7 +22,7 @@ function WatchlistButtonsContainer({
   phoneNumber,
   carId,
   userId,
-  buttonsType = "primary",
+  buttonsType,
 }: ButtonsContainerProps) {
   const onDeletePress = () => {
     if (onDelete && carId && carId.trim() !== "") {
@@ -56,7 +56,7 @@ function WatchlistButtonsContainer({
         </TouchableOpacity>
       )}
       {/* // TODO: after comet chat is integrated completely */}
-      <Button title="Call" onPress={onCallPress} type={"secondary"} />
+      <Button title="Call" onPress={onCallPress} type={buttonsType ? buttonsType : "secondary"} />
       <Button title="Message" onPress={onMessagePress} type={buttonsType} />
     </View>
   );

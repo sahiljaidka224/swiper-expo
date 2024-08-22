@@ -1,16 +1,38 @@
 import Colors from "@/constants/Colors";
-import { useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useGetOrgCars } from "@/api/hooks/watchlist";
+import CarOverview from "@/components/CarOverview";
+import ErrorView from "@/components/Error";
+import CarOverviewLoader from "@/components/SkeletonLoaders/CarOverviewLoader";
+import StockButtonContainer from "@/components/StockButtonContainer";
+import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
+import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlist";
-import CarOverview from "./CarOverview";
-import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
-import StockButtonContainer from "./StockButtonContainer";
-import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
-import { FlashList } from "@shopify/flash-list";
-import { useAuth } from "@/context/AuthContext";
-import ErrorView from "./Error";
+export default function OrgListing() {
+  // TODO: use Order state
+  const [orderState, setOrderState] = useState<{ orderBy: string; orderDirection: string }>({
+    orderBy: "dateCreate",
+    orderDirection: "desc",
+  });
+
+  const { orgId } = useLocalSearchParams();
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerTitle: "" }} />
+      <CarsListOrgs
+        context="search"
+        orderBy={orderState.orderBy}
+        orderDirection={orderState.orderDirection}
+        orgId={orgId as string}
+      />
+    </View>
+  );
+}
 
 interface CarsListProps {
   context: CarsListContext;
@@ -19,7 +41,7 @@ interface CarsListProps {
   orgId?: string;
 }
 
-export function CarsList({
+function CarsListOrgs({
   context,
   orderBy = "dateCreate",
   orderDirection = "desc",
@@ -33,37 +55,17 @@ export function CarsList({
     error: getError,
     refresh,
     fetchMore,
-  } = useGetWatchlist(context, orderBy, orderDirection, orgId);
-  const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
+  } = useGetOrgCars(context, orderBy, orderDirection, orgId);
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (!isLoading && cars) {
+    if (!isLoading && cars && cars) {
       setWatchlistData(cars);
     }
   }, [cars]);
 
   const onMessagePress = () => {};
-
-  const onDeletePress = useCallback(
-    (carId: any) => {
-      setWatchlistData((prevData) => prevData.filter((i) => i.carId !== carId));
-      try {
-        trigger(
-          { carId: carId, token: token },
-          {
-            revalidate: true,
-          }
-        );
-      } catch (error) {
-        // Revert state if there's an error
-        setWatchlistData(cars);
-        console.error("Failed to remove car from watchlist:", error);
-      }
-    },
-    [trigger, cars]
-  );
 
   const loadMore = () => {
     if (!isLoading && cars?.length > 0) {
@@ -88,7 +90,6 @@ export function CarsList({
               carId={item?.carId}
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
-              onDelete={onDeletePress}
             />
           ) : (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
@@ -96,12 +97,12 @@ export function CarsList({
         </Animated.View>
       );
     },
-    [onDeletePress, watchListData]
+    [watchListData]
   );
 
   return (
     <View style={{ flex: 1 }}>
-      {isLoading && (!cars || cars.length === 0) && (
+      {isLoading && (!cars || cars?.length === 0) && (
         <View style={{ marginTop: 150 }}>
           <CarOverviewLoader />
           <CarOverviewLoader />
@@ -144,6 +145,10 @@ function Footer() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   itemSeperatorContainer: {
     paddingHorizontal: 10,
   },

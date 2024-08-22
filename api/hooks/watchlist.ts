@@ -85,6 +85,65 @@ export function useGetWatchlist(
   };
 }
 
+export function useGetOrgCars(
+  context: CarsListContext,
+  orderBy: string = "dateCreate",
+  orderDirection: string = "desc",
+  orgId: string | undefined = undefined,
+  initialPage: number = 1,
+  limit: number = 10
+) {
+  const { token } = useAuth();
+  const [page, setPage] = useState(initialPage);
+  const [cars, setCars] = useState<any[]>([]);
+
+  let fetchUrl = `https://backend-swiper.datalinks.nl/car/${context}?from=${
+    (page - 1) * limit
+  }&limit=${limit}&order_by=${orderBy}&order_direction=${orderDirection}`;
+
+  if (orgId && context === "search") {
+    fetchUrl += `&count=false&includeSeen=false&organisationId=${orgId}`;
+  }
+
+  const { data, error, isLoading, mutate, isValidating } = useSWR(
+    token ? [fetchUrl, token] : null,
+    ([url, token]) => getCarsInWatchlist(url, { arg: { token } }),
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (data?.data && data.data.cars) {
+      if (page === 1) {
+        console.log({ data: data.data });
+        setCars(data.data.cars);
+      } else {
+        setCars((prevCars) => {
+          console.log({ prevCars });
+          return [...prevCars, ...data.data.cars];
+        });
+      }
+    }
+  }, [data, page]);
+
+  const refresh = () => {
+    setPage(1);
+    mutate();
+  };
+
+  const fetchMore = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
+
+  return {
+    isValidating,
+    cars,
+    isLoading,
+    error,
+    refresh,
+    fetchMore,
+  };
+}
+
 export function useRemoveCarFromWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/",

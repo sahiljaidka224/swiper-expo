@@ -1,24 +1,37 @@
 import Colors from "@/constants/Colors";
-import { Pressable, StyleSheet, View, Text } from "react-native";
+import { Pressable, StyleSheet, View, Text, Platform, Linking } from "react-native";
 import Avatar from "./Avatar";
 import Button from "./Button";
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 
 interface OrganisationCardProps {
   name: string;
   address: {
-    lat: string;
-    lng: string;
+    streetAddress: string | null;
+    lat: string | null;
+    lng: string | null;
   };
   orgId: string;
 }
 
 export default function OrganisationCard({ name, address, orgId }: OrganisationCardProps) {
-  const segments = useSegments();
-  console.log({ segments });
-
   const onShowStock = () => {
     router.push({ pathname: "/(tabs)/(followed)/org/[listing]", params: { orgId } });
+  };
+
+  const onLocate = () => {
+    const scheme = Platform.select({
+      ios: `maps://0,0?q=${address.streetAddress}`,
+      android: `geo:0,0?q=${address.streetAddress}`,
+    });
+    const latLng = `${address.lat},${address.lng}`;
+    const label = "Custom Label";
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`,
+    });
+
+    Linking.openURL(url);
   };
 
   return (
@@ -33,7 +46,7 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
       </View>
       <View style={styles.itemSeperator} />
       <View style={styles.itemButtonsContainer}>
-        <Button title="Locate" onPress={() => {}} />
+        {address.lat && address.lng ? <Button title="Locate" onPress={onLocate} /> : null}
         <Button title="Show Stock" onPress={onShowStock} />
       </View>
     </Pressable>

@@ -31,7 +31,11 @@ export default function UserProfile() {
           <OrganisationCard
             key={org?.organisationId}
             orgId={org.organisationId}
-            address={{ lat: org?.latitude ?? 0, lng: org?.longitude ?? 0 }}
+            address={{
+              streetAddress: org?.address ?? null,
+              lat: org?.latitude ?? null,
+              lng: org?.longitude ?? null,
+            }}
             name={org?.name}
           />
         );

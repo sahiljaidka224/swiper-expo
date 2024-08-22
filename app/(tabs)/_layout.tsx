@@ -25,11 +25,11 @@ export default function TabsRootLayout() {
         }}
       >
         <Tabs.Screen
-          name="swiper"
+          name="(swiper)"
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => <SwiperIcon color={color} />,
+            tabBarIcon: ({ color }) => <SwiperIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -37,7 +37,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => <WatchListIcon color={color} />,
+            tabBarIcon: ({ color }) => <WatchListIcon color={color} />,
           }}
         />
         <Tabs.Screen
@@ -58,19 +58,15 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => <StockIcon color={color} />,
+            tabBarIcon: ({ color }) => <StockIcon color={color} />,
           }}
         />
         <Tabs.Screen
           name="calls"
           options={{
             href: null,
-
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="phone-outline" size={size} color={color} />
-            ),
           }}
         />
         <Tabs.Screen
@@ -78,7 +74,7 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ size, color }) => <PushCarIcon color={color} />,
+            tabBarIcon: ({ color }) => <PushCarIcon color={color} />,
           }}
         />
       </Tabs>
