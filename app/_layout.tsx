@@ -50,7 +50,7 @@ function BaseLayout() {
       (async () => {
         const isSuccess = await cometChatInit(user?.id);
         if (isSuccess) {
-          router.replace("/(tabs)/chats");
+          router.replace("/(tabs)/(chats)");
         }
       })();
     } else if (!token && inTabsGroup) {

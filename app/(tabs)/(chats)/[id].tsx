@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useGetMessages, useSendMessage } from "@/hooks/cometchat/messages";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { Image } from "expo-image";
 import { useGetUserDetails } from "@/api/hooks/user";
@@ -211,8 +211,15 @@ const Header = ({ userId }: { userId: string }) => {
   const { user, isLoading } = useGetUserDetails(userId);
   if (!user || isLoading) return;
 
+  const onPress = () => {
+    router.push({
+      pathname: `/(tabs)/(chats)/user/${userId}`,
+      params: { id: userId },
+    });
+  };
+
   return (
-    <View
+    <Pressable
       style={{
         flexDirection: "row",
         gap: 10,
@@ -220,12 +227,13 @@ const Header = ({ userId }: { userId: string }) => {
         alignItems: "center",
         flex: 1,
       }}
+      onPress={onPress}
     >
       <View style={{ width: 40, height: 40 }}>
         <Avatar userId={userId} />
       </View>
       <Text style={{ fontSize: 16, fontWeight: "500" }}>{user?.displayName}</Text>
-    </View>
+    </Pressable>
   );
 };
 

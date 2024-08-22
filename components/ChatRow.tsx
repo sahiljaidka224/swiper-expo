@@ -42,7 +42,7 @@ export default function ChatRow({ conversation }: ChatRowProps) {
 
   return (
     <AppleStyleSwipeableRow>
-      <Link href={`/(tabs)/chats/${userUID}`} asChild>
+      <Link href={`/(tabs)/(chats)/${userUID}`} asChild>
         <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
           <View style={styles.container}>
             <View style={styles.avatarContainer}>

@@ -11,6 +11,7 @@ import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
 import { FlashList } from "@shopify/flash-list";
 import { useAuth } from "@/context/AuthContext";
 import ErrorView from "./Error";
+import Text from "./Text";
 
 interface CarsListProps {
   context: CarsListContext;
@@ -125,7 +126,7 @@ export function CarsList({
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
         onEndReachedThreshold={0.5}
         renderItem={renderItem}
-        // ListEmptyComponent={ListEmpty} // TODO: List Empty
+        ListEmptyComponent={!isLoading ? ListEmpty : null}
       />
     </View>
   );
@@ -141,6 +142,30 @@ function ItemSeperator() {
 
 function Footer() {
   return <ActivityIndicator size="large" color={Colors.primary} />;
+}
+
+function ListEmpty() {
+  return (
+    <View
+      style={{
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <Text
+        style={{
+          textAlign: "center",
+          fontSize: 24,
+          fontFamily: "SF_Pro_Display_Medium",
+          color: Colors.textDark,
+        }}
+      >
+        Oh, Snap! No cars found. Try again later
+      </Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

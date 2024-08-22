@@ -1,8 +1,8 @@
 import Colors from "@/constants/Colors";
-import { Pressable, StyleSheet, View, Text, Platform, Linking } from "react-native";
+import { Pressable, StyleSheet, View, Text, Platform, Linking, Alert } from "react-native";
 import Avatar from "./Avatar";
 import Button from "./Button";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 
 interface OrganisationCardProps {
   name: string;
@@ -15,8 +15,21 @@ interface OrganisationCardProps {
 }
 
 export default function OrganisationCard({ name, address, orgId }: OrganisationCardProps) {
+  const segments = useSegments();
   const onShowStock = () => {
-    router.push({ pathname: "/(tabs)/(followed)/org/[listing]", params: { orgId } });
+    let path = "(followed)";
+    if (segments.includes("(stock)")) {
+      path = "(stock)";
+    }
+
+    if (segments.includes("(chats)")) {
+      path = "(chats)";
+    }
+
+    if (segments.includes("(swiper)")) {
+      path = "(swiper)";
+    }
+    router.push({ pathname: `/(tabs)/${path}/org/[listing]`, params: { orgId } });
   };
 
   const onLocate = () => {
@@ -31,7 +44,11 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
       android: `${scheme}${latLng}(${label})`,
     });
 
-    Linking.openURL(url);
+    if (url) {
+      Linking.openURL(url);
+    } else {
+      Alert.alert("Error", "Unable to open maps");
+    }
   };
 
   return (

@@ -25,7 +25,7 @@ export default function Chats() {
   );
 
   const onProfilePress = () => {
-    router.push("/chats/settings");
+    router.push("/(chats)/settings");
   };
 
   return (

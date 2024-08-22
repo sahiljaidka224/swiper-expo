@@ -114,13 +114,9 @@ export function useGetOrgCars(
   useEffect(() => {
     if (data?.data && data.data.cars) {
       if (page === 1) {
-        console.log({ data: data.data });
         setCars(data.data.cars);
       } else {
-        setCars((prevCars) => {
-          console.log({ prevCars });
-          return [...prevCars, ...data.data.cars];
-        });
+        setCars((prevCars) => [...prevCars, ...data.data.cars]);
       }
     }
   }, [data, page]);

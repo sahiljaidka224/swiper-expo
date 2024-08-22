@@ -41,7 +41,7 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="chats"
+          name="(chats)"
           options={{
             title: "",
             headerShown: false,

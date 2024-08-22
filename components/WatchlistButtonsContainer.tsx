@@ -44,7 +44,7 @@ function WatchlistButtonsContainer({
       onMessage();
     }
     if (userId && userId.trimEnd() !== "") {
-      router.push(`/(tabs)/chats/${userId}`);
+      router.push(`/(tabs)/(chats)/${userId}`);
     }
   };
 

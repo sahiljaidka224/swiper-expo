@@ -11,6 +11,7 @@ import StockButtonContainer from "@/components/StockButtonContainer";
 import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import Text from "@/components/Text";
 
 export default function OrgListing() {
   // TODO: use Order state
@@ -47,7 +48,6 @@ function CarsListOrgs({
   orderDirection = "desc",
   orgId,
 }: CarsListProps) {
-  const { token } = useAuth();
   const {
     isValidating,
     cars,
@@ -126,8 +126,32 @@ function CarsListOrgs({
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
         onEndReachedThreshold={0.5}
         renderItem={renderItem}
-        // ListEmptyComponent={ListEmpty} // TODO: List Empty
+        ListEmptyComponent={!isLoading ? ListEmpty : null}
       />
+    </View>
+  );
+}
+
+function ListEmpty() {
+  return (
+    <View
+      style={{
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <Text
+        style={{
+          textAlign: "center",
+          fontSize: 24,
+          fontFamily: "SF_Pro_Display_Medium",
+          color: Colors.textDark,
+        }}
+      >
+        Oh, Snap! No cars found. Try again later
+      </Text>
     </View>
   );
 }
