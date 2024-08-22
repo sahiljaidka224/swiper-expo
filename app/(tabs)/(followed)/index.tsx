@@ -58,7 +58,7 @@ export default function WatchlistPage() {
         }}
       />
       <CarsList
-        context="watchlist"
+        context="followed"
         orderBy={orderState.orderBy}
         orderDirection={orderState.orderDirection}
       />

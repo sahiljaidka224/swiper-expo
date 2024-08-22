@@ -26,10 +26,7 @@ export default function CarDetailPage() {
         {car && (
           <>
             <Carousel images={images} price={car?.price} />
-            <CarDetail
-              car={car}
-              context={segments.includes("(watchlist)") ? "watchlist" : "stock"}
-            />
+            <CarDetail car={car} context={segments.includes("(followed)") ? "followed" : "stock"} />
           </>
         )}
       </ScrollView>

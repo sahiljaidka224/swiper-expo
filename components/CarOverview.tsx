@@ -9,9 +9,14 @@ import { Image } from "expo-image";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
 
-function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist" }) {
+function CarOverview({ car, context }: { car: any; context: CarsListContext }) {
   const onAnimatePress = (carId: string) => {
-    router.push({ pathname: `/(tabs)/(${context})/car/[id]`, params: { id: carId } });
+    router.push({
+      pathname: `/(tabs)/(${
+        context === "search" || context === "followed" ? "followed" : "stock"
+      })/car/[id]`,
+      params: { id: carId },
+    });
   };
 
   return (
@@ -35,7 +40,7 @@ function CarOverview({ car, context }: { car: any; context: "stock" | "watchlist
           <Text style={styles.itemPriceText}>{`${
             car?.price && car?.price > 0
               ? `$${formatNumberWithCommas(car.price)}`
-              : context === "watchlist"
+              : context === "followed"
               ? "Enquire"
               : "No Price"
           }`}</Text>

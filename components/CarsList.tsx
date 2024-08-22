@@ -13,15 +13,17 @@ import { useAuth } from "@/context/AuthContext";
 import ErrorView from "./Error";
 
 interface CarsListProps {
-  context: "stock" | "watchlist";
+  context: CarsListContext;
   orderBy: string;
   orderDirection: string;
+  orgId?: string;
 }
 
 export function CarsList({
   context,
   orderBy = "dateCreate",
   orderDirection = "desc",
+  orgId,
 }: CarsListProps) {
   const { token } = useAuth();
   const {
@@ -31,11 +33,12 @@ export function CarsList({
     error: getError,
     refresh,
     fetchMore,
-  } = useGetWatchlist(context, orderBy, orderDirection);
+  } = useGetWatchlist(context, orderBy, orderDirection, orgId);
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
+  console.log({ isLoading, cars });
   useEffect(() => {
     if (!isLoading && cars) {
       setWatchlistData(cars);
@@ -81,7 +84,7 @@ export function CarsList({
           exiting={FadeOutUp}
         >
           <CarOverview car={item} context={context} />
-          {context === "watchlist" ? (
+          {context === "followed" || context === "search" ? (
             <WatchlistButtonsContainer
               carId={item?.carId}
               onMessage={onMessagePress}
@@ -120,7 +123,7 @@ export function CarsList({
         estimatedItemSize={395}
         ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
-        onEndReached={context === "stock" ? loadMore : null}
+        onEndReached={context === "stock" || context === "search" ? loadMore : null}
         onEndReachedThreshold={0.5}
         renderItem={renderItem}
         // ListEmptyComponent={ListEmpty} // TODO: List Empty

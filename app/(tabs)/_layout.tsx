@@ -33,7 +33,7 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="(watchlist)"
+          name="(followed)"
           options={{
             title: "",
             headerShown: false,

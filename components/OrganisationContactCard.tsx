@@ -2,6 +2,7 @@ import Colors from "@/constants/Colors";
 import { Pressable, StyleSheet, View, Text } from "react-native";
 import Avatar from "./Avatar";
 import Button from "./Button";
+import { router, useSegments } from "expo-router";
 
 interface OrganisationCardProps {
   name: string;
@@ -13,6 +14,13 @@ interface OrganisationCardProps {
 }
 
 export default function OrganisationCard({ name, address, orgId }: OrganisationCardProps) {
+  const segments = useSegments();
+  console.log({ segments });
+
+  const onShowStock = () => {
+    router.push({ pathname: "/(tabs)/(followed)/org/[listing]", params: { orgId } });
+  };
+
   return (
     <Pressable style={styles.contactCardContainer} onPress={() => {}}>
       <View style={styles.container}>
@@ -26,7 +34,7 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
       <View style={styles.itemSeperator} />
       <View style={styles.itemButtonsContainer}>
         <Button title="Locate" onPress={() => {}} />
-        <Button title="Show Stock" onPress={() => {}} />
+        <Button title="Show Stock" onPress={onShowStock} />
       </View>
     </Pressable>
   );

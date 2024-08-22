@@ -2,7 +2,7 @@ import Colors from "@/constants/Colors";
 import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
 import Avatar from "./Avatar";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { useSegments } from "expo-router";
 
 function ContactCard({
@@ -15,9 +15,11 @@ function ContactCard({
   organisationName: string;
 }) {
   const segments = useSegments();
+  const pathnames = usePathname();
+  console.log({ segments, pathnames });
   const onPress = () => {
     router.push({
-      pathname: `/${segments.includes("(watchlist)") ? "(watchlist)" : "(stock)"}/user/[userId]`,
+      pathname: `/${segments.includes("(followed)") ? "(followed)" : "(stock)"}/user/[userId]`,
       params: { id: userId },
     });
   };

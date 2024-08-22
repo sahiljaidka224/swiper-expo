@@ -31,9 +31,10 @@ const removeCarFromWatchlist = async (
 };
 
 export function useGetWatchlist(
-  context: "stock" | "watchlist",
+  context: CarsListContext,
   orderBy: string = "dateCreate",
   orderDirection: string = "desc",
+  orgId: string | undefined = undefined,
   initialPage: number = 1,
   limit: number = 35
 ) {
@@ -41,11 +42,13 @@ export function useGetWatchlist(
   const [page, setPage] = useState(initialPage);
   const [cars, setCars] = useState<any[]>([]);
 
-  const fetchUrl = `https://backend-swiper.datalinks.nl/car/${
-    context === "watchlist" ? "followed" : "stock"
-  }?from=${
+  let fetchUrl = `https://backend-swiper.datalinks.nl/car/${context}?from=${
     (page - 1) * limit
   }&limit=${limit}&order_by=${orderBy}&order_direction=${orderDirection}`;
+
+  if (orgId && context === "search") {
+    fetchUrl += `&count=false&includeSeen=false&organisationId=${orgId}`;
+  }
 
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     token ? [fetchUrl, token] : null,
