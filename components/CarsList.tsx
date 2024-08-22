@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import Animated, { CurvedTransition, FadeInUp, FadeOutUp } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlist";
 import CarOverview from "./CarOverview";
@@ -10,16 +10,28 @@ import StockButtonContainer from "./StockButtonContainer";
 import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
 import { FlashList } from "@shopify/flash-list";
 import { useAuth } from "@/context/AuthContext";
+import ErrorView from "./Error";
 
 interface CarsListProps {
   context: "stock" | "watchlist";
+  orderBy: string;
+  orderDirection: string;
 }
 
-const transition = CurvedTransition.delay(100);
-
-export function CarsList({ context }: CarsListProps) {
+export function CarsList({
+  context,
+  orderBy = "dateCreate",
+  orderDirection = "desc",
+}: CarsListProps) {
   const { token } = useAuth();
-  const { cars, isLoading, error: getError, refresh, fetchMore } = useGetWatchlist(context);
+  const {
+    isValidating,
+    cars,
+    isLoading,
+    error: getError,
+    refresh,
+    fetchMore,
+  } = useGetWatchlist(context, orderBy, orderDirection);
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -86,35 +98,34 @@ export function CarsList({ context }: CarsListProps) {
   );
 
   return (
-    <>
-      <Animated.View layout={transition} style={{ flex: 1 }}>
-        {isLoading && (!cars || cars.length === 0) && (
-          <View style={{ marginTop: 150 }}>
-            <CarOverviewLoader />
-            <CarOverviewLoader />
-            <CarOverviewLoader />
-            <CarOverviewLoader />
-            <CarOverviewLoader />
-          </View>
-        )}
-        <FlashList
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={{ paddingBottom: 40 }}
-          refreshing={isLoading && cars.length > 0}
-          onRefresh={refresh}
-          keyExtractor={(item) => item.carId}
-          scrollEnabled={true}
-          data={watchListData}
-          estimatedItemSize={395}
-          ItemSeparatorComponent={ItemSeperator}
-          ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
-          onEndReached={context === "stock" ? loadMore : null}
-          onEndReachedThreshold={0.5}
-          renderItem={renderItem}
-          // ListEmptyComponent={ListEmpty} // TODO: List Empty
-        />
-      </Animated.View>
-    </>
+    <View style={{ flex: 1 }}>
+      {isLoading && (!cars || cars.length === 0) && (
+        <View style={{ marginTop: 150 }}>
+          <CarOverviewLoader />
+          <CarOverviewLoader />
+          <CarOverviewLoader />
+          <CarOverviewLoader />
+          <CarOverviewLoader />
+        </View>
+      )}
+      {getError && !isLoading && !cars ? <ErrorView /> : null}
+      <FlashList
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={{ paddingBottom: 40 }}
+        refreshing={(isLoading || isValidating) && !cars}
+        onRefresh={refresh}
+        keyExtractor={(item) => item.carId}
+        scrollEnabled={true}
+        data={watchListData}
+        estimatedItemSize={395}
+        ItemSeparatorComponent={ItemSeperator}
+        ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
+        onEndReached={context === "stock" ? loadMore : null}
+        onEndReachedThreshold={0.5}
+        renderItem={renderItem}
+        // ListEmptyComponent={ListEmpty} // TODO: List Empty
+      />
+    </View>
   );
 }
 

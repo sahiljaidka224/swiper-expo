@@ -32,6 +32,8 @@ const removeCarFromWatchlist = async (
 
 export function useGetWatchlist(
   context: "stock" | "watchlist",
+  orderBy: string = "dateCreate",
+  orderDirection: string = "desc",
   initialPage: number = 1,
   limit: number = 35
 ) {
@@ -41,9 +43,11 @@ export function useGetWatchlist(
 
   const fetchUrl = `https://backend-swiper.datalinks.nl/car/${
     context === "watchlist" ? "followed" : "stock"
-  }?from=${(page - 1) * limit}&limit=${limit}&order_by=dateCreate&order_direction=desc`;
+  }?from=${
+    (page - 1) * limit
+  }&limit=${limit}&order_by=${orderBy}&order_direction=${orderDirection}`;
 
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, isLoading, mutate, isValidating } = useSWR(
     token ? [fetchUrl, token] : null,
     ([url, token]) => getCarsInWatchlist(url, { arg: { token } }),
     { revalidateOnFocus: false }
@@ -69,6 +73,7 @@ export function useGetWatchlist(
   };
 
   return {
+    isValidating,
     cars,
     isLoading,
     error,
