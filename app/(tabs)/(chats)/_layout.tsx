@@ -27,7 +27,14 @@ export default function ChatsLayout() {
       <Stack.Screen
         name="settings"
         options={{
-          title: "Settings",
+          title: "",
+          headerStyle: { backgroundColor: Colors.background },
+        }}
+      />
+      <Stack.Screen
+        name="feed"
+        options={{
+          title: "Car News",
           headerStyle: { backgroundColor: Colors.background },
         }}
       />

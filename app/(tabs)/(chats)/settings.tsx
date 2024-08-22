@@ -1,9 +1,18 @@
+import Avatar from "@/components/Avatar";
 import BoxedIcon from "@/components/BoxedIcon";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, ScrollView, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+} from "react-native";
 
 const devices = [
   {
@@ -65,12 +74,29 @@ const support = [
 ];
 
 export default function Settings() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+      }}
+    >
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        {[devices, items, support].map((x, index) => (
+        <View style={{ alignItems: "center", marginTop: 10, gap: 10 }}>
+          {user && (
+            <View style={{ height: 150, width: 150 }}>
+              <Avatar userId={user?.id} />
+            </View>
+          )}
+        </View>
+        <View style={{ padding: 20, gap: 20 }}>
+          <TextInput value={user?.name} style={styles.textInput} />
+          <TextInput value={user?.phoneNumber} style={styles.textInput} />
+          <TextInput value={user?.org?.name} style={styles.textInput} />
+        </View>
+        {/* {[devices, items, support].map((x, index) => (
           <View key={index} style={defaultStyles.block}>
             <FlatList
               scrollEnabled={false}
@@ -85,7 +111,7 @@ export default function Settings() {
               )}
             />
           </View>
-        ))}
+        ))} */}
 
         <TouchableOpacity onPress={() => logout()}>
           <Text
@@ -103,3 +129,17 @@ export default function Settings() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  textInput: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 15,
+    backgroundColor: Colors.lightGrayBackground,
+    borderColor: Colors.borderGray,
+    fontFamily: "SF_Pro_Display_Regular",
+    fontSize: 20,
+    color: Colors.textDark,
+    textTransform: "capitalize",
+  },
+});

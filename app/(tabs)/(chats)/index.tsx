@@ -9,6 +9,7 @@ import { useCallback } from "react";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import Colors from "@/constants/Colors";
 import { useGetUserOrgDetails } from "@/api/hooks/user";
+import MaterialCommunityIcons from "@expo/vector-icons/build/MaterialCommunityIcons";
 
 export default function Chats() {
   const { conversationList, error, loading, fetchConversations } = useGetConversations();
@@ -28,6 +29,10 @@ export default function Chats() {
     router.push("/(chats)/settings");
   };
 
+  const onFeedPress = () => {
+    router.push("/(chats)/feed");
+  };
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -36,9 +41,14 @@ export default function Chats() {
       <Stack.Screen
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={onProfilePress}>
-              <FontAwesome5 name="user-circle" size={24} color={Colors.primary} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <TouchableOpacity onPress={onProfilePress}>
+                <FontAwesome5 name="user-circle" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onFeedPress}>
+                <MaterialCommunityIcons name="web" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
