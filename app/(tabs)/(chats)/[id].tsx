@@ -1,7 +1,8 @@
-import { ImageBackground, StyleSheet, View, Pressable, Platform, TextInput } from "react-native";
+import { ImageBackground, StyleSheet, View, Pressable, Platform } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Bubble,
+  Composer,
   DayProps,
   GiftedChat,
   IMessage,
@@ -9,7 +10,6 @@ import {
   MessageImageProps,
   MessageTextProps,
   Send,
-  SendProps,
   SystemMessageProps,
   TimeProps,
 } from "react-native-gifted-chat";
@@ -200,7 +200,29 @@ export default function ChatDetailsPage() {
         textInputProps={styles.composer}
         renderTime={RenderTime}
         renderInputToolbar={(props) => (
-          <InputToolbar {...props} containerStyle={{ backgroundColor: Colors.background }} />
+          <InputToolbar
+            {...props}
+            containerStyle={{ backgroundColor: Colors.background }}
+            renderComposer={(props) => (
+              <Composer
+                {...props}
+                textInputProps={{
+                  ...props,
+                  maxFontSizeMultiplier: 2,
+                }}
+                textInputStyle={{
+                  borderRadius: 15,
+                  borderWidth: 1,
+                  borderColor: Colors.lightGray,
+                  paddingHorizontal: 10,
+                  fontSize: 16,
+                  marginVertical: 10,
+                  paddingTop: 8,
+                  fontFamily: "SF_Pro_Display_Regular",
+                }}
+              />
+            )}
+          />
         )}
       />
     </ImageBackground>
