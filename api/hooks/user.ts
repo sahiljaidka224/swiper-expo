@@ -27,6 +27,46 @@ const getUserOrgDetails = async (url: string, { arg }: { arg: { token: string } 
   return response.json();
 };
 
+const postUserDetails = async (
+  url: string,
+  { arg }: { arg: { token: string; firstName: string; lastName: string } }
+) => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+    body: JSON.stringify({ firstName: arg.firstName, lastName: arg.lastName }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update user details");
+  }
+
+  return response.json();
+};
+
+const postUserAvatar = async (
+  url: string,
+  { arg }: { arg: { token: string; userId: string; avatar: string } }
+) => {
+  const response = await fetch(`${url}/${arg.userId}/image`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+    body: JSON.stringify({ avatar: arg.avatar }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update user avatar");
+  }
+
+  return response.json();
+};
+
 const loginWithPhone = async (
   url: string,
   { arg }: { arg: { phoneNumber: string; password: string } }
@@ -119,5 +159,33 @@ export function useGetUserOrgDetails() {
     userOrgData: data?.data,
     isUserOrgDataLoading,
     userOrgDataError,
+  };
+}
+
+export function useUpdateUserDetails() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/user",
+    postUserDetails
+  );
+
+  return {
+    updateUserDetails: trigger,
+    updatedUserDetails: data?.data ?? null,
+    isMutating,
+    error,
+  };
+}
+
+export function useUpdateUserAvatar() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/user",
+    postUserAvatar
+  );
+
+  return {
+    updateUserAvatar: trigger,
+    data: data?.data ?? null,
+    isUserAvatarMutating: isMutating,
+    error,
   };
 }
