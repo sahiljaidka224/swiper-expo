@@ -2,7 +2,7 @@ import Colors from "@/constants/Colors";
 import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 
 import {
   CodeField,
@@ -10,6 +10,8 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from "react-native-confirmation-code-field";
+import Text from "@/components/Text";
+
 const CELL_COUNT = 6;
 export default function PhonePage() {
   const { phone, signin } = useLocalSearchParams<{ phone: string; signin: string }>();

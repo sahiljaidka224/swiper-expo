@@ -1,5 +1,6 @@
 import React, { Component, PropsWithChildren } from "react";
-import { Animated, StyleSheet, View, Text } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
+import Text from "./Text";
 
 import { RectButton } from "react-native-gesture-handler";
 

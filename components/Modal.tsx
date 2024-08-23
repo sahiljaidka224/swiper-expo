@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
 import MaterialIcons from "@expo/vector-icons/build/MaterialIcons";
-import { Modal as RNModal, View, Text, Pressable, StyleSheet } from "react-native";
+import { Modal as RNModal, View, Pressable, StyleSheet } from "react-native";
 
 interface ModalProps {
   children: React.ReactNode;

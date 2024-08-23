@@ -1,10 +1,11 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import ContactCard from "./ContactCard";
 import StockButtonContainer from "./StockButtonContainer";
+import Text from "./Text";
 
 interface CarDetailProps {
   car: any;

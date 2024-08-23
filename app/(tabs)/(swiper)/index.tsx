@@ -3,7 +3,7 @@ import ContactCard from "@/components/ContactCard";
 import Colors from "@/constants/Colors";
 import { BlurView } from "expo-blur";
 import React, { useRef, useCallback, useState, useEffect } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Pressable } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
@@ -11,6 +11,7 @@ import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
+import Text from "@/components/Text";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";

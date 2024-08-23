@@ -1,9 +1,10 @@
 import Colors from "@/constants/Colors";
 import React from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { Pressable, View, StyleSheet } from "react-native";
 import Avatar from "./Avatar";
-import { router, usePathname } from "expo-router";
+import { router } from "expo-router";
 import { useSegments } from "expo-router";
+import Text from "./Text";
 
 function ContactCard({
   userId,

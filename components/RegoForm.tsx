@@ -1,4 +1,4 @@
-import { Text, View, TextInput, StyleSheet, Pressable } from "react-native";
+import { View, TextInput, StyleSheet, Pressable } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import Colors from "@/constants/Colors";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -6,6 +6,7 @@ import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useCarDetailsFromNedVis } from "@/api/hooks/car-detail";
 import { useEffect } from "react";
+import Text from "./Text";
 
 const states = ["ACT", "NSW", "NT", "QLD", "SA", "VIC", "WA", "TAS"];
 const transmission = ["Automatic", "Manual"];
@@ -88,6 +89,7 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
               value={value}
               style={[styles.textInput, { flex: 1 }]}
               autoCapitalize="characters"
+              maxFontSizeMultiplier={1.3}
             />
           )}
           name="rego"
@@ -120,6 +122,7 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
             value={value}
             style={styles.textInput}
             autoCapitalize="characters"
+            maxFontSizeMultiplier={1.3}
           />
         )}
         name="odometer"

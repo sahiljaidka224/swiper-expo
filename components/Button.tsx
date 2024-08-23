@@ -1,5 +1,6 @@
 import Colors from "@/constants/Colors";
-import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
+import Text from "./Text";
 
 type ButtonProps = {
   title: string;
@@ -35,8 +36,7 @@ export default function Button({ title, onPress, type = "primary", isLoading }: 
 const styles = StyleSheet.create({
   container: {
     borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    padding: 10,
     flex: 1,
     justifyContent: "center",
   },

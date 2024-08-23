@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 type BoxedIconProps = {
   name: typeof Ionicons.defaultProps;

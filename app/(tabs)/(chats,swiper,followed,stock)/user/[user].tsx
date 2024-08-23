@@ -4,7 +4,8 @@ import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import OrganisationCard from "@/components/OrganisationContactCard";
 import Colors from "@/constants/Colors";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import Text from "@/components/Text";
 
 export default function UserProfile() {
   const { id } = useLocalSearchParams();

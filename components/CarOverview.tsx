@@ -2,9 +2,10 @@ import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { Image } from "expo-image";
+import Text from "@/components/Text";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");

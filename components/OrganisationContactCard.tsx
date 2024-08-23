@@ -1,8 +1,9 @@
 import Colors from "@/constants/Colors";
-import { Pressable, StyleSheet, View, Text, Platform, Linking, Alert } from "react-native";
+import { Pressable, StyleSheet, View, Platform, Linking, Alert } from "react-native";
 import Avatar from "./Avatar";
 import Button from "./Button";
 import { router, useSegments } from "expo-router";
+import Text from "./Text";
 
 interface OrganisationCardProps {
   name: string;

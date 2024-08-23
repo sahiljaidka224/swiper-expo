@@ -1,13 +1,21 @@
-import { StyleSheet } from "react-native";
+import Colors from "@/constants/Colors";
+import { useState } from "react";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import WebView from "react-native-webview";
 
 export default function FeedPage() {
+  const [loading, setLoading] = useState(true);
+
   return (
-    <WebView
-      style={styles.container}
-      originWhitelist={["*"]}
-      source={{ uri: "https://www.carexpert.com.au/" }}
-    />
+    <>
+      {loading && <ActivityIndicator size="large" color={Colors.primary} />}
+      <WebView
+        style={styles.container}
+        originWhitelist={["*"]}
+        onLoadEnd={() => setLoading(false)}
+        source={{ uri: "https://www.carexpert.com.au/" }}
+      />
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image } from "react-native";
+import { View, TouchableOpacity, ScrollView, StyleSheet, Image } from "react-native";
 import calls from "@/assets/data/calls.json";
 import { defaultStyles } from "@/constants/Styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,6 +17,7 @@ import Animated, {
 } from "react-native-reanimated";
 import SwipeableRow from "@/components/SwipeableRow";
 import * as Haptics from "expo-haptics";
+import Text from "@/components/Text";
 
 const transition = CurvedTransition.delay(100);
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);

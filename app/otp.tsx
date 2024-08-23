@@ -1,5 +1,4 @@
 import Colors from "@/constants/Colors";
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -113,6 +112,7 @@ export default function OTPPage() {
               setPhoneNumber({ masked, unmasked: `0${unmasked.replaceAll(" ", "")}` });
             }}
             mask={phoneNumberMask}
+            maxFontSizeMultiplier={1.3}
           />
           <View style={styles.seperator} />
 
@@ -122,6 +122,7 @@ export default function OTPPage() {
             secureTextEntry
             onChangeText={setPassword}
             placeholderTextColor={Colors.textLight}
+            maxFontSizeMultiplier={1.3}
           />
         </View>
         <Text style={styles.legal}>

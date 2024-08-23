@@ -1,11 +1,12 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
 import Modal from "./Modal";
 import { ScrollView } from "react-native-gesture-handler";
+import Text from "./Text";
 
 const placeholderImage = require("@/assets/images/no-image-large.png");
 

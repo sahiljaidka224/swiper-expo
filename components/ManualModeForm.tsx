@@ -1,10 +1,11 @@
-import { Text, View, TextInput, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { View, TextInput, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import Colors from "@/constants/Colors";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useMakeList } from "@/api/hooks/car-search";
+import Text from "./Text";
 
 const transmission = ["Automatic", "Manual"];
 
@@ -102,6 +103,7 @@ export default function ManualModeForm({
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              maxFontSizeMultiplier={1.3}
               style={[styles.textInput, { flex: 1 }]}
             />
           )}
@@ -120,6 +122,7 @@ export default function ManualModeForm({
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            maxFontSizeMultiplier={1.3}
             style={[styles.textInput]}
           />
         )}
@@ -137,6 +140,7 @@ export default function ManualModeForm({
             onChangeText={onChange}
             value={value}
             style={styles.textInput}
+            maxFontSizeMultiplier={1.3}
             keyboardType="number-pad"
           />
         )}

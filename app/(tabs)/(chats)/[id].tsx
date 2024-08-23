@@ -1,13 +1,17 @@
-import { ImageBackground, StyleSheet, View, Text, Pressable, Platform } from "react-native";
+import { ImageBackground, StyleSheet, View, Pressable, Platform, TextInput } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Bubble,
+  DayProps,
   GiftedChat,
   IMessage,
   InputToolbar,
   MessageImageProps,
+  MessageTextProps,
   Send,
-  SystemMessage,
+  SendProps,
+  SystemMessageProps,
+  TimeProps,
 } from "react-native-gifted-chat";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
@@ -20,6 +24,8 @@ import { useGetUserDetails } from "@/api/hooks/user";
 import { useAssets } from "expo-asset";
 import * as ImagePicker from "expo-image-picker";
 import { ResizeMode, Video } from "expo-av";
+import Text from "@/components/Text";
+import { format } from "date-fns";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 
@@ -150,7 +156,7 @@ export default function ChatDetailsPage() {
       <GiftedChat
         messages={messages}
         alignTop
-        scrollToBottom
+        // scrollToBottom
         onSend={(messages: IMessage[]) => onSend(messages, text)}
         user={{ _id: 1, name: "Domenic" }}
         onInputTextChanged={setText}
@@ -167,12 +173,12 @@ export default function ChatDetailsPage() {
           fetchMessages();
         }}
         keyboardShouldPersistTaps="handled"
-        renderSystemMessage={(props) => (
-          <SystemMessage {...props} textStyle={{ color: Colors.gray }} />
-        )}
+        renderSystemMessage={SystemMessageText}
         renderBubble={(props) => {
           return <Bubble {...props} />;
         }}
+        renderDay={(props: DayProps<IMessage>) => null}
+        renderMessageText={MessageText}
         renderSend={(props) => (
           <View style={styles.sendContainer}>
             {text.length > 0 && (
@@ -190,22 +196,81 @@ export default function ChatDetailsPage() {
             )}
           </View>
         )}
+        renderTicks={RenderTicks}
         textInputProps={styles.composer}
+        renderTime={RenderTime}
         renderInputToolbar={(props) => (
-          <InputToolbar
-            {...props}
-            containerStyle={{ backgroundColor: Colors.background }}
-            renderActions={() => (
-              <View style={{ height: 44, justifyContent: "center", alignItems: "center", left: 5 }}>
-                <Ionicons name="add" color={Colors.primary} size={28} />
-              </View>
-            )}
-          />
+          <InputToolbar {...props} containerStyle={{ backgroundColor: Colors.background }} />
         )}
       />
     </ImageBackground>
   );
 }
+
+const RenderTicks = (props: any) => {
+  if (!props.from) return;
+
+  if (props.sent)
+    return (
+      <View style={{ margin: 4, justifyContent: "center" }}>
+        <Ionicons name="checkmark-done" size={18} color="#fff" />
+      </View>
+    );
+
+  if (props.received)
+    return (
+      <View style={{ margin: 4 }}>
+        <Ionicons name="checkmark" size={18} color="#fff" />
+      </View>
+    );
+
+  return null;
+};
+
+const RenderTime = (props: TimeProps<IMessage>) => {
+  if (!props.currentMessage?.createdAt) return;
+  return (
+    <Text
+      style={{
+        color: props.position === "left" ? Colors.textDark : "#fff",
+        fontSize: 12,
+        textAlign: "center",
+        padding: 5,
+      }}
+    >
+      {format(props.currentMessage?.createdAt, "hh:mm a")}
+    </Text>
+  );
+};
+
+const SystemMessageText = (props: SystemMessageProps<IMessage>) => {
+  return (
+    <Text
+      {...props}
+      style={{ textAlign: "center", color: Colors.gray, fontSize: 10, paddingVertical: 12 }}
+    >
+      {props.currentMessage?.text}
+    </Text>
+  );
+};
+
+const MessageText = (messageText: MessageTextProps<IMessage>) => {
+  return (
+    <View style={styles.messageTextWrapper}>
+      <Text
+        {...messageText}
+        style={[
+          styles.messageText,
+          {
+            color: messageText.position === "left" ? Colors.textDark : "#fff",
+          },
+        ]}
+      >
+        {messageText.currentMessage?.text}
+      </Text>
+    </View>
+  );
+};
 
 const Header = ({ userId }: { userId: string }) => {
   const { user, isLoading } = useGetUserDetails(userId);
@@ -271,4 +336,12 @@ const styles = StyleSheet.create({
   },
   video: { width: "100%", height: "100%", borderRadius: 5 },
   mediaContainer: { borderRadius: 30, padding: 5, height: 175, width: 250 },
+  messageTextWrapper: {
+    padding: 8,
+  },
+  messageText: {
+    fontFamily: "SF_Pro_Display_Medium",
+    fontSize: 16,
+    color: "#fff",
+  },
 });
