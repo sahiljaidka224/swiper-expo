@@ -29,7 +29,21 @@ const getUserOrgDetails = async (url: string, { arg }: { arg: { token: string } 
 
 const postUserDetails = async (
   url: string,
-  { arg }: { arg: { token: string; firstName: string; lastName: string } }
+  {
+    arg,
+  }: {
+    arg: {
+      token: string;
+      userDetails: {
+        firstName: string;
+        lastName: string;
+        dealershipName?: string;
+        displayName?: string;
+        profileWizardComplete?: number;
+        phoneNumber?: string;
+      };
+    };
+  }
 ) => {
   const response = await fetch(url, {
     method: "POST",
@@ -37,7 +51,7 @@ const postUserDetails = async (
       "Content-type": "application/json; charset=UTF-8",
       Authorization: `Bearer ${arg.token}`,
     },
-    body: JSON.stringify({ firstName: arg.firstName, lastName: arg.lastName }),
+    body: JSON.stringify(arg.userDetails),
   });
 
   if (!response.ok) {

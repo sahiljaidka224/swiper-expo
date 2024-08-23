@@ -1,6 +1,5 @@
 import { MessageIcon, PushCarIcon, StockIcon, SwiperIcon, WatchListIcon } from "@/components/Icons";
 import Colors from "@/constants/Colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 

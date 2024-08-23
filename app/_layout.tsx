@@ -50,7 +50,7 @@ function BaseLayout() {
       (async () => {
         const isSuccess = await cometChatInit(user?.id);
         if (isSuccess) {
-          router.replace("/(tabs)/(chats)");
+          router.replace(user.profileComplete ? "/(tabs)/(chats)" : "/profile");
         }
       })();
     } else if (!token && inTabsGroup) {
@@ -73,6 +73,8 @@ function BaseLayout() {
         name="verify/[phone]"
         options={{ headerTitle: "Verify Your Phone Number", headerBackTitle: "Edit Number" }}
       />
+      <Stack.Screen name="profile" options={{ title: "Your Details", headerBackVisible: false }} />
+
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   );
