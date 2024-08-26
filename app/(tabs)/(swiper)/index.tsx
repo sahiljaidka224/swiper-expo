@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   renderCardImage: {
-    height: "45%",
+    height: "40%",
     width: "100%",
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
   renderCardPlaceholder: {
-    height: "55%",
+    height: "60%",
     width: "100%",
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   absoluteCenteredView: {
-    height: "55%",
+    height: "60%",
     position: "absolute",
     bottom: 0,
     left: 0,

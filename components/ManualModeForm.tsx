@@ -34,7 +34,6 @@ export default function ManualModeForm({
     defaultValues: {
       make: "Make",
       model: "",
-      odometer: "",
       transmission: transmission[0],
     },
   });
@@ -124,6 +123,7 @@ export default function ManualModeForm({
             value={value}
             maxFontSizeMultiplier={1.3}
             style={[styles.textInput]}
+            keyboardType="number-pad"
           />
         )}
         name="odometer"

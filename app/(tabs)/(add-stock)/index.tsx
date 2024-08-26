@@ -27,8 +27,6 @@ export default function AddStockPage() {
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [carDetails, setCarDetails] = useState<any | null>();
 
-  console.log({ savedCar });
-
   useEffect(() => {
     if (error && !isMutating) {
       Alert.alert("Error", error);
@@ -36,51 +34,49 @@ export default function AddStockPage() {
   }, [isMutating, error]);
 
   useEffect(() => {
-    const convertUriToBlob = async (uri: string): Promise<Blob> => {
-      const response = await fetch(uri);
-      const blob = await response.blob();
+    const convertURItoBlob = async (uri: string) => {
+      const blob = await fetch(uri).then((r) => r.blob());
       return blob;
     };
 
-    if (!isMutating && carDetails && savedCar && savedCar.carId && selectedImages.length > 0) {
-      const formData = new FormData();
-      formData.append("carId", savedCar.carId);
+    const uploadImages = async () => {
+      if (!isMutating && carDetails && savedCar && savedCar.carId && selectedImages.length > 0) {
+        const formData = new FormData();
+        formData.append("carId", savedCar.carId);
 
-      selectedImages.forEach(async (asset, index) => {
-        const blob = await convertUriToBlob(asset.uri);
-        formData.append(`file${index}`, {
-          uri: asset.uri,
-          name: asset.name,
-          type: asset.type,
-        });
-      });
+        for (let index = 0; index < selectedImages.length; index++) {
+          const file = selectedImages[index];
+          const fileUri = file.uri;
+          const blob = await convertURItoBlob(fileUri);
 
-      console.log(formData);
-
-      try {
-        if (!token) return;
-        uploadFiles({ formData, token });
-        console.log("Upload successful!");
-      } catch (error) {
-        console.log("Upload failed:", error);
-        // setUploadError('Upload failed. Retrying...');
-
-        // Retry logic
-        try {
-          // await trigger(formData);
-          console.log("Retry successful!");
-        } catch (retryError) {
-          console.log("Retry failed:", retryError);
-          // setUploadError("Retry failed");
+          console.log({ blob });
+          formData.append(
+            `file${index}`,
+            new File([blob], `image${index}.jpg`, { type: "image/jpg" })
+            // new File([fileUri], `image${index}.jpg`, { type: file.type })
+          );
+          formData.append(`file${index + 1}`, blob, `image${index}.jpg`);
         }
-      } finally {
-        setCarDetails(null);
-        setSelectedImages([]);
+        console.log({ formData });
+        try {
+          if (!token) return;
+          uploadFiles({ formData, token });
+          console.log("Upload successful!");
+          Alert.alert("Success", "Car added to stock successfully!");
+        } catch (error) {
+          console.log("Upload failed:", error);
+          Alert.alert("Error", "Failed to upload images");
+        } finally {
+          // setCarDetails(null);
+          // setSelectedImages([]);
+        }
+      } else {
+        // setCarDetails(null);
+        // setSelectedImages([]);
       }
-    } else {
-      // setCarDetails(null);
-      // setSelectedImages([]);
-    }
+    };
+
+    uploadImages();
   }, [isMutating, savedCar]);
 
   const onAddCarToStock = () => {

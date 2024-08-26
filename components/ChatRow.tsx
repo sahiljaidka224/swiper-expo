@@ -101,8 +101,8 @@ function MessageText({
 
       return (
         <>
-          <Text style={styles.msgText} numberOfLines={1}>
-            {messageText}
+          <Text style={styles.msgText} numberOfLines={1} ellipsizeMode="tail" lineBreakMode="clip">
+            {messageText.length > 40 ? `${messageText.slice(0, 40)}...` : messageText}
           </Text>
         </>
       );

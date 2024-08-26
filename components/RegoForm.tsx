@@ -32,7 +32,6 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
     defaultValues: {
       rego: "",
       state: "State",
-      odometer: "",
       transmission: transmission[0],
     },
   });
@@ -111,18 +110,15 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
       </View>
       <Controller
         control={control}
-        rules={{
-          maxLength: 100,
-        }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             placeholder="Odometer"
             onBlur={onBlur}
             onChangeText={onChange}
-            value={value}
+            value={value ? value : ""}
             style={styles.textInput}
-            autoCapitalize="characters"
             maxFontSizeMultiplier={1.3}
+            keyboardType="number-pad"
           />
         )}
         name="odometer"

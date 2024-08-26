@@ -29,7 +29,6 @@ const uploadFilesToStock = async (
     const response = await axios.post(url, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data", // Automatically set by axios when FormData is used
       },
     });
 
@@ -48,6 +47,8 @@ const uploadFilesToStock = async (
 export function useSaveToStock() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/save_to_stock",
+    // "http://localhost:9091/car/save_to_stock",
+
     saveToStock
   );
 
@@ -62,6 +63,7 @@ export function useSaveToStock() {
 export function useUploadFilesToStock() {
   const { trigger, data, error, isMutating } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/save_files_to_stock",
+    // "http://localhost:9091/car/save_files_to_stock",
     uploadFilesToStock
   );
 
