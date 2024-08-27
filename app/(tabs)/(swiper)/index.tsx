@@ -177,7 +177,7 @@ export default function SwiperPage() {
 
   return (
     <GestureHandlerRootView style={[styles.container, { marginTop: insets.top + 30 }]}>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           headerRight: () => (
             <Pressable onPress={() => router.push("/(swiper)/search")}>
@@ -185,7 +185,7 @@ export default function SwiperPage() {
             </Pressable>
           ),
         }}
-      />
+      /> */}
       <View style={styles.subContainer}>
         {!isLoading && watchListData.length > 0 ? (
           <Swiper

@@ -7,9 +7,8 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import Text from "@/components/Text";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { useMakeList, useModelList } from "@/api/hooks/car-search";
-
-const transmission = ["Automatic", "Manual"];
+import { useCarYear, useMakeList, useModelList } from "@/api/hooks/car-search";
+import { useAuth } from "@/context/AuthContext";
 
 type FormData = {
   make: string;
@@ -25,24 +24,46 @@ type FormData = {
 
 export default function SearchPage() {
   const { showActionSheetWithOptions } = useActionSheet();
+  const { token } = useAuth();
   const {
     control,
     handleSubmit,
     formState: { errors },
+    getValues,
     setValue,
   } = useForm<FormData>({});
   const { makeList: makeData, loading: makeListLoading, error } = useMakeList();
-  const { triggerFetch } = useModelList();
+  const { triggerModelFetch, modelsData, isMutating: isModelsLoading } = useModelList();
+  const { triggerCarYearFetch, isCarYearLoading, carYearData, carYearError } = useCarYear();
 
-  const [makeList, setMakeList] = useState<{ make: string }[]>([]);
+  const [makeList, setMakeList] = useState<string[]>([]);
+  const [modelList, setModelList] = useState<string[]>([]);
+  const [yearList, setYearList] = useState<string[]>([]);
+
+  console.log({ modelsData });
 
   useEffect(() => {
-    if (makeData && !makeListLoading) {
-      setMakeList(makeData);
+    if (makeData && makeData.length > 0 && !makeListLoading) {
+      setMakeList(makeData.map((m: { make: string }) => m?.make));
     }
   }, [makeData, makeListLoading]);
 
-  const onMakeListOpen = (options: string[]) => {
+  useEffect(() => {
+    if (modelsData && modelsData.length > 0 && !isModelsLoading) {
+      setModelList(modelsData.map((m: { model: string }) => m?.model));
+    }
+  }, [modelsData, isModelsLoading]);
+
+  useEffect(() => {
+    if (carYearData && carYearData.length > 0 && !isCarYearLoading) {
+      setYearList(carYearData.map((y: { year: string }) => y?.year));
+    }
+  }, [carYearData, isCarYearLoading]);
+
+  const onMakeListOpen = (
+    options: string[],
+    fieldValue: "make" | "model" | "fromYear" | "toYear"
+  ) => {
     const cancelButtonIndex = options.length - 1;
 
     showActionSheetWithOptions(
@@ -52,8 +73,24 @@ export default function SearchPage() {
       },
       (buttonIndex) => {
         if (buttonIndex !== cancelButtonIndex) {
-          setValue("make", options[buttonIndex as number]);
-          triggerFetch(options[buttonIndex as number]);
+          setValue(fieldValue, options[buttonIndex as number]);
+
+          if (!token) return;
+          const selectedValue = options[buttonIndex as number];
+          if (fieldValue === "make") {
+            setValue("model", "");
+            triggerModelFetch({ token, make: selectedValue });
+            triggerCarYearFetch({ token, make: selectedValue, year: "all" });
+          }
+
+          if (fieldValue === "model") {
+            triggerCarYearFetch({
+              token,
+              make: getValues("make"),
+              model: selectedValue,
+              year: "all",
+            });
+          }
         }
       }
     );
@@ -67,9 +104,7 @@ export default function SearchPage() {
         name="make"
         render={({ field: { value, name } }) => (
           <Pressable
-            onPress={() =>
-              onMakeListOpen([...(makeList ?? []).map((m: { make: string }) => m?.make), "Cancel"])
-            }
+            onPress={() => onMakeListOpen([...makeList, "Cancel"], "make")}
             style={styles.selector}
           >
             {makeListLoading ? (
@@ -87,7 +122,10 @@ export default function SearchPage() {
         control={control}
         name="model"
         render={({ field: { value, name } }) => (
-          <Pressable onPress={() => {}} style={styles.selector}>
+          <Pressable
+            onPress={() => onMakeListOpen([...modelList, "Cancel"], "model")}
+            style={styles.selector}
+          >
             <Text style={[styles.valueStyle, value ? null : styles.placeholder]}>
               {value ? value : name}
             </Text>
@@ -100,7 +138,10 @@ export default function SearchPage() {
           control={control}
           name="fromYear"
           render={({ field: { value, name } }) => (
-            <Pressable onPress={() => {}} style={styles.selector}>
+            <Pressable
+              onPress={() => onMakeListOpen([...yearList, "Cancel"], "fromYear")}
+              style={styles.selector}
+            >
               <Text style={[styles.valueStyle, value ? null : styles.placeholder]}>
                 {value ? value : "From Year"}
               </Text>
@@ -112,7 +153,10 @@ export default function SearchPage() {
           control={control}
           name="toYear"
           render={({ field: { value, name } }) => (
-            <Pressable onPress={() => {}} style={styles.selector}>
+            <Pressable
+              onPress={() => onMakeListOpen([...yearList, "Cancel"], "toYear")}
+              style={styles.selector}
+            >
               <Text style={[styles.valueStyle, value ? null : styles.placeholder]}>
                 {value ? value : "To Year"}
               </Text>

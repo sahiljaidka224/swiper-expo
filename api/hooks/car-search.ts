@@ -1,7 +1,20 @@
 import { useAuth } from "@/context/AuthContext";
 import useSWR from "swr";
+import useSWRMutation from "swr/dist/mutation";
 
-const fetchMakeList = async (url: string, { arg }: { arg: { token: string } }) => {
+const fetchMakeList = async (
+  url: string,
+  { arg }: { arg: { token: string; make?: string; model?: string; year?: string } }
+) => {
+  if (arg.make) {
+    url += `?make=${arg.make}`;
+  }
+
+  if (arg.model || arg.year) {
+    if (arg.make) {
+      url += `&model=${arg.model ? arg.model : ""}&year=${arg.year ? arg.year : "all"}`;
+    }
+  }
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -32,21 +45,31 @@ export const useMakeList = () => {
 };
 
 export const useModelList = () => {
-  const { token } = useAuth();
-  const fetchUrl = "https://backend-swiper.datalinks.nl/cardb?make=";
-  const { data, error, isLoading, mutate } = useSWR(
-    token ? [fetchUrl, token] : null,
-    ([url, token]) => fetchMakeList(url, { arg: { token } })
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/cardb",
+    fetchMakeList
   );
 
-  const triggerFetch = async (make: string) => {
-    mutate(`${fetchUrl}${make}`);
+  return {
+    isMutating,
+    modelsData: data?.data ?? [],
+    modelError: error,
+    triggerModelFetch: trigger,
   };
+};
+
+export const useCarYear = () => {
+  const {
+    trigger: triggerCarYearFetch,
+    isMutating,
+    data,
+    error,
+  } = useSWRMutation("https://backend-swiper.datalinks.nl/cardb", fetchMakeList);
 
   return {
-    modelList: data?.data ?? [],
-    loading: isLoading,
-    error,
-    triggerFetch,
+    isCarYearLoading: isMutating,
+    carYearData: data?.data ?? [],
+    carYearError: error,
+    triggerCarYearFetch,
   };
 };
