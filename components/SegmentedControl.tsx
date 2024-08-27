@@ -13,12 +13,13 @@ type SegmentedControlProps = {
   options: string[];
   selectedOption: string;
   onOptionPress?: (option: string) => void;
+  width?: number;
 };
 
 const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
-  ({ options, selectedOption, onOptionPress }) => {
+  ({ options, selectedOption, onOptionPress, width }) => {
     const internalPadding = 6;
-    const segmentedControlWidth = 300;
+    const segmentedControlWidth = width ? width : 150;
 
     const itemWidth = (segmentedControlWidth - internalPadding) / options.length;
 

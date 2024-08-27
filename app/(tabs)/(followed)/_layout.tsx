@@ -27,6 +27,13 @@ export default function WatchlistLayout() {
             title: "",
           }}
         />
+        <Stack.Screen
+          name="new-chat/[id]"
+          options={{
+            title: "",
+            presentation: "modal",
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );

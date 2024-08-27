@@ -16,18 +16,27 @@ interface ChatRowProps {
 }
 
 export default function ChatRow({ conversation }: ChatRowProps) {
-  const conversationWith = conversation.getConversationWith() as CometChat.User;
+  const conversationWith = conversation.getConversationWith();
   const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
     conversation?.getLastMessage();
-  const userUID = conversationWith.getUid();
+
+  const userUID =
+    conversationWith instanceof CometChat.User ? conversationWith.getUid() : undefined;
+  const groupUID =
+    conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
   const userName = conversationWith.getName();
+
+  let icon = undefined;
+  if (conversationWith instanceof CometChat.Group) {
+    icon = conversationWith.getIcon();
+  }
   const lastMessageSentAt = lastMessage.getSentAt();
   const sender = lastMessage.getSender();
   const senderUID = sender.getUid();
   const isRead = Boolean(lastMessage.getReadAt());
   const isDelivered = Boolean(lastMessage.getDeliveredAt());
   const isSent = Boolean(lastMessageSentAt);
-  const isOutgoingMsg = isOutgoingMessage(senderUID, userUID);
+  const isOutgoingMsg = userUID ? isOutgoingMessage(senderUID, userUID) : undefined;
 
   const metadata = lastMessage.getMetadata() as {
     organisation_from: string;
@@ -42,12 +51,13 @@ export default function ChatRow({ conversation }: ChatRowProps) {
 
   return (
     <AppleStyleSwipeableRow>
-      <Link href={`/(tabs)/(chats)/${userUID}`} asChild>
+      <Link href={`/(tabs)/(chats)/${userUID ? userUID : groupUID}`} asChild>
         <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
           <View style={styles.container}>
             <View style={styles.avatarContainer}>
-              <Avatar userId={userUID} />
+              <Avatar userId={userUID} source={icon} />
             </View>
+
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{userName}</Text>
               <Text style={styles.orgNameText}>{organisationFromName}</Text>

@@ -8,7 +8,7 @@ export const useGetConversations = () => {
 
   const fetchConversations = async () => {
     const conversationsRequest = new CometChat.ConversationsRequestBuilder()
-      .setConversationType("user")
+      .withUserAndGroupTags(true)
       .setLimit(50)
       .build();
 

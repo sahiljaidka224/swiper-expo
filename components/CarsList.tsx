@@ -12,6 +12,9 @@ import { FlashList } from "@shopify/flash-list";
 import { useAuth } from "@/context/AuthContext";
 import ErrorView from "./Error";
 import Text from "./Text";
+import { router } from "expo-router";
+import { useCreateGroup } from "@/hooks/cometchat/groups";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
 
 interface CarsListProps {
   context: CarsListContext;
@@ -26,7 +29,7 @@ export function CarsList({
   orderDirection = "desc",
   orgId,
 }: CarsListProps) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const {
     isValidating,
     cars,
@@ -36,6 +39,7 @@ export function CarsList({
     fetchMore,
   } = useGetWatchlist(context, orderBy, orderDirection, orgId);
   const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
+  const { createGroup, error: errorGroup, group, loading: isGroupLoading } = useCreateGroup();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
@@ -45,7 +49,12 @@ export function CarsList({
     }
   }, [cars]);
 
-  const onMessagePress = () => {};
+  useEffect(() => {
+    if (group && !isGroupLoading) {
+      const guid = group.getGuid();
+      router.push({ pathname: "/(tabs)/(followed)/new-chat/[id]", params: { id: guid } });
+    }
+  }, [isGroupLoading, group]);
 
   const onDeletePress = useCallback(
     (carId: any) => {
@@ -77,6 +86,42 @@ export function CarsList({
 
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+      const onMessagePress = () => {
+        if (!user?.id || !item?.organisation?.ownerUserId) return;
+
+        const GUID = `${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`;
+        const chatName = String(`${user?.name} - ${item?.make} ${item?.model}`).toUpperCase();
+        const icon = item?.images[0]?.url ?? "https://picsum.photos/200";
+        const owner = user?.id;
+        const members = [owner, item?.organisation?.ownerUserId];
+        const metadata = {
+          carId: item?.carId,
+          make: item?.make,
+          model: item?.model,
+          year: item?.year,
+          price: item?.price,
+          odometer: item?.odometer,
+          icon,
+        };
+        const tags = ["car-chat"];
+        console.log({ icon });
+
+        const group = new CometChat.Group(
+          GUID,
+          chatName,
+          CometChat.GROUP_TYPE.PRIVATE,
+          undefined,
+          icon,
+          undefined
+        );
+        group.setMetadata(metadata);
+        group.setTags(tags);
+        group.setOwner(owner);
+        group.setMembersCount(2);
+
+        createGroup(group, members);
+      };
+
       return (
         <Animated.View
           style={styles.itemWrapper}
@@ -126,7 +171,7 @@ export function CarsList({
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
         onEndReachedThreshold={0.5}
         renderItem={renderItem}
-        ListEmptyComponent={!isLoading ? ListEmpty : null}
+        ListEmptyComponent={!isLoading && (!cars || !cars.length) ? ListEmpty : null}
       />
     </View>
   );

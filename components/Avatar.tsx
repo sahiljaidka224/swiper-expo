@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 
 const userPlaceholderImage = require("@/assets/images/user-placeholder.png");
 
-function Avatar({ userId }: { userId: string }) {
+function Avatar({ userId, source }: { userId?: string; source?: string }) {
   return (
     <View style={styles.avatarContainer}>
       <Image
@@ -13,7 +13,9 @@ function Avatar({ userId }: { userId: string }) {
         allowDownscaling
         alt="User Avatar"
         contentFit="cover"
-        source={{ uri: `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` }}
+        source={{
+          uri: userId ? `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` : source,
+        }}
       />
     </View>
   );

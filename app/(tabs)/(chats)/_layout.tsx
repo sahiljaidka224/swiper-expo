@@ -1,8 +1,11 @@
+import { useGetUserOrgDetails } from "@/api/hooks/user";
 import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Stack } from "expo-router";
 
 export default function ChatsLayout() {
+  useGetUserOrgDetails();
+
   return (
     <ActionSheetProvider>
       <Stack>
@@ -37,6 +40,14 @@ export default function ChatsLayout() {
           name="feed"
           options={{
             title: "Car News",
+            headerStyle: { backgroundColor: Colors.background },
+          }}
+        />
+        <Stack.Screen
+          name="new-chat/[id]"
+          options={{
+            title: "",
+            presentation: "modal",
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
