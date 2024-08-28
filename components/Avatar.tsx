@@ -25,8 +25,6 @@ export default React.memo(Avatar);
 
 const styles = StyleSheet.create({
   avatarImage: {
-    // minHeight: 50,
-    // minWidth: 50,
     aspectRatio: 1,
     borderRadius: 999999,
   },

@@ -23,5 +23,5 @@ export function formatTimestamp(timestamp: number): string {
 }
 
 export function isOutgoingMessage(fromUID: string, currentUserUID: string) {
-  return fromUID !== currentUserUID;
+  return fromUID === currentUserUID;
 }

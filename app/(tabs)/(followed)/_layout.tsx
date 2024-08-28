@@ -1,5 +1,7 @@
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { Stack } from "expo-router";
+import { AntDesign } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
+import { Pressable } from "react-native";
 
 export default function WatchlistLayout() {
   return (
@@ -32,6 +34,11 @@ export default function WatchlistLayout() {
           options={{
             title: "",
             presentation: "modal",
+            headerRight: () => (
+              <Pressable onPress={() => router.back()}>
+                <AntDesign name="closecircleo" size={24} color="black" />
+              </Pressable>
+            ),
           }}
         />
       </Stack>

@@ -5,13 +5,14 @@ import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
 import ErrorView from "@/components/Error";
 import { router, Stack, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import Colors from "@/constants/Colors";
-import MaterialCommunityIcons from "@expo/vector-icons/build/MaterialCommunityIcons";
 import { SegmentedControl } from "@/components/SegmentedControl";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Animated, { CurvedTransition } from "react-native-reanimated";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
+import AntDesign from "@expo/vector-icons/build/AntDesign";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const transition = CurvedTransition.delay(100);
 export default function Chats() {
@@ -75,14 +76,19 @@ export default function Chats() {
             />
           ),
           headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
-                <FontAwesome5 name="user-circle" size={24} color={Colors.primary} />
+                <AntDesign name="user" size={24} color={Colors.primary} />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFeedPress}>
-                <MaterialCommunityIcons name="web" size={24} color={Colors.primary} />
+                <FontAwesome name="newspaper-o" size={24} color={Colors.primary} />
               </TouchableOpacity>
             </View>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push("/(tabs)/(chats)/users-list")}>
+              <Ionicons name="add-circle-outline" size={24} color={Colors.primary} />
+            </TouchableOpacity>
           ),
         }}
       />

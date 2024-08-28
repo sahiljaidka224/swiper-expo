@@ -48,7 +48,7 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display: segments[2] === "[id]" ? "none" : "flex",
+              display: segments[2] === "[id]" || segments[3] === "[id]" ? "none" : "flex",
             },
           }}
         />

@@ -17,6 +17,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { formatTimestamp, isOutgoingMessage } from "@/utils/cometchat";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import { useAuth } from "@/context/AuthContext";
 
 interface ChatRowProps {
   conversation: CometChat.Conversation;
@@ -24,6 +25,7 @@ interface ChatRowProps {
 }
 
 export default function ChatRow({ conversation, index }: ChatRowProps) {
+  const { user } = useAuth();
   const conversationWith = conversation.getConversationWith();
   const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
     conversation?.getLastMessage();
@@ -44,7 +46,7 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
   const isRead = Boolean(lastMessage.getReadAt());
   const isDelivered = Boolean(lastMessage.getDeliveredAt());
   const isSent = Boolean(lastMessageSentAt);
-  const isOutgoingMsg = userUID ? isOutgoingMessage(senderUID, userUID) : undefined;
+  const isOutgoingMsg = user ? isOutgoingMessage(senderUID, user?.id) : undefined;
 
   const metadata = lastMessage.getMetadata() as {
     organisation_from: string;

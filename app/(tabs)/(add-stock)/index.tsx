@@ -127,7 +127,12 @@ export default function AddStockPage() {
               marginBottom: 12,
             }}
           >
-            <SegmentedControl options={options} selectedOption={mode} onOptionPress={setMode} />
+            <SegmentedControl
+              options={options}
+              selectedOption={mode}
+              onOptionPress={setMode}
+              width={300}
+            />
           </View>
 
           {carDetails && (

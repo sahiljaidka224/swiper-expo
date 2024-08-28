@@ -1,7 +1,9 @@
 import { useGetUserOrgDetails } from "@/api/hooks/user";
 import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { Stack } from "expo-router";
+import AntDesign from "@expo/vector-icons/build/AntDesign";
+import { router, Stack } from "expo-router";
+import { Pressable } from "react-native";
 
 export default function ChatsLayout() {
   useGetUserOrgDetails();
@@ -21,14 +23,7 @@ export default function ChatsLayout() {
             },
           }}
         />
-        <Stack.Screen
-          name="[id]"
-          options={{
-            title: "",
-            headerBackTitleVisible: false,
-            headerStyle: { backgroundColor: Colors.background },
-          }}
-        />
+
         <Stack.Screen
           name="settings"
           options={{
@@ -48,6 +43,29 @@ export default function ChatsLayout() {
           options={{
             title: "",
             headerBackTitle: "",
+            headerBackTitleVisible: false,
+            headerStyle: { backgroundColor: Colors.background },
+          }}
+        />
+        <Stack.Screen
+          name="users-list/index"
+          options={{
+            title: "Swiper Users",
+            headerBackTitle: "",
+            presentation: "modal",
+            headerBackTitleVisible: false,
+            headerStyle: { backgroundColor: Colors.background },
+            headerRight: () => (
+              <Pressable onPress={() => router.back()}>
+                <AntDesign name="closecircleo" size={24} color="black" />
+              </Pressable>
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="[id]"
+          options={{
+            title: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
           }}
