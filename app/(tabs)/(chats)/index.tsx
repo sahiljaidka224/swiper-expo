@@ -1,4 +1,4 @@
-import { View, ScrollView, TouchableOpacity } from "react-native";
+import { View, ScrollView, TouchableOpacity, ListRenderItem } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
 import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
@@ -9,10 +9,11 @@ import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import Colors from "@/constants/Colors";
 import MaterialCommunityIcons from "@expo/vector-icons/build/MaterialCommunityIcons";
 import { SegmentedControl } from "@/components/SegmentedControl";
-import ChatRowConvesation from "@/components/ChatRow";
+import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
-import { FlashList } from "@shopify/flash-list";
+import Animated, { CurvedTransition } from "react-native-reanimated";
 
+const transition = CurvedTransition.delay(100);
 export default function Chats() {
   const [conversations, setConversations] = useState<CometChat.Conversation[]>([]);
   const [selectedOption, setSelectedOption] = useState("All");
@@ -51,9 +52,9 @@ export default function Chats() {
     router.push("/(chats)/feed");
   };
 
-  const renderItem = useCallback(
-    ({ item }: { item: CometChat.Conversation }) => {
-      return <ChatRowConvesation conversation={item} />;
+  const renderItem: ListRenderItem<unknown> = useCallback(
+    ({ item, index }) => {
+      return <ChatRow conversation={item as CometChat.Conversation} index={index} />;
     },
     [conversations]
   );
@@ -61,7 +62,8 @@ export default function Chats() {
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{ paddingBottom: 20, backgroundColor: "#fff" }}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 20, backgroundColor: Colors.background }}
     >
       <Stack.Screen
         options={{
@@ -96,17 +98,23 @@ export default function Chats() {
         </>
       )}
       {error && <ErrorView />}
-      <FlashList
-        contentInsetAdjustmentBehavior="automatic"
-        scrollEnabled={false}
-        data={conversations}
-        refreshing={loading}
-        keyExtractor={(item) => item.getConversationId()}
-        showsVerticalScrollIndicator={false}
-        estimatedItemSize={85}
-        ItemSeparatorComponent={ItemSeparator}
-        renderItem={renderItem}
-      />
+      <Animated.View layout={transition}>
+        <Animated.FlatList
+          contentInsetAdjustmentBehavior="automatic"
+          skipEnteringExitingAnimations
+          scrollEnabled={false}
+          data={conversations}
+          refreshing={loading}
+          itemLayoutAnimation={transition}
+          keyExtractor={(item: unknown) => {
+            const conversation = item as CometChat.Conversation;
+            return conversation.getConversationId();
+          }}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={renderItem}
+        />
+      </Animated.View>
     </ScrollView>
   );
 }

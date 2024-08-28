@@ -47,7 +47,8 @@ export default function ChatsLayout() {
           name="new-chat/[id]"
           options={{
             title: "",
-            presentation: "modal",
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
           }}
         />

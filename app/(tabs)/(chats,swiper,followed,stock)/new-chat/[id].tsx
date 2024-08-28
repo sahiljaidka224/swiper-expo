@@ -20,16 +20,17 @@ import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/mess
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { Image } from "expo-image";
-import { useGetUserDetails } from "@/api/hooks/user";
 import { useAssets } from "expo-asset";
 import * as ImagePicker from "expo-image-picker";
 import { ResizeMode, Video } from "expo-av";
 import Text from "@/components/Text";
 import { format } from "date-fns";
+import { useGetGroup } from "@/hooks/cometchat/groups";
+import { formatNumberWithCommas } from "@/utils";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 
-export default function NewChatsPage() {
+export default function NewGroupChatPage() {
   const [assets, error] = useAssets([backroundPattern]);
   const { id } = useLocalSearchParams();
   const {
@@ -150,7 +151,7 @@ export default function NewChatsPage() {
     >
       <Stack.Screen
         options={{
-          headerTitle: () => <Header userId={id as string} />,
+          headerTitle: () => <Header groupUID={id as string} />,
         }}
       />
       <GiftedChat
@@ -294,14 +295,19 @@ const MessageText = (messageText: MessageTextProps<IMessage>) => {
   );
 };
 
-const Header = ({ userId }: { userId: string }) => {
-  const { user, isLoading } = useGetUserDetails(userId);
-  if (!user || isLoading) return;
+const Header = ({ groupUID }: { groupUID: string }) => {
+  const { group, isGroupLoading } = useGetGroup(groupUID);
+  if (!group || isGroupLoading) return;
+
+  const groupName = group.getName();
+  const icon = group.getIcon();
+  const metadata = group.getMetadata() as { carId: string; odometer: number; price: number };
 
   const onPress = () => {
+    if (!metadata?.carId) return;
     router.push({
-      pathname: `/(tabs)/(chats)/user/${userId}`,
-      params: { id: userId },
+      pathname: `/(tabs)/(chats)/car/[id]`,
+      params: { id: metadata?.carId },
     });
   };
 
@@ -317,9 +323,16 @@ const Header = ({ userId }: { userId: string }) => {
       onPress={onPress}
     >
       <View style={{ width: 40, height: 40 }}>
-        <Avatar userId={userId} />
+        <Avatar source={icon} />
       </View>
-      <Text style={{ fontSize: 16, fontWeight: "500" }}>{user?.displayName}</Text>
+      <View style={{ flexDirection: "column" }}>
+        <Text style={{ fontSize: 16, fontFamily: "SF_Pro_Display_Medium" }}>{groupName}</Text>
+        <Text
+          style={{ fontSize: 14, fontFamily: "SF_Pro_Display_Light" }}
+        >{`${formatNumberWithCommas(metadata.odometer)}KM $${formatNumberWithCommas(
+          metadata.price
+        )}`}</Text>
+      </View>
     </Pressable>
   );
 };

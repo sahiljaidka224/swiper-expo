@@ -1,6 +1,12 @@
 import Colors from "@/constants/Colors";
 import { Link } from "expo-router";
-import { TouchableHighlight, View, Animated, StyleSheet, I18nManager } from "react-native";
+import {
+  TouchableHighlight,
+  View,
+  Animated as RNAnimated,
+  StyleSheet,
+  I18nManager,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { Component, PropsWithChildren } from "react";
 
@@ -10,12 +16,14 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { formatTimestamp, isOutgoingMessage } from "@/utils/cometchat";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 interface ChatRowProps {
   conversation: CometChat.Conversation;
+  index: number;
 }
 
-export default function ChatRow({ conversation }: ChatRowProps) {
+export default function ChatRow({ conversation, index }: ChatRowProps) {
   const conversationWith = conversation.getConversationWith();
   const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
     conversation?.getLastMessage();
@@ -51,31 +59,36 @@ export default function ChatRow({ conversation }: ChatRowProps) {
 
   return (
     <AppleStyleSwipeableRow>
-      <Link href={`/(tabs)/(chats)/${userUID ? userUID : groupUID}`} asChild>
-        <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
-          <View style={styles.container}>
-            <View style={styles.avatarContainer}>
-              <Avatar userId={userUID} source={icon} />
-            </View>
-
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>{userName}</Text>
-              <Text style={styles.orgNameText}>{organisationFromName}</Text>
-              <View style={styles.msgContainer}>
-                {isSent && isOutgoingMsg && (
-                  <Ionicons
-                    name={isRead || isDelivered ? "checkmark-done-outline" : "checkmark-outline"}
-                    size={18}
-                    color={isRead ? Colors.primary : Colors.iconGray}
-                  />
-                )}
-                <MessageText lastMessage={lastMessage} />
+      <Animated.View entering={FadeInUp.delay(index * 10)} exiting={FadeOutUp}>
+        <Link
+          href={userUID ? `/(tabs)/(chats)/${userUID}` : `/(tabs)/(chats)/new-chat/${groupUID}`}
+          asChild
+        >
+          <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
+            <View style={styles.container}>
+              <View style={styles.avatarContainer}>
+                <Avatar userId={userUID} source={icon} />
               </View>
+
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>{userName}</Text>
+                <Text style={styles.orgNameText}>{organisationFromName}</Text>
+                <View style={styles.msgContainer}>
+                  {isSent && isOutgoingMsg && (
+                    <Ionicons
+                      name={isRead || isDelivered ? "checkmark-done-outline" : "checkmark-outline"}
+                      size={18}
+                      color={isRead ? Colors.primary : Colors.iconGray}
+                    />
+                  )}
+                  <MessageText lastMessage={lastMessage} />
+                </View>
+              </View>
+              <Text style={styles.timeStampContainer}>{formatTimestamp(lastMessageSentAt)}</Text>
             </View>
-            <Text style={styles.timeStampContainer}>{formatTimestamp(lastMessageSentAt)}</Text>
-          </View>
-        </TouchableHighlight>
-      </Link>
+          </TouchableHighlight>
+        </Link>
+      </Animated.View>
     </AppleStyleSwipeableRow>
   );
 }
@@ -124,7 +137,7 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
     text: string,
     color: string,
     x: number,
-    progress: Animated.AnimatedInterpolation<number>
+    progress: RNAnimated.AnimatedInterpolation<number>
   ) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
@@ -137,7 +150,7 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
     };
 
     return (
-      <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
+      <RNAnimated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
         <RectButton style={[styles.rightAction, { backgroundColor: color }]} onPress={pressHandler}>
           <Ionicons
             name={text === "More" ? "ellipsis-horizontal" : "archive"}
@@ -147,13 +160,13 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
           />
           <Text style={styles.actionText}>{text}</Text>
         </RectButton>
-      </Animated.View>
+      </RNAnimated.View>
     );
   };
 
   private renderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
-    _dragAnimatedValue: Animated.AnimatedInterpolation<number>
+    progress: RNAnimated.AnimatedInterpolation<number>,
+    _dragAnimatedValue: RNAnimated.AnimatedInterpolation<number>
   ) => (
     <View
       style={{
@@ -190,11 +203,6 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
 }
 
 const styles = StyleSheet.create({
-  leftAction: {
-    flex: 1,
-    backgroundColor: "#497AFC",
-    justifyContent: "center",
-  },
   actionText: {
     color: "white",
     fontSize: 16,
@@ -226,6 +234,7 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     lineHeight: 21,
     textTransform: "capitalize",
+    maxWidth: "80%",
   },
   orgNameText: {
     fontSize: 16,
@@ -248,9 +257,9 @@ const styles = StyleSheet.create({
   },
   timeStampContainer: {
     color: Colors.gray,
-    top: 10,
+    top: 5,
     alignSelf: "flex-start",
     position: "absolute",
-    right: 10,
+    right: 5,
   },
 });

@@ -1,5 +1,5 @@
 import { CometChat } from "@cometchat/chat-sdk-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const useCreateGroup = () => {
   const [loading, setLoading] = useState(false);
@@ -33,4 +33,31 @@ export const useCreateGroup = () => {
   };
 
   return { createGroup, loading, error, group };
+};
+
+export const useGetGroup = (guid: string) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<CometChat.CometChatException | null>(null);
+  const [group, setGroup] = useState<CometChat.Group | null>(null);
+
+  const getGroup = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await CometChat.getGroup(guid);
+      setGroup(response);
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
+      console.log("Group fetch failed with error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getGroup();
+  }, []);
+
+  return { getGroup, isGroupLoading: loading, groupError: error, group };
 };
