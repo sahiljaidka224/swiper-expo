@@ -1,4 +1,4 @@
-import { View, Pressable, Platform } from "react-native";
+import { View, Pressable, Platform, ActivityIndicator } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
@@ -9,6 +9,7 @@ import Text from "@/components/Text";
 import { useGetGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
 import ChatComponent from "@/components/ChatScreen";
+import Colors from "@/constants/Colors";
 
 export default function NewGroupChatPage() {
   const { id } = useLocalSearchParams();
@@ -120,9 +121,9 @@ export default function NewGroupChatPage() {
   );
 }
 
-const Header = ({ groupUID }: { groupUID: string }) => {
+const Header = React.memo(({ groupUID }: { groupUID: string }) => {
   const { group, isGroupLoading } = useGetGroup(groupUID);
-  if (!group || isGroupLoading) return;
+  if (!group || isGroupLoading) return <ActivityIndicator size="small" color={Colors.primary} />;
 
   const groupName = group.getName();
   const icon = group.getIcon();
@@ -131,7 +132,7 @@ const Header = ({ groupUID }: { groupUID: string }) => {
   const onPress = () => {
     if (!metadata?.carId) return;
     router.push({
-      pathname: `/(tabs)/(chats)/car/[id]`,
+      pathname: `/(tabs)/(followed)/car/[id]`,
       params: { id: metadata?.carId },
     });
   };
@@ -159,11 +160,11 @@ const Header = ({ groupUID }: { groupUID: string }) => {
         </Text>
         <Text
           allowFontScaling={false}
-          style={{ fontSize: 14, fontFamily: "SF_Pro_Display_Light" }}
-        >{`${formatNumberWithCommas(metadata.odometer)}KM $${formatNumberWithCommas(
+          style={{ fontSize: 14, fontFamily: "SF_Pro_Display_Medium" }}
+        >{`${formatNumberWithCommas(metadata.odometer)}KM - $${formatNumberWithCommas(
           metadata.price
         )}`}</Text>
       </View>
     </Pressable>
   );
-};
+});

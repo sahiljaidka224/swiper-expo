@@ -90,7 +90,9 @@ export function CarsList({
         if (!user?.id || !item?.organisation?.ownerUserId) return;
 
         const GUID = `${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`;
-        const chatName = String(`${user?.name} - ${item?.make} ${item?.model}`).toUpperCase();
+        const chatName = String(
+          `${user?.name.split(" ")[0]} - ${item?.year} ${item?.make} ${item?.model}`
+        ).toUpperCase();
         const icon = item?.images[0]?.url ?? "https://picsum.photos/200";
         const owner = user?.id;
         const members = [owner, item?.organisation?.ownerUserId];
@@ -134,7 +136,7 @@ export function CarsList({
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
               onDelete={onDeletePress}
-              isPrimaryButtonLoading={isMutating}
+              isPrimaryButtonLoading={isGroupLoading}
             />
           ) : (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />

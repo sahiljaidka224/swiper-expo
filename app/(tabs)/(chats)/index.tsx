@@ -108,6 +108,7 @@ export default function Chats() {
           options={["Chats", "Groups"]}
           selectedOption={selectedOption}
           onOptionPress={setSelectedOption}
+          width={275}
         />
       </View>
       <Animated.View layout={transition}>

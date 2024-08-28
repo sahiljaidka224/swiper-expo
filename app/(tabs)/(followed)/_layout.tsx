@@ -1,7 +1,5 @@
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { AntDesign } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
-import { Pressable } from "react-native";
+import { Stack } from "expo-router";
 
 export default function WatchlistLayout() {
   return (
@@ -33,12 +31,14 @@ export default function WatchlistLayout() {
           name="new-chat/[id]"
           options={{
             title: "",
-            presentation: "modal",
-            headerRight: () => (
-              <Pressable onPress={() => router.back()}>
-                <AntDesign name="closecircleo" size={24} color="black" />
-              </Pressable>
-            ),
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
+            // presentation: "modal",
+            // headerRight: () => (
+            //   <Pressable onPress={() => router.back()}>
+            //     <AntDesign name="closecircleo" size={24} color="black" />
+            //   </Pressable>
+            // ),
           }}
         />
       </Stack>
