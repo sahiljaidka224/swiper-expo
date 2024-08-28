@@ -18,6 +18,7 @@ import Avatar from "./Avatar";
 import { formatTimestamp, isOutgoingMessage } from "@/utils/cometchat";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
+import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 
 interface ChatRowProps {
   conversation: CometChat.Conversation;
@@ -26,7 +27,9 @@ interface ChatRowProps {
 
 export default function ChatRow({ conversation, index }: ChatRowProps) {
   const { user } = useAuth();
+  const { markAsRead } = useMarkMessageAsRead();
   const conversationWith = conversation.getConversationWith();
+  const unreadMessageCount = conversation.getUnreadMessageCount();
   const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
     conversation?.getLastMessage();
 
@@ -59,19 +62,25 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
       : metadata["organisation_from"];
   }
 
+  const onPress = () => {
+    if (unreadMessageCount > 0) {
+      markAsRead(lastMessage);
+    }
+  };
+
   return (
     <AppleStyleSwipeableRow>
       <Animated.View entering={FadeInUp.delay(index * 10)} exiting={FadeOutUp}>
         <Link
           href={userUID ? `/(tabs)/(chats)/${userUID}` : `/(tabs)/(chats)/new-chat/${groupUID}`}
           asChild
+          onPress={onPress}
         >
           <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
             <View style={styles.container}>
               <View style={styles.avatarContainer}>
-                <Avatar userId={userUID} source={icon} />
+                <Avatar userId={userUID} source={icon} borderRadius={userUID ? 99999 : 12} />
               </View>
-
               <View style={styles.textContainer}>
                 <Text style={styles.nameText}>{userName}</Text>
                 <Text style={styles.orgNameText}>{organisationFromName}</Text>
@@ -86,7 +95,21 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
                   <MessageText lastMessage={lastMessage} />
                 </View>
               </View>
-              <Text style={styles.timeStampContainer}>{formatTimestamp(lastMessageSentAt)}</Text>
+              <View style={styles.timeStampContainer}>
+                <Text
+                  style={[
+                    styles.timestamp,
+                    { color: unreadMessageCount > 0 ? Colors.primary : Colors.gray },
+                  ]}
+                >
+                  {formatTimestamp(lastMessageSentAt)}
+                </Text>
+                {unreadMessageCount > 0 ? (
+                  <View style={styles.unreadCountContainer}>
+                    <Text style={styles.unreadCount}>{unreadMessageCount}</Text>
+                  </View>
+                ) : null}
+              </View>
             </View>
           </TouchableHighlight>
         </Link>
@@ -258,10 +281,27 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   timeStampContainer: {
-    color: Colors.gray,
-    top: 5,
-    alignSelf: "flex-start",
     position: "absolute",
+    flex: 1,
     right: 5,
+    top: 5,
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 10,
+  },
+  unreadCountContainer: {
+    backgroundColor: Colors.primary,
+    borderRadius: 9999,
+    padding: 5,
+    paddingHorizontal: 10,
+  },
+  timestamp: {
+    fontSize: 14,
+    fontFamily: "SF_Pro_Display_Regular",
+  },
+  unreadCount: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: "SF_Pro_Display_Bold",
   },
 });

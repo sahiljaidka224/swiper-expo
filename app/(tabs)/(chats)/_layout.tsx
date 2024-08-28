@@ -18,9 +18,6 @@ export default function ChatsLayout() {
             headerLargeTitle: false,
             headerBlurEffect: "regular",
             headerTransparent: true,
-            headerSearchBarOptions: {
-              placeholder: "Search",
-            },
           }}
         />
 

@@ -1,38 +1,18 @@
-import { ImageBackground, StyleSheet, View, Pressable, Platform } from "react-native";
+import { View, Pressable, Platform } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Bubble,
-  Composer,
-  DayProps,
-  GiftedChat,
-  IMessage,
-  InputToolbar,
-  MessageImageProps,
-  MessageTextProps,
-  Send,
-  SystemMessageProps,
-  TimeProps,
-} from "react-native-gifted-chat";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import Avatar from "@/components/Avatar";
-import { Image } from "expo-image";
-import { useAssets } from "expo-asset";
 import * as ImagePicker from "expo-image-picker";
-import { ResizeMode, Video } from "expo-av";
 import Text from "@/components/Text";
-import { format } from "date-fns";
 import { useGetGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
-
-const backroundPattern = require("@/assets/images/pattern.png");
+import ChatComponent from "@/components/ChatScreen";
 
 export default function NewGroupChatPage() {
-  const [assets, error] = useAssets([backroundPattern]);
   const { id } = useLocalSearchParams();
+
   const {
     messages: chatMessages,
     error: fetchMessagesErr,
@@ -42,9 +22,6 @@ export default function NewGroupChatPage() {
   } = useGetGroupMessages(id as string);
   const { sendMessage, sendMediaMessage } = useSendGroupMessage();
   const [messages, setMessages] = useState<IMessage[]>();
-  const insets = useSafeAreaInsets();
-
-  const [text, setText] = useState<string>("");
 
   useEffect(() => {
     setMessages([
@@ -124,176 +101,24 @@ export default function NewGroupChatPage() {
     }
   };
 
-  const MessageVideo = (props: any) => {
-    const { currentMessage } = props;
-    return (
-      <View style={styles.mediaContainer}>
-        <Video
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay={false}
-          source={{ uri: currentMessage.video }}
-          style={styles.video}
-        />
-      </View>
-    );
-  };
-
   const onSend = useCallback((messages: IMessage[], text: string) => {
     setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
     if (text.trimEnd().length > 0) sendMessage(id as string, text);
   }, []);
 
   return (
-    <ImageBackground
-      source={assets ? assets[0] : backroundPattern}
-      style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
-    >
-      <Stack.Screen
-        options={{
-          headerTitle: () => <Header groupUID={id as string} />,
-        }}
-      />
-      <GiftedChat
-        messages={messages}
-        alignTop
-        // scrollToBottom
-        onSend={(messages: IMessage[]) => onSend(messages, text)}
-        user={{ _id: 1, name: "Domenic" }}
-        onInputTextChanged={setText}
-        bottomOffset={insets.bottom}
-        renderAvatar={null}
-        minInputToolbarHeight={50}
-        maxComposerHeight={100}
-        infiniteScroll
-        loadEarlier={hasMore}
-        isLoadingEarlier={loading}
-        renderMessageImage={MessageImage}
-        renderMessageVideo={MessageVideo}
-        onLoadEarlier={() => {
-          fetchMessages();
-        }}
-        keyboardShouldPersistTaps="handled"
-        renderSystemMessage={SystemMessageText}
-        renderBubble={(props) => {
-          return <Bubble {...props} />;
-        }}
-        renderDay={(props: DayProps<IMessage>) => null}
-        renderMessageText={MessageText}
-        renderSend={(props) => (
-          <View style={styles.sendContainer}>
-            {text.length > 0 && (
-              <Send {...props} containerStyle={{ justifyContent: "center" }}>
-                <Ionicons name="send" color={Colors.primary} size={28} />
-              </Send>
-            )}
-            {text.length === 0 && (
-              <>
-                <Pressable onPress={pickImage}>
-                  <Ionicons name="camera-outline" color={Colors.primary} size={28} />
-                </Pressable>
-                <Ionicons name="mic-outline" color={Colors.primary} size={28} />
-              </>
-            )}
-          </View>
-        )}
-        renderTicks={RenderTicks}
-        textInputProps={styles.composer}
-        renderTime={RenderTime}
-        renderInputToolbar={(props) => (
-          <InputToolbar
-            {...props}
-            containerStyle={{ backgroundColor: Colors.background }}
-            renderComposer={(props) => (
-              <Composer
-                {...props}
-                textInputProps={{
-                  ...props,
-                  maxFontSizeMultiplier: 2,
-                }}
-                textInputStyle={{
-                  borderRadius: 15,
-                  borderWidth: 1,
-                  borderColor: Colors.lightGray,
-                  paddingHorizontal: 10,
-                  fontSize: 16,
-                  marginVertical: 10,
-                  paddingTop: 8,
-                  fontFamily: "SF_Pro_Display_Regular",
-                }}
-              />
-            )}
-          />
-        )}
-      />
-    </ImageBackground>
+    <ChatComponent
+      fetchMessages={fetchMessages}
+      messages={messages}
+      onSend={onSend}
+      hasMore={hasMore}
+      loadingMore={loading}
+      pickImage={pickImage}
+      userId={id as string}
+      Header={() => <Header groupUID={id as string} />}
+    />
   );
 }
-
-const RenderTicks = (props: any) => {
-  if (!props.from) return;
-
-  if (props.sent)
-    return (
-      <View style={{ margin: 4, justifyContent: "center" }}>
-        <Ionicons name="checkmark-done" size={18} color="#fff" />
-      </View>
-    );
-
-  if (props.received)
-    return (
-      <View style={{ margin: 4 }}>
-        <Ionicons name="checkmark" size={18} color="#fff" />
-      </View>
-    );
-
-  return null;
-};
-
-const RenderTime = (props: TimeProps<IMessage>) => {
-  if (!props.currentMessage?.createdAt) return;
-  return (
-    <Text
-      style={{
-        color: props.position === "left" ? Colors.textDark : "#fff",
-        fontSize: 12,
-        textAlign: "center",
-        padding: 5,
-      }}
-    >
-      {format(props.currentMessage?.createdAt, "hh:mm a")}
-    </Text>
-  );
-};
-
-const SystemMessageText = (props: SystemMessageProps<IMessage>) => {
-  return (
-    <Text
-      {...props}
-      style={{ textAlign: "center", color: Colors.gray, fontSize: 10, paddingVertical: 12 }}
-    >
-      {props.currentMessage?.text}
-    </Text>
-  );
-};
-
-const MessageText = (messageText: MessageTextProps<IMessage>) => {
-  return (
-    <View style={styles.messageTextWrapper}>
-      <Text
-        {...messageText}
-        style={[
-          styles.messageText,
-          {
-            color: messageText.position === "left" ? Colors.textDark : "#fff",
-          },
-        ]}
-      >
-        {messageText.currentMessage?.text}
-      </Text>
-    </View>
-  );
-};
 
 const Header = ({ groupUID }: { groupUID: string }) => {
   const { group, isGroupLoading } = useGetGroup(groupUID);
@@ -326,8 +151,14 @@ const Header = ({ groupUID }: { groupUID: string }) => {
         <Avatar source={icon} />
       </View>
       <View style={{ flexDirection: "column" }}>
-        <Text style={{ fontSize: 16, fontFamily: "SF_Pro_Display_Medium" }}>{groupName}</Text>
         <Text
+          style={{ fontSize: 16, fontFamily: "SF_Pro_Display_Medium" }}
+          allowFontScaling={false}
+        >
+          {groupName}
+        </Text>
+        <Text
+          allowFontScaling={false}
           style={{ fontSize: 14, fontFamily: "SF_Pro_Display_Light" }}
         >{`${formatNumberWithCommas(metadata.odometer)}KM $${formatNumberWithCommas(
           metadata.price
@@ -336,47 +167,3 @@ const Header = ({ groupUID }: { groupUID: string }) => {
     </Pressable>
   );
 };
-
-const MessageImage = (props: MessageImageProps<IMessage>) => {
-  return (
-    <View style={styles.mediaContainer}>
-      <Image
-        priority="high"
-        source={props.currentMessage?.image}
-        contentFit="cover"
-        style={{ width: "100%", height: "100%", borderRadius: 5 }}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  composer: {
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: Colors.lightGray,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    marginVertical: 4,
-    paddingTop: 8,
-  },
-  sendContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 44,
-    gap: 14,
-    justifyContent: "center",
-    paddingHorizontal: 14,
-  },
-  video: { width: "100%", height: "100%", borderRadius: 5 },
-  mediaContainer: { borderRadius: 30, padding: 5, height: 175, width: 250 },
-  messageTextWrapper: {
-    padding: 8,
-  },
-  messageText: {
-    fontFamily: "SF_Pro_Display_Medium",
-    fontSize: 16,
-    color: "#fff",
-  },
-});

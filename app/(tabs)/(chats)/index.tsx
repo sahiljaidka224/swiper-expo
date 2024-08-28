@@ -17,7 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 const transition = CurvedTransition.delay(100);
 export default function Chats() {
   const [conversations, setConversations] = useState<CometChat.Conversation[]>([]);
-  const [selectedOption, setSelectedOption] = useState("All");
+  const [selectedOption, setSelectedOption] = useState("Chats");
   const { conversationList, error, loading, fetchConversations } = useGetConversations();
 
   useFocusEffect(
@@ -32,13 +32,18 @@ export default function Chats() {
 
   useEffect(() => {
     if (conversationList && conversationList.length && !loading) {
-      setConversations(conversationList);
+      if (selectedOption === "Chats") {
+        setConversations(conversationList.filter((c) => c.getConversationType() === "user"));
+        return;
+      }
+
+      setConversations(conversationList.filter((c) => c.getConversationType() === "group"));
     }
   }, [conversationList, loading]);
 
   useEffect(() => {
-    if (selectedOption === "All") {
-      setConversations(conversationList);
+    if (selectedOption === "Chats") {
+      setConversations(conversationList.filter((c) => c.getConversationType() === "user"));
       return;
     }
 
@@ -68,15 +73,9 @@ export default function Chats() {
     >
       <Stack.Screen
         options={{
-          headerTitle: () => (
-            <SegmentedControl
-              options={["All", "Groups"]}
-              selectedOption={selectedOption}
-              onOptionPress={setSelectedOption}
-            />
-          ),
+          title: "Chats",
           headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
                 <AntDesign name="user" size={24} color={Colors.primary} />
               </TouchableOpacity>
@@ -104,6 +103,13 @@ export default function Chats() {
         </>
       )}
       {error && <ErrorView />}
+      <View style={{ alignItems: "center", marginVertical: 10 }}>
+        <SegmentedControl
+          options={["Chats", "Groups"]}
+          selectedOption={selectedOption}
+          onOptionPress={setSelectedOption}
+        />
+      </View>
       <Animated.View layout={transition}>
         <Animated.FlatList
           contentInsetAdjustmentBehavior="automatic"

@@ -104,7 +104,6 @@ export function CarsList({
           icon,
         };
         const tags = ["car-chat"];
-        console.log({ icon });
 
         const group = new CometChat.Group(
           GUID,
@@ -135,6 +134,7 @@ export function CarsList({
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
               onDelete={onDeletePress}
+              isPrimaryButtonLoading={isMutating}
             />
           ) : (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />

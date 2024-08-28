@@ -112,16 +112,24 @@ export const useSendMessage = () => {
     | null
   >(null);
 
-  const sendMessage = async (receiverID: string, messageText: string) => {
+  const sendMessage = async (
+    receiverID: string,
+    messageText: string,
+    organisationFrom?: string,
+    organisationTo?: string
+  ) => {
     setLoading(true);
     setError(null);
 
     const textMessage = new CometChat.TextMessage(receiverID, messageText, "user");
+    textMessage.setMetadata({
+      organisation_from: organisationFrom,
+      organisation_to: organisationTo,
+    });
 
     try {
       const response = await CometChat.sendMessage(textMessage);
       setMessage(response);
-      // console.log("Message sent successfully:", response);
     } catch (error) {
       setError(error as CometChat.CometChatException);
       console.log("Message sending failed with error:", error);
@@ -137,12 +145,18 @@ export const useSendMessage = () => {
       uri: string;
       type: string | undefined;
       size: number | undefined;
-    }[]
+    }[],
+    organisationFrom?: string,
+    organisationTo?: string
   ) => {
     setLoading(true);
     setError(null);
 
     const mediaMessage = new CometChat.MediaMessage(receiverID, files, "image", "user");
+    mediaMessage.setMetadata({
+      organisation_from: organisationFrom,
+      organisation_to: organisationTo,
+    });
 
     try {
       const response = await CometChat.sendMediaMessage(mediaMessage);
@@ -268,11 +282,20 @@ export const useSendGroupMessage = () => {
     | null
   >(null);
 
-  const sendMessage = async (receiverID: string, messageText: string) => {
+  const sendMessage = async (
+    receiverID: string,
+    messageText: string,
+    organisationFrom?: string,
+    organisationTo?: string
+  ) => {
     setLoading(true);
     setError(null);
 
-    const textMessage = new CometChat.TextMessage(receiverID, messageText, "user");
+    const textMessage = new CometChat.TextMessage(receiverID, messageText, "group");
+    textMessage.setMetadata({
+      organisation_from: organisationFrom,
+      organisation_to: organisationTo,
+    });
 
     try {
       const response = await CometChat.sendGroupMessage(textMessage);
@@ -293,12 +316,18 @@ export const useSendGroupMessage = () => {
       uri: string;
       type: string | undefined;
       size: number | undefined;
-    }[]
+    }[],
+    organisationFrom?: string,
+    organisationTo?: string
   ) => {
     setLoading(true);
     setError(null);
 
-    const mediaMessage = new CometChat.MediaMessage(receiverID, files, "image", "user");
+    const mediaMessage = new CometChat.MediaMessage(receiverID, files, "image", "group");
+    mediaMessage.setMetadata({
+      organisation_from: organisationFrom,
+      organisation_to: organisationTo,
+    });
 
     try {
       const response = await CometChat.sendMediaMessage(mediaMessage);
@@ -313,4 +342,16 @@ export const useSendGroupMessage = () => {
   };
 
   return { sendMessage, loading, error, message, sendMediaMessage };
+};
+
+export const useMarkMessageAsRead = () => {
+  const markAsRead = async (message: CometChat.BaseMessage) => {
+    try {
+      await CometChat.markAsRead(message);
+    } catch (error) {
+      console.log("Error marking message as read:", error);
+    }
+  };
+
+  return { markAsRead };
 };

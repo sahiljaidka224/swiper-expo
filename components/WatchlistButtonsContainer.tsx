@@ -14,6 +14,8 @@ interface ButtonsContainerProps {
   carId: string;
   buttonsType?: "primary" | "secondary";
   userId?: string | null;
+  isPrimaryButtonLoading?: boolean;
+  isSecondaryButtonLoading?: boolean;
 }
 
 function WatchlistButtonsContainer({
@@ -23,6 +25,8 @@ function WatchlistButtonsContainer({
   carId,
   userId,
   buttonsType,
+  isPrimaryButtonLoading = false,
+  isSecondaryButtonLoading = false,
 }: ButtonsContainerProps) {
   const onDeletePress = () => {
     if (onDelete && carId && carId.trim() !== "") {
@@ -56,8 +60,20 @@ function WatchlistButtonsContainer({
         </TouchableOpacity>
       )}
       {/* // TODO: after comet chat is integrated completely */}
-      <Button title="Call" onPress={onCallPress} type={buttonsType ? buttonsType : "secondary"} />
-      <Button title="Message" onPress={onMessagePress} type={buttonsType} />
+      <Button
+        title="Call"
+        onPress={onCallPress}
+        type={buttonsType ? buttonsType : "secondary"}
+        isLoading={isSecondaryButtonLoading}
+        disabled={isSecondaryButtonLoading}
+      />
+      <Button
+        title="Message"
+        onPress={onMessagePress}
+        type={buttonsType}
+        isLoading={isPrimaryButtonLoading}
+        disabled={isPrimaryButtonLoading}
+      />
     </View>
   );
 }
