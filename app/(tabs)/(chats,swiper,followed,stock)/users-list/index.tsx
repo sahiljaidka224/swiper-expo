@@ -8,10 +8,10 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  SectionList,
   StyleSheet,
   TextInput,
   View,
@@ -21,7 +21,7 @@ export default function UsersListPage() {
   const { users, error, loading } = useGetCometChatUsers();
   const [searchText, setSearchText] = useState("");
   const keyExtractor = (item: CometChat.User) => item.getUid();
-  const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 0;
+  const keyboardVerticalOffset = Platform.OS === "ios" ? 100 : 0;
 
   const renderItem = ({ item }: { item: CometChat.User }) => <User user={item} />;
 
@@ -32,6 +32,22 @@ export default function UsersListPage() {
       lastName.startsWith(searchText.toLowerCase())
     );
   });
+
+  const groupedUsers = filteredUsers.reduce((acc, user) => {
+    const firstLetter = user.getName().charAt(0).toUpperCase();
+    if (!acc[firstLetter]) {
+      acc[firstLetter] = [];
+    }
+    acc[firstLetter].push(user);
+    return acc;
+  }, {} as Record<string, CometChat.User[]>);
+
+  const sections = Object.keys(groupedUsers)
+    .sort()
+    .map((letter) => ({
+      title: letter,
+      data: groupedUsers[letter],
+    }));
 
   return (
     <KeyboardAvoidingView
@@ -48,7 +64,16 @@ export default function UsersListPage() {
       />
       {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
-      <FlatList data={filteredUsers} keyExtractor={keyExtractor} renderItem={renderItem} />
+      <SectionList
+        sections={sections}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>{title}</Text>
+          </View>
+        )}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -79,7 +104,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },
   userContainer: {
@@ -87,28 +112,18 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: Colors.background,
     alignItems: "center",
-    margin: 10,
-    padding: 10,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
+    marginHorizontal: 5,
+    padding: 5,
   },
   name: {
     color: Colors.textDark,
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: "SF_Pro_Display_Medium",
     textTransform: "capitalize",
   },
   orgName: {
     color: Colors.textDark,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "SF_Pro_Display_Light",
     marginTop: 2,
   },
@@ -122,5 +137,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     fontSize: 20,
     fontFamily: "SF_Pro_Display_Regular",
+  },
+  sectionHeader: {
+    backgroundColor: Colors.background,
+    paddingVertical: 5,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  sectionHeaderText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontFamily: "SF_Pro_Display_Bold",
   },
 });

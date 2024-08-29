@@ -14,10 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
+      "buildNumber": "2",
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
         "NSMicrophoneUsageDescription": "Test"
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
