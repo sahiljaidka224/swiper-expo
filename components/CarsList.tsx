@@ -82,10 +82,12 @@ export function CarsList({
     }
   };
 
-  const onSendToPhoneContacts = () => {};
-
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+      const onSendToPhoneContacts = () => {
+        router.push({ pathname: "/(tabs)/(stock)/users-list" });
+      };
+
       const onMessagePress = () => {
         if (!user?.id || !item?.organisation?.ownerUserId) return;
 

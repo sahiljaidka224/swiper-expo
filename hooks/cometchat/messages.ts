@@ -93,11 +93,13 @@ export const useGetMessages = (toId: string) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
         onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
-          console.log("Typing started :", typingIndicator);
+          const senderUID = typingIndicator.getSender().getUid();
+          if (senderUID === user?.id) return;
           setIsTyping(true);
         },
         onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
-          console.log("Typing ended :", typingIndicator);
+          const senderUID = typingIndicator.getSender().getUid();
+          if (senderUID === user?.id) return;
           setIsTyping(false);
         },
       })

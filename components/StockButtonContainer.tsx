@@ -12,7 +12,7 @@ interface ButtonsContainerProps {
   showSMSOption?: boolean;
 }
 
-function StockButtonsContainer({
+function StockButtonContainer({
   onPushToSwiperContacts,
   onDelete,
   carId,
@@ -50,7 +50,7 @@ function StockButtonsContainer({
   );
 }
 
-export default React.memo(StockButtonsContainer);
+export default React.memo(StockButtonContainer);
 
 const styles = StyleSheet.create({
   itemButtonsContainer: {
