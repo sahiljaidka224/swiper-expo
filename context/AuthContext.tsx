@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 
-interface User {
+export interface CurrentUser {
   name: string;
   id: string;
   phoneNumber: string;
@@ -14,10 +14,10 @@ interface User {
 
 interface AuthContextType {
   token: string | null;
-  user: User | null;
+  user: CurrentUser | null;
   isAuthLoading: boolean;
-  login: (token: string, user: User) => void;
-  updateUser: (user: User) => void;
+  login: (token: string, user: CurrentUser) => void;
+  updateUser: (user: CurrentUser) => void;
   logout: () => void;
 }
 
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [userInfo, setUserInfo] = useState<CurrentUser | null>(null);
   const [isAuthLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (storedToken && storedUserInfo) {
         setToken(storedToken);
         try {
-          const parsedUserInfo: User | null = JSON.parse(storedUserInfo);
+          const parsedUserInfo: CurrentUser | null = JSON.parse(storedUserInfo);
           if (parsedUserInfo) setUserInfo(parsedUserInfo);
         } catch (error) {}
       }
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadAuthData();
   }, []);
 
-  const login = async (authToken: string, user: User) => {
+  const login = async (authToken: string, user: CurrentUser) => {
     setToken(authToken);
     setUserInfo(user);
 
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await SecureStore.deleteItemAsync("user");
   };
 
-  const updateUser = async (user: User) => {
+  const updateUser = async (user: CurrentUser) => {
     setUserInfo(user);
 
     await SecureStore.setItemAsync("user", JSON.stringify(user));

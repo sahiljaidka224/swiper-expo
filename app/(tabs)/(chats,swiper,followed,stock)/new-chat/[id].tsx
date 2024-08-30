@@ -1,4 +1,4 @@
-import { View, Pressable, Platform, ActivityIndicator } from "react-native";
+import { View, Pressable, Platform, ActivityIndicator, Alert } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
@@ -10,35 +10,28 @@ import { useGetGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
 import ChatComponent from "@/components/ChatScreen";
 import Colors from "@/constants/Colors";
+import { useAuth } from "@/context/AuthContext";
 
 export default function NewGroupChatPage() {
   const { id } = useLocalSearchParams();
-
+  const { user } = useAuth();
   const {
     messages: chatMessages,
     error: fetchMessagesErr,
     loading,
     fetchMessages,
     hasMore,
+    setMessages,
+    isTyping,
   } = useGetGroupMessages(id as string);
   const { sendMessage, sendMediaMessage } = useSendGroupMessage();
-  const [messages, setMessages] = useState<IMessage[]>();
 
   useEffect(() => {
-    setMessages([
-      ...chatMessages,
-      {
-        _id: 0,
-        system: true,
-        text: "All your messages are encrypted and secured",
-        createdAt: new Date(),
-        user: {
-          _id: 0,
-          name: "Bot",
-        },
-      },
-    ]);
-  }, [chatMessages]);
+    if (fetchMessagesErr && !loading) {
+      Alert.alert("Error", "Failed to fetch messages", [{ text: "OK" }]);
+      router.back();
+    }
+  }, [fetchMessagesErr, loading]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -52,7 +45,7 @@ export default function NewGroupChatPage() {
 
     if (!result.canceled) {
       let files = [];
-      for (let file of result.assets) {
+      for (let [index, file] of result.assets.entries()) {
         const uri = file.uri;
         let name: string | null = "";
         let type: string | undefined = "";
@@ -62,12 +55,12 @@ export default function NewGroupChatPage() {
           type = file.type;
         } else {
           type = file.type;
-          name = "Camera_001.jpeg";
+          name = `Camera_0${index}.jpeg`;
         }
 
         if (type === "video") {
           type = "video/quicktime";
-          name = "Camera_002.mov";
+          name = `Camera_0${index}.mov`;
         }
         // TODO: handle video
 
@@ -90,7 +83,7 @@ export default function NewGroupChatPage() {
               createdAt: new Date(),
               user: {
                 _id: 1,
-                name: "Bob",
+                name: user?.name,
               },
             },
           ],
@@ -103,20 +96,26 @@ export default function NewGroupChatPage() {
   };
 
   const onSend = useCallback((messages: IMessage[], text: string) => {
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
+    const updatedMessages = messages.map((m) => {
+      return { ...m, received: true, from: 1 };
+    });
+
+    setMessages((previousMessages) => GiftedChat.append(previousMessages, updatedMessages));
     if (text.trimEnd().length > 0) sendMessage(id as string, text);
   }, []);
 
   return (
     <ChatComponent
       fetchMessages={fetchMessages}
-      messages={messages}
+      messages={chatMessages}
       onSend={onSend}
       hasMore={hasMore}
       loadingMore={loading}
       pickImage={pickImage}
       userId={id as string}
       Header={() => <Header groupUID={id as string} />}
+      isTyping={isTyping}
+      context="group"
     />
   );
 }

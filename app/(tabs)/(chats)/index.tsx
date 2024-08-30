@@ -39,16 +39,7 @@ export default function Chats() {
 
       setConversations(conversationList.filter((c) => c.getConversationType() === "group"));
     }
-  }, [conversationList, loading]);
-
-  useEffect(() => {
-    if (selectedOption === "Chats") {
-      setConversations(conversationList.filter((c) => c.getConversationType() === "user"));
-      return;
-    }
-
-    setConversations(conversationList.filter((c) => c.getConversationType() === "group"));
-  }, [selectedOption]);
+  }, [conversationList, loading, selectedOption]);
 
   const onProfilePress = () => {
     router.push("/(chats)/settings");

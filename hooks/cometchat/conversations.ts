@@ -1,5 +1,6 @@
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useCallback, useEffect, useState } from "react";
+import * as Haptics from "expo-haptics";
 
 export const useGetConversations = () => {
   const [conversationList, setConversationList] = useState<CometChat.Conversation[]>([]);
@@ -24,6 +25,28 @@ export const useGetConversations = () => {
 
   useEffect(() => {
     fetchConversations();
+  }, []);
+
+  useEffect(() => {
+    let listenerID: string = `conversations-listener`;
+
+    CometChat.addMessageListener(
+      listenerID,
+      new CometChat.MessageListener({
+        onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
+          fetchConversations();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+        onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
+          fetchConversations();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+      })
+    );
+
+    return () => {
+      CometChat.removeMessageListener(listenerID);
+    };
   }, []);
 
   return { conversationList, error, loading, fetchConversations };

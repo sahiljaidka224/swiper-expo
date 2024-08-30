@@ -83,7 +83,11 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.nameText}>{userName}</Text>
-                <Text style={styles.orgNameText}>{organisationFromName}</Text>
+                <Text style={styles.orgNameText}>
+                  {organisationFromName && organisationFromName !== "undefined"
+                    ? organisationFromName
+                    : ""}
+                </Text>
                 <View style={styles.msgContainer}>
                   {isSent && isOutgoingMsg && (
                     <Ionicons

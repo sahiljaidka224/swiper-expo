@@ -14,7 +14,9 @@ import {
   Send,
   SystemMessageProps,
   TimeProps,
+  MessageImage as GiftedChatMessageImage,
 } from "react-native-gifted-chat";
+import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
 
 import dayjs from "dayjs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,6 +30,8 @@ import Text from "@/components/Text";
 import { format } from "date-fns";
 import { useChatContext } from "react-native-gifted-chat/lib/GiftedChatContext";
 import { useAssets } from "expo-asset";
+import { useAuth } from "@/context/AuthContext";
+import { useTypingIndicator } from "@/hooks/cometchat/messages";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 
@@ -40,6 +44,8 @@ interface ChatComponentProps {
   fetchMessages: () => void;
   pickImage: () => void;
   Header: () => React.ReactNode;
+  isTyping: boolean;
+  context: "user" | "group";
 }
 
 export default function ChatComponent({
@@ -51,10 +57,14 @@ export default function ChatComponent({
   loadingMore,
   fetchMessages,
   Header,
+  isTyping,
+  context,
 }: ChatComponentProps) {
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [assets] = useAssets([backroundPattern]);
   const [text, setText] = useState<string>("");
+  const { startTyping, endTyping } = useTypingIndicator();
 
   return (
     <ImageBackground
@@ -67,11 +77,21 @@ export default function ChatComponent({
         }}
       />
       <GiftedChat
+        isTyping={isTyping}
         messages={messages}
         alignTop
+        scrollToBottom
+        scrollToBottomComponent={() => <Text>V</Text>}
         onSend={(messages: IMessage[]) => onSend(messages, text)}
-        user={{ _id: 1, name: "Domenic" }}
-        onInputTextChanged={setText}
+        user={{ _id: 1, name: user?.name }}
+        onInputTextChanged={(text) => {
+          setText(text);
+          if (text.length > 0) {
+            startTyping(userId, context);
+          } else if (text.length === 0) {
+            endTyping(userId, context);
+          }
+        }}
         bottomOffset={insets.bottom}
         renderAvatar={null}
         minInputToolbarHeight={50}
@@ -138,6 +158,7 @@ export default function ChatComponent({
             )}
           />
         )}
+        renderFooter={() => <TypingIndicator isTyping={isTyping} />}
       />
     </ImageBackground>
   );
@@ -226,11 +247,14 @@ const MessageText = (messageText: MessageTextProps<IMessage>) => {
 const MessageImage = (props: MessageImageProps<IMessage>) => {
   return (
     <View style={styles.mediaContainer}>
-      <Image
-        priority="high"
-        source={props.currentMessage?.image}
-        contentFit="cover"
-        style={{ width: "100%", height: "100%", borderRadius: 5 }}
+      <GiftedChatMessageImage
+        {...props}
+        imageProps={{
+          resizeMode: "cover",
+
+          loadingIndicatorSource: { uri: props.currentMessage?.image },
+        }}
+        imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 5 }]}
       />
     </View>
   );

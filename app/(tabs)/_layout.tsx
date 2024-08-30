@@ -1,10 +1,16 @@
 import { MessageIcon, PushCarIcon, StockIcon, SwiperIcon, WatchListIcon } from "@/components/Icons";
 import Colors from "@/constants/Colors";
+import { Image } from "expo-image";
 import { Tabs, useSegments } from "expo-router";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function TabsRootLayout() {
   const segments = useSegments();
+
+  useEffect(() => {
+    Image.clearMemoryCache();
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 import { View, Pressable, Platform, Alert } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 
 import { useGetMessages, useSendMessage } from "@/hooks/cometchat/messages";
@@ -23,9 +23,10 @@ export default function ChatDetailsPage() {
     loading,
     fetchMessages,
     hasMore,
+    setMessages,
+    isTyping,
   } = useGetMessages(id as string);
   const { sendMessage, sendMediaMessage } = useSendMessage();
-  const [messages, setMessages] = useState<IMessage[]>();
 
   useEffect(() => {
     if (fetchMessagesErr && !loading) {
@@ -33,22 +34,6 @@ export default function ChatDetailsPage() {
       router.back();
     }
   }, [fetchMessagesErr, loading]);
-
-  useEffect(() => {
-    setMessages([
-      ...chatMessages,
-      {
-        _id: 0,
-        system: true,
-        text: "All your messages are encrypted and secured",
-        createdAt: new Date(),
-        user: {
-          _id: 0,
-          name: "Bot",
-        },
-      },
-    ]);
-  }, [chatMessages]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -62,7 +47,7 @@ export default function ChatDetailsPage() {
 
     if (!result.canceled) {
       let files = [];
-      for (let file of result.assets) {
+      for (let [index, file] of result.assets.entries()) {
         const uri = file.uri;
         let name: string | null = "";
         let type: string | undefined = "";
@@ -72,12 +57,12 @@ export default function ChatDetailsPage() {
           type = file.type;
         } else {
           type = file.type;
-          name = "Camera_001.jpeg";
+          name = `Camera_0${index}.jpeg`;
         }
 
         if (type === "video") {
           type = "video/quicktime";
-          name = "Camera_002.mov";
+          name = `Camera_0${index}.mov`;
         }
         // TODO: handle video
 
@@ -100,7 +85,7 @@ export default function ChatDetailsPage() {
               createdAt: new Date(),
               user: {
                 _id: 1,
-                name: "Bob",
+                name: user?.displayName,
               },
             },
           ],
@@ -118,7 +103,11 @@ export default function ChatDetailsPage() {
   };
 
   const onSend = useCallback((messages: IMessage[], text: string) => {
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
+    const updatedMessages = messages.map((m) => {
+      return { ...m, received: true, from: 1 };
+    });
+
+    setMessages((previousMessages) => GiftedChat.append(previousMessages, updatedMessages));
     if (text.trimEnd().length > 0)
       sendMessage(
         id as string,
@@ -131,7 +120,7 @@ export default function ChatDetailsPage() {
   return (
     <ChatComponent
       fetchMessages={fetchMessages}
-      messages={messages}
+      messages={chatMessages}
       onSend={onSend}
       hasMore={hasMore}
       loadingMore={loading}
@@ -140,6 +129,8 @@ export default function ChatDetailsPage() {
       Header={() => (
         <Header userId={id as string} isLoading={isUserLoading} name={user?.displayName} />
       )}
+      isTyping={isTyping}
+      context="user"
     />
   );
 }

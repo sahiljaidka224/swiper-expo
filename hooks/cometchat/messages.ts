@@ -1,15 +1,112 @@
-import { useAuth } from "@/context/AuthContext";
+import { CurrentUser, useAuth } from "@/context/AuthContext";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { IMessage } from "react-native-gifted-chat";
+import * as Haptics from "expo-haptics";
+
+function parseCometChatMessageToGiftedChat(
+  user: CurrentUser,
+  message: CometChat.BaseMessage
+): IMessage | IMessage[] | undefined {
+  const sender = message.getSender();
+  const messageType = message.getType();
+  const data = message.getData();
+  const fromCurrentUser = user?.id === sender.getUid();
+  const sentAt = message.getSentAt();
+  const received = message.getReadAt();
+
+  const baseMessage = {
+    _id: message.getId(),
+    from: fromCurrentUser ? 1 : 0,
+    createdAt: new Date(sentAt * 1000),
+    sent: Boolean(sentAt),
+    received: Boolean(received),
+    user: {
+      _id: fromCurrentUser ? 1 : 0,
+      name: fromCurrentUser ? user?.name : sender.getName(),
+    },
+    text: "",
+  };
+
+  if (messageType === "image" || messageType === "video") {
+    return data.attachments.map((attachment: { url: string }) => ({
+      ...baseMessage,
+      _id: message.getId() + Math.floor(Math.random() * 1000),
+      image: messageType === "image" ? attachment.url : undefined,
+      video: messageType === "video" ? attachment.url : undefined,
+    }));
+  } else if (messageType === "text") {
+    let messageText = "";
+    try {
+      const jsonContent = JSON.parse(data.text);
+      if (typeof jsonContent !== "object") throw new Error("Bad json");
+      messageText = jsonContent.message;
+    } catch {
+      messageText = data.text || data.action;
+    }
+
+    return {
+      ...baseMessage,
+      text: messageText ?? "",
+      image: undefined,
+      video: undefined,
+    };
+  }
+
+  return undefined;
+}
 
 export const useGetMessages = (toId: string) => {
   const { user } = useAuth();
+  const { markAsRead } = useMarkMessageAsRead();
   const messageRequest = useRef<CometChat.MessagesRequest | null>(null);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+
+  useEffect(() => {
+    let listenerID: string = `${toId}-listener`;
+
+    CometChat.addMessageListener(
+      listenerID,
+      new CometChat.MessageListener({
+        onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
+          const senderId = textMessage.getSender().getUid();
+          if (senderId !== toId || !user) return;
+          const parsedMessage = parseCometChatMessageToGiftedChat(user, textMessage);
+
+          if (!parsedMessage || Array.isArray(parsedMessage)) return;
+          setMessages((prevMessages) => [parsedMessage, ...prevMessages]);
+          markAsRead(textMessage);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+        onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
+          const senderId = mediaMessage.getSender().getUid();
+          if (senderId !== toId || !user) return;
+          const parsedMessages = parseCometChatMessageToGiftedChat(user, mediaMessage);
+
+          if (!parsedMessages || !Array.isArray(parsedMessages)) return;
+          setMessages((prevMessages) => [...parsedMessages, ...prevMessages]);
+          markAsRead(mediaMessage);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+        onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
+          console.log("Typing started :", typingIndicator);
+          setIsTyping(true);
+        },
+        onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
+          console.log("Typing ended :", typingIndicator);
+          setIsTyping(false);
+        },
+      })
+    );
+
+    return () => {
+      CometChat.removeMessageListener(listenerID);
+    };
+  }, []);
 
   const initializeMessageRequest = () => {
     if (messageRequest.current) return;
@@ -33,55 +130,11 @@ export const useGetMessages = (toId: string) => {
         return;
       }
 
+      if (!user) return;
+
       const mapped: IMessage[] = fetchedMessages.flatMap((m) => {
-        const sender = m.getSender();
-        const messageType = m.getType();
-        const data = m.getData();
-        const from = user?.id === sender.getUid();
-        const sentAt = m.getSentAt();
-        const received = m.getReadAt();
-
-        const baseMessage = {
-          _id: m.getId(),
-          from: from ? 1 : 0,
-          createdAt: new Date(sentAt * 1000),
-          sent: Boolean(sentAt),
-          received: Boolean(received),
-          user: {
-            _id: from ? 1 : 0,
-            name: from ? "You" : "Bob",
-          },
-        };
-
-        if (messageType === "image" || messageType === "video") {
-          // Return multiple messages for each attachment
-          return data.attachments.map((attachment: { url: string }) => ({
-            ...baseMessage,
-            _id: m.getId() + Math.floor(Math.random() * 1000),
-            image: messageType === "image" ? attachment.url : undefined,
-            video: messageType === "video" ? attachment.url : undefined,
-            text: "",
-          }));
-        } else if (messageType === "text") {
-          let messageText = "";
-          try {
-            const jsonContent = JSON.parse(data.text);
-            if (typeof jsonContent !== "object") throw new Error("Bad json");
-            messageText = jsonContent.message;
-          } catch {
-            messageText = data.text || data.action;
-          }
-
-          return {
-            ...baseMessage,
-            text: messageText ?? "",
-            image: undefined,
-            video: undefined,
-          };
-        }
-
-        // If the message type is not handled, return an empty array (no message)
-        return [];
+        const parsedMessage = parseCometChatMessageToGiftedChat(user, m);
+        return parsedMessage ? parsedMessage : [];
       });
 
       setMessages((prevMessages) => [...prevMessages, ...mapped.reverse()]);
@@ -97,7 +150,7 @@ export const useGetMessages = (toId: string) => {
     fetchMessages();
   }, []);
 
-  return { messages, error, loading, hasMore, fetchMessages };
+  return { messages, error, loading, hasMore, fetchMessages, setMessages, isTyping };
 };
 
 export const useSendMessage = () => {
@@ -180,6 +233,51 @@ export const useGetGroupMessages = (toId: string) => {
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+
+  const { markAsRead } = useMarkMessageAsRead();
+
+  useEffect(() => {
+    let listenerID: string = `${toId}-listener`;
+
+    CometChat.addMessageListener(
+      listenerID,
+      new CometChat.MessageListener({
+        onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
+          if (!user) return;
+          const parsedMessage = parseCometChatMessageToGiftedChat(user, textMessage);
+
+          if (!parsedMessage || Array.isArray(parsedMessage)) return;
+          setMessages((prevMessages) => [parsedMessage, ...prevMessages]);
+          markAsRead(textMessage);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+        onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
+          if (!user) return;
+          const parsedMessages = parseCometChatMessageToGiftedChat(user, mediaMessage);
+
+          if (!parsedMessages || !Array.isArray(parsedMessages)) return;
+          setMessages((prevMessages) => [...parsedMessages, ...prevMessages]);
+          markAsRead(mediaMessage);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        },
+        onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
+          const senderUID = typingIndicator.getSender().getUid();
+          if (senderUID === user?.id) return;
+          setIsTyping(true);
+        },
+        onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
+          const senderUID = typingIndicator.getSender().getUid();
+          if (senderUID === user?.id) return;
+          setIsTyping(false);
+        },
+      })
+    );
+
+    return () => {
+      CometChat.removeMessageListener(listenerID);
+    };
+  }, []);
 
   const initializeMessageRequest = () => {
     if (messageRequest.current) return;
@@ -203,55 +301,11 @@ export const useGetGroupMessages = (toId: string) => {
         return;
       }
 
+      if (!user) return;
+
       const mapped: IMessage[] = fetchedMessages.flatMap((m) => {
-        const sender = m.getSender();
-        const messageType = m.getType();
-        const data = m.getData();
-        const from = user?.id === sender.getUid();
-        const sentAt = m.getSentAt();
-        const received = m.getReadAt();
-
-        const baseMessage = {
-          _id: m.getId(),
-          from: from ? 1 : 0,
-          createdAt: new Date(sentAt * 1000),
-          sent: Boolean(sentAt),
-          received: Boolean(received),
-          user: {
-            _id: from ? 1 : 0,
-            name: from ? "You" : "Bob",
-          },
-        };
-
-        if (messageType === "image" || messageType === "video") {
-          // Return multiple messages for each attachment
-          return data.attachments.map((attachment: { url: string }) => ({
-            ...baseMessage,
-            _id: m.getId() + Math.floor(Math.random() * 1000),
-            image: messageType === "image" ? attachment.url : undefined,
-            video: messageType === "video" ? attachment.url : undefined,
-            text: "",
-          }));
-        } else if (messageType === "text") {
-          let messageText = "";
-          try {
-            const jsonContent = JSON.parse(data.text);
-            if (typeof jsonContent !== "object") throw new Error("Bad json");
-            messageText = jsonContent.message;
-          } catch {
-            messageText = data.text || data.action;
-          }
-
-          return {
-            ...baseMessage,
-            text: messageText ?? "",
-            image: undefined,
-            video: undefined,
-          };
-        }
-
-        // If the message type is not handled, return an empty array (no message)
-        return [];
+        const parsedMessage = parseCometChatMessageToGiftedChat(user, m);
+        return parsedMessage ? parsedMessage : [];
       });
 
       setMessages((prevMessages) => [...prevMessages, ...mapped.reverse()]);
@@ -267,7 +321,7 @@ export const useGetGroupMessages = (toId: string) => {
     fetchMessages();
   }, []);
 
-  return { messages, error, loading, hasMore, fetchMessages };
+  return { messages, error, loading, hasMore, fetchMessages, setMessages, isTyping };
 };
 
 export const useSendGroupMessage = () => {
@@ -354,4 +408,38 @@ export const useMarkMessageAsRead = () => {
   };
 
   return { markAsRead };
+};
+
+export const useTypingIndicator = () => {
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+
+  const startTyping = useCallback(
+    (receiverId: string, receiverType: string) => {
+      if (!isTyping) {
+        let typingNotification: CometChat.TypingIndicator = new CometChat.TypingIndicator(
+          receiverId,
+          receiverType
+        );
+        CometChat.startTyping(typingNotification);
+        setIsTyping(true);
+      }
+    },
+    [isTyping]
+  );
+
+  const endTyping = useCallback(
+    (receiverId: string, receiverType: string) => {
+      if (isTyping) {
+        let typingNotification: CometChat.TypingIndicator = new CometChat.TypingIndicator(
+          receiverId,
+          receiverType
+        );
+        CometChat.endTyping(typingNotification);
+        setIsTyping(false);
+      }
+    },
+    [isTyping]
+  );
+
+  return { startTyping, endTyping, isCurrentUserTyping: isTyping };
 };
