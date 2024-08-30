@@ -30,8 +30,10 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
   const { markAsRead } = useMarkMessageAsRead();
   const conversationWith = conversation.getConversationWith();
   const unreadMessageCount = conversation.getUnreadMessageCount();
+
   const lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage =
     conversation?.getLastMessage();
+  if (!lastMessage) return null;
 
   const userUID =
     conversationWith instanceof CometChat.User ? conversationWith.getUid() : undefined;
@@ -47,7 +49,6 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
   const sender = lastMessage.getSender();
   const senderUID = sender.getUid();
   const isRead = Boolean(lastMessage.getReadAt());
-  const isDelivered = Boolean(lastMessage.getDeliveredAt());
   const isSent = Boolean(lastMessageSentAt);
   const isOutgoingMsg = user ? isOutgoingMessage(senderUID, user?.id) : undefined;
 

@@ -1,0 +1,35 @@
+chats 
+  - index ✅
+    - fetch all conversations
+    - display list of conversations
+    - split based on Chats/Groups
+    - add msg listeners to update UI, maybe just trigger fetchConversations() but be quicker to update UI with unread count 
+
+  - [id]
+    - fetch all messages
+    - parse msgs for gifted chat
+    - display list of messages
+    - add msg listeners to update UI? how to manage state and keep it in sync with the server
+    - when new msg received, add it to UI, 
+    - when open mark all msgs as read
+    - scroll to bottom component 
+    - typing indicator 
+    - fix group messages 
+    - make image clickable ✅ done till here
+    
+    - add image from camera
+    - live chat msg read/unread
+    - forward media message
+
+
+push-stock
+  - button press
+    - opens list of users
+    - select multiple 
+    - pass the car information to users list
+    - send car message to all users ✅
+
+- only create group after msg is sent
+- move sending msg from followed to common function
+
+Push notification while sending a message, take reference from Swiper yellow app

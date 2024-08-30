@@ -36,6 +36,12 @@ export default function ChatsLayout() {
           }}
         />
         <Stack.Screen
+          name="car/[id]"
+          options={{
+            title: "",
+          }}
+        />
+        <Stack.Screen
           name="new-chat/[id]"
           options={{
             title: "",

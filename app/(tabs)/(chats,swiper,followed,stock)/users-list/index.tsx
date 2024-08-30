@@ -263,7 +263,12 @@ export default function UsersListPage() {
             onChangeText={setTextInputValue}
           />
           <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
-            <Button title="Send Now" onPress={onPressSendNow} type="primary" />
+            <Button
+              title="Send Now"
+              onPress={onPressSendNow}
+              type="primary"
+              isLoading={isGroupCreateLoading}
+            />
           </View>
         </View>
       </Modal>

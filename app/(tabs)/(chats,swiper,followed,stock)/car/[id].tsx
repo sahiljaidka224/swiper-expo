@@ -1,5 +1,5 @@
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
+import { useLocalSearchParams, useSegments } from "expo-router";
 import { useGetCarDetails } from "@/api/hooks/car-detail";
 import Colors from "@/constants/Colors";
 
@@ -26,7 +26,7 @@ export default function CarDetailPage() {
         {car && (
           <>
             <Carousel images={images} price={car?.price} />
-            <CarDetail car={car} context={segments.includes("(followed)") ? "followed" : "stock"} />
+            <CarDetail car={car} context={segments[1]} />
           </>
         )}
       </ScrollView>

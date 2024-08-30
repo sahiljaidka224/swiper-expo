@@ -123,7 +123,6 @@ export default function ChatComponent({
                 <Pressable onPress={pickImage}>
                   <Ionicons name="camera-outline" color={Colors.primary} size={28} />
                 </Pressable>
-                <Ionicons name="mic-outline" color={Colors.primary} size={28} />
               </>
             )}
           </View>

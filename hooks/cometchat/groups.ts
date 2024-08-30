@@ -65,11 +65,13 @@ export const useCreateGroup = () => {
         } catch (error) {
           if ((error as CometChat.CometChatException).code === "ERR_GUID_ALREADY_EXISTS") {
             // setGroup(group);
+            if (text.length > 0) sendMessage(group.getGuid(), text);
+            continue;
           } else {
-            setError(error as CometChat.CometChatException);
+            if (text.length > 0) sendMessage(group.getGuid(), text);
+            // setError(error as CometChat.CometChatException);
             continue;
           }
-          console.log("Group creation failed with error:", error);
         } finally {
           setLoading(false);
         }

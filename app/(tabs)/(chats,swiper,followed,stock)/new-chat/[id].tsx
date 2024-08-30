@@ -1,8 +1,8 @@
 import { View, Pressable, Platform, ActivityIndicator, Alert } from "react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useSegments } from "expo-router";
 import Avatar from "@/components/Avatar";
 import * as ImagePicker from "expo-image-picker";
 import Text from "@/components/Text";
@@ -25,13 +25,6 @@ export default function NewGroupChatPage() {
     isTyping,
   } = useGetGroupMessages(id as string);
   const { sendMessage, sendMediaMessage } = useSendGroupMessage();
-
-  // useEffect(() => {
-  //   if (fetchMessagesErr && !loading) {
-  //     Alert.alert("Error", "Failed to fetch messages", [{ text: "OK" }]);
-  //     router.back();
-  //   }
-  // }, [fetchMessagesErr, loading]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -121,6 +114,7 @@ export default function NewGroupChatPage() {
 }
 
 const Header = React.memo(({ groupUID }: { groupUID: string }) => {
+  const segments = useSegments();
   const { group, isGroupLoading } = useGetGroup(groupUID);
   if (!group || isGroupLoading) return <ActivityIndicator size="small" color={Colors.primary} />;
 
@@ -130,8 +124,9 @@ const Header = React.memo(({ groupUID }: { groupUID: string }) => {
 
   const onPress = () => {
     if (!metadata?.carId) return;
+
     router.push({
-      pathname: `/(tabs)/(followed)/car/[id]`,
+      pathname: `/(tabs)/${segments[1]}/car/[id]`,
       params: { id: metadata?.carId },
     });
   };
