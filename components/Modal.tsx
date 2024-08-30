@@ -14,7 +14,7 @@ export default function Modal({ children, isVisible, onClose }: ModalProps) {
       <View style={styles.modalContent}>
         <View style={styles.headerContainer}>
           <Pressable onPress={onClose}>
-            <MaterialIcons name="close" color={Colors.background} size={30} />
+            <MaterialIcons name="close" color={Colors.primary} size={30} />
           </Pressable>
         </View>
         {children}
@@ -27,22 +27,20 @@ const styles = StyleSheet.create({
   modalContent: {
     height: "95%",
     width: "100%",
-    // backgroundColor: Colors.borderGray,
     opacity: 1,
     borderTopRightRadius: 18,
     borderTopLeftRadius: 18,
     position: "absolute",
     bottom: 0,
+    backgroundColor: Colors.background,
   },
   headerContainer: {
-    height: "8%",
+    height: "6%",
     zIndex: 10,
-    position: "absolute",
     top: 0,
     display: "flex",
     width: "100%",
-    backgroundColor: Colors.primary,
-    opacity: 0.6,
+    // backgroundColor: Colors.primary,
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
     paddingHorizontal: 20,

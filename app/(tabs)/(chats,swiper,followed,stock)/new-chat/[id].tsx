@@ -1,5 +1,5 @@
 import { View, Pressable, Platform, ActivityIndicator, Alert } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
 import { router, useLocalSearchParams } from "expo-router";
@@ -26,12 +26,12 @@ export default function NewGroupChatPage() {
   } = useGetGroupMessages(id as string);
   const { sendMessage, sendMediaMessage } = useSendGroupMessage();
 
-  useEffect(() => {
-    if (fetchMessagesErr && !loading) {
-      Alert.alert("Error", "Failed to fetch messages", [{ text: "OK" }]);
-      router.back();
-    }
-  }, [fetchMessagesErr, loading]);
+  // useEffect(() => {
+  //   if (fetchMessagesErr && !loading) {
+  //     Alert.alert("Error", "Failed to fetch messages", [{ text: "OK" }]);
+  //     router.back();
+  //   }
+  // }, [fetchMessagesErr, loading]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

@@ -10,9 +10,9 @@ import { SegmentedControl } from "@/components/SegmentedControl";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Animated, { CurvedTransition } from "react-native-reanimated";
-import Ionicons from "@expo/vector-icons/build/Ionicons";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 const transition = CurvedTransition.delay(100);
 export default function Chats() {
@@ -77,7 +77,7 @@ export default function Chats() {
           ),
           headerRight: () => (
             <TouchableOpacity onPress={() => router.push("/(tabs)/(chats)/users-list")}>
-              <Ionicons name="add-circle-outline" size={24} color={Colors.primary} />
+              <FontAwesome6 name="user-plus" size={22} color={Colors.primary} />
             </TouchableOpacity>
           ),
         }}

@@ -67,14 +67,6 @@ export default function TabsRootLayout() {
           }}
         />
         <Tabs.Screen
-          name="calls"
-          options={{
-            href: null,
-            title: "",
-            headerShown: false,
-          }}
-        />
-        <Tabs.Screen
           name="(add-stock)"
           options={{
             title: "",

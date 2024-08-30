@@ -1,16 +1,22 @@
+import { useGetCarDetails } from "@/api/hooks/car-detail";
 import Avatar from "@/components/Avatar";
+import Button from "@/components/Button";
 import ErrorView from "@/components/Error";
+import Modal from "@/components/Modal";
 import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
+import { useAuth } from "@/context/AuthContext";
+import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { formatTimestamp } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { router, Stack, useSegments } from "expo-router";
-import React from "react";
+import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -19,17 +25,43 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function UsersListPage() {
   const segments = useSegments();
-  const selectMultiple = segments.includes("(stock)") || segments.includes("(add-stock)");
+  const multipleSelectionAllowed = segments.includes("(stock)") || segments.includes("(add-stock)");
+  const { user: currentUser } = useAuth();
+
   const { users, error, loading } = useGetCometChatUsers();
+
+  const {
+    createMultipleGroups,
+    loading: isGroupCreateLoading,
+    error: groupCreateError,
+  } = useCreateGroup();
+  const { carId } = useLocalSearchParams<{ carId?: string }>();
+
+  const {
+    car,
+    isLoading: carDetailsLoading,
+    error: carDetailsError,
+  } = useGetCarDetails(carId as string);
+
   const [selectedUsers, setSelectedUsers] = useState<CometChat.User[]>([]);
   const [searchText, setSearchText] = useState("");
-  const keyExtractor = (item: CometChat.User) => item.getUid();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [textInputValue, setTextInputValue] = useState("");
+
   const keyboardVerticalOffset = Platform.OS === "ios" ? 100 : 0;
 
-  console.log({ selectMultiple });
+  useEffect(() => {
+    if (!isGroupCreateLoading && selectedUsers.length && multipleSelectionAllowed) {
+      setTextInputValue("");
+      setSelectedUsers([]);
+      setIsModalVisible(false);
+      router.back();
+    }
+  }, [isGroupCreateLoading, groupCreateError]);
 
   const filteredUsers = users.filter((user) => {
     const [firstName, lastName] = user.getName().toLowerCase().split(" ");
@@ -55,10 +87,12 @@ export default function UsersListPage() {
       data: groupedUsers[letter],
     }));
 
+  const keyExtractor = (item: CometChat.User) => item.getUid();
+
   const renderItem = ({ item }: { item: CometChat.User }) => {
     const onPress = () => {
       const userUID = item.getUid();
-      if (selectMultiple) {
+      if (multipleSelectionAllowed) {
         setSelectedUsers((prev) => {
           const index = prev.findIndex((user) => user.getUid() === userUID);
           if (index === -1) {
@@ -73,7 +107,65 @@ export default function UsersListPage() {
     };
 
     const isSelected = selectedUsers.find((user) => user.getUid() === item.getUid()) !== undefined;
-    return <User user={item} onPress={onPress} selected={isSelected} />;
+    return (
+      <User
+        user={item}
+        onPress={onPress}
+        selected={isSelected}
+        multipleSelectionAllowed={multipleSelectionAllowed}
+      />
+    );
+  };
+
+  const onPressSendNow = () => {
+    if (!car && !carDetailsLoading) {
+      Alert.alert("Car details not found", "Please try again later");
+      router.back();
+      return;
+    }
+
+    if (!currentUser) return;
+    const chatName = String(
+      `${currentUser?.name.split(" ")[0]} - ${car?.year} ${car?.make} ${car?.model}`
+    ).toUpperCase();
+    const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
+    const owner = currentUser?.id;
+    const metadata = {
+      carId: car?.carId,
+      carName: `${car?.year} ${car?.make} ${car?.model}`,
+      price: car?.price,
+      odometer: car?.odometer,
+      icon,
+    };
+
+    let groupData = selectedUsers.map((user) => {
+      const userUID = user.getUid();
+
+      const GUID = String(`${userUID}_${car?.carId}_${currentUser?.id}`).slice(0, 100);
+
+      const members = [owner, userUID];
+
+      const group = new CometChat.Group(
+        GUID,
+        chatName,
+        CometChat.GROUP_TYPE.PRIVATE,
+        undefined,
+        icon,
+        undefined
+      );
+      group.setMetadata(metadata);
+
+      group.setOwner(owner);
+      group.setMembersCount(2);
+
+      return {
+        members,
+        group,
+        text: textInputValue.trimEnd().length > 0 ? textInputValue : "",
+      };
+    });
+
+    createMultipleGroups(groupData);
   };
 
   return (
@@ -85,7 +177,7 @@ export default function UsersListPage() {
       <Stack.Screen
         options={{
           headerRight: () => {
-            if (!selectMultiple)
+            if (!multipleSelectionAllowed)
               return (
                 <Pressable onPress={() => router.back()}>
                   <AntDesign name="closecircleo" size={24} color="black" />
@@ -96,10 +188,7 @@ export default function UsersListPage() {
               <Pressable
                 disabled={selectedUsers.length === 0}
                 onPress={() => {
-                  router.back();
-                  // router.push(
-                  //   `/(tabs)/(stock)/${selectedUsers.map((user) => user.getUid()).join(",")}`
-                  // );
+                  setIsModalVisible(true);
                 }}
               >
                 <Text
@@ -135,6 +224,49 @@ export default function UsersListPage() {
           </View>
         )}
       />
+      <Modal isVisible={isModalVisible} onClose={() => router.dismissAll()}>
+        <View>
+          <Text
+            style={{
+              fontFamily: "SF_Pro_Display_Regular",
+              fontSize: 18,
+              textAlign: "center",
+              marginTop: 10,
+            }}
+          >
+            Pushing to these Swiper Users:
+          </Text>
+          <ScrollView
+            style={{ backgroundColor: Colors.background, padding: 10, height: 100 }}
+            horizontal
+          >
+            {selectedUsers.map((user) => {
+              const userUID = user.getUid();
+              const userName = user.getName();
+
+              return (
+                <View key={userUID} style={{ margin: 5, alignItems: "center" }}>
+                  <View style={styles.avatarContainer}>
+                    <Avatar userId={userUID} />
+                  </View>
+                  <Text style={styles.name}>{userName.split(" ")[0]}</Text>
+                </View>
+              );
+            })}
+          </ScrollView>
+
+          <TextInput
+            placeholder="Write a message"
+            style={styles.sendMessageInput}
+            multiline
+            value={textInputValue}
+            onChangeText={setTextInputValue}
+          />
+          <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
+            <Button title="Send Now" onPress={onPressSendNow} type="primary" />
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -144,10 +276,12 @@ const User = React.memo(
     user,
     onPress,
     selected = false,
+    multipleSelectionAllowed = false,
   }: {
     user: CometChat.User;
     onPress: () => void;
     selected?: boolean;
+    multipleSelectionAllowed?: boolean;
   }) => {
     const userUID = user.getUid();
     const userName = user.getName();
@@ -164,9 +298,11 @@ const User = React.memo(
             <Text style={styles.orgName}>{`Last seen: ${formatTimestamp(lastSeen)}`}</Text>
           </View>
         </View>
-        <View style={styles.selectedContainer}>
-          {selected ? <AntDesign name="check" size={20} color={Colors.primary} /> : null}
-        </View>
+        {multipleSelectionAllowed ? (
+          <View style={styles.selectedContainer}>
+            {selected ? <AntDesign name="check" size={20} color={Colors.primary} /> : null}
+          </View>
+        ) : null}
       </Pressable>
     );
   }
@@ -210,6 +346,18 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderGray,
     borderWidth: 2,
     fontSize: 20,
+    fontFamily: "SF_Pro_Display_Regular",
+  },
+  sendMessageInput: {
+    backgroundColor: Colors.background,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    margin: 10,
+    borderRadius: 12,
+    borderColor: Colors.borderGray,
+    borderWidth: 2,
+    fontSize: 20,
+    maxHeight: 120,
     fontFamily: "SF_Pro_Display_Regular",
   },
   sectionHeader: {

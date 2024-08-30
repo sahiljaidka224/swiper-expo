@@ -85,13 +85,16 @@ export function CarsList({
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       const onSendToPhoneContacts = () => {
-        router.push({ pathname: "/(tabs)/(stock)/users-list" });
+        router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${item?.carId}` });
       };
 
       const onMessagePress = () => {
         if (!user?.id || !item?.organisation?.ownerUserId) return;
 
-        const GUID = `${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`;
+        const GUID = String(`${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`).slice(
+          0,
+          100
+        );
         const chatName = String(
           `${user?.name.split(" ")[0]} - ${item?.year} ${item?.make} ${item?.model}`
         ).toUpperCase();
@@ -107,7 +110,6 @@ export function CarsList({
           odometer: item?.odometer,
           icon,
         };
-        const tags = ["car-chat"];
 
         const group = new CometChat.Group(
           GUID,
@@ -118,7 +120,7 @@ export function CarsList({
           undefined
         );
         group.setMetadata(metadata);
-        group.setTags(tags);
+
         group.setOwner(owner);
         group.setMembersCount(2);
 

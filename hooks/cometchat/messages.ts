@@ -171,7 +171,8 @@ export const useSendMessage = () => {
     receiverID: string,
     messageText: string,
     organisationFrom?: string,
-    organisationTo?: string
+    organisationTo?: string,
+    metadata?: Record<string, string | number | undefined>
   ) => {
     setLoading(true);
     setError(null);
@@ -180,6 +181,7 @@ export const useSendMessage = () => {
     textMessage.setMetadata({
       organisation_from: organisationFrom,
       organisation_to: organisationTo,
+      ...metadata,
     });
 
     try {
@@ -188,6 +190,39 @@ export const useSendMessage = () => {
     } catch (error) {
       setError(error as CometChat.CometChatException);
       console.log("Message sending failed with error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendMessageToMultiple = async (
+    receiverID: string[],
+    messageText: string,
+    organisationFrom?: string,
+    organisationTo?: string,
+    metadata?: Record<string, string | number | undefined>
+  ) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      for (let id of receiverID) {
+        const textMessage = new CometChat.TextMessage(id, messageText, "user");
+        textMessage.setMetadata({
+          organisation_from: organisationFrom,
+          organisation_to: organisationTo,
+          ...metadata,
+        });
+
+        try {
+          await CometChat.sendMessage(textMessage);
+        } catch (error) {
+          setError(error as CometChat.CometChatException);
+          console.log("Message sending failed with error:", error);
+        }
+      }
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
     } finally {
       setLoading(false);
     }
@@ -225,7 +260,7 @@ export const useSendMessage = () => {
     }
   };
 
-  return { sendMessage, loading, error, message, sendMediaMessage };
+  return { sendMessage, loading, error, message, sendMediaMessage, sendMessageToMultiple };
 };
 
 export const useGetGroupMessages = (toId: string) => {
