@@ -8,10 +8,7 @@ export const useGetConversations = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchConversations = async () => {
-    const conversationsRequest = new CometChat.ConversationsRequestBuilder()
-      .withUserAndGroupTags(true)
-      .setLimit(50)
-      .build();
+    const conversationsRequest = new CometChat.ConversationsRequestBuilder().setLimit(50).build();
 
     try {
       const conversations = await conversationsRequest.fetchNext();
@@ -72,4 +69,38 @@ export const useDeleteConversation = () => {
   }, []);
 
   return { deleteConversation, deletedConversation, error, isLoading };
+};
+
+export const useGetGroupConversationsWithTags = (tags: string[]) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<CometChat.CometChatException | null>(null);
+  const [groupConversations, setGroups] = useState<CometChat.Conversation[]>([]);
+  const getGroups = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const conversationsRequest = new CometChat.ConversationsRequestBuilder()
+        .setLimit(30)
+        .withTags(true)
+        .setConversationType("group")
+        .setGroupTags(tags)
+        .build();
+
+      const conversations = await conversationsRequest.fetchNext();
+
+      setGroups(conversations);
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
+      console.log("Group fetch failed with error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getGroups();
+  }, []);
+
+  return { getGroups, isGroupsLoading: loading, groupsError: error, groupConversations };
 };

@@ -29,7 +29,14 @@ push-stock
     - pass the car information to users list
     - send car message to all users ✅
 
-- only create group after msg is sent
-- move sending msg from followed to common function
+
+- add to their watchlist when pushing to stock
+- online indicator ✅
+- auto msg from admin
+- error sending image from Camera
+- leave a group as a participant ✅
+- message from listing page
+- lisitng page linking ✅
+
 
 Push notification while sending a message, take reference from Swiper yellow app

@@ -95,9 +95,7 @@ export function CarsList({
           0,
           100
         );
-        const chatName = String(
-          `${user?.name.split(" ")[0]} - ${item?.year} ${item?.make} ${item?.model}`
-        ).toUpperCase();
+        const chatName = String(`${item?.year} ${item?.make} ${item?.model}`).toUpperCase();
         const icon = item?.images[0]?.url ?? "https://picsum.photos/200";
         const owner = user?.id;
         const members = [owner, item?.organisation?.ownerUserId];
@@ -110,6 +108,7 @@ export function CarsList({
           odometer: item?.odometer,
           icon,
         };
+        const tags = [owner, item?.organisation?.ownerUserId];
 
         const group = new CometChat.Group(
           GUID,
@@ -120,7 +119,7 @@ export function CarsList({
           undefined
         );
         group.setMetadata(metadata);
-
+        group.setTags(tags);
         group.setOwner(owner);
         group.setMembersCount(2);
 

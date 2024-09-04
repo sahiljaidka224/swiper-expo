@@ -301,15 +301,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
             maxFontSizeMultiplier={1.3}
             readOnly
           />
-
-          {Application.nativeApplicationVersion && context === "update" ? (
-            <TextInput
-              value={Application.nativeApplicationVersion}
-              style={styles.textInput}
-              maxFontSizeMultiplier={1.3}
-              readOnly
-            />
-          ) : null}
         </View>
 
         <View style={{ paddingHorizontal: 20, gap: 15 }}>
@@ -321,6 +312,11 @@ export default function ProfileComponent({ context }: ProfileProps) {
             type={isEnabled() ? "primary" : "disabled"}
           />
           {context === "update" && <Button type="secondary" title="Logout" onPress={onLogout} />}
+          <Text style={styles.versionText}>
+            Version:{" "}
+            {Application.nativeApplicationVersion ? Application.nativeApplicationVersion : ""} (
+            {Application.nativeBuildVersion ? Application.nativeBuildVersion : ""})
+          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -352,6 +348,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "SF_Pro_Display_Medium",
     color: Colors.textDark,
+  },
+  versionText: {
+    fontFamily: "SF_Pro_Display_Light",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 

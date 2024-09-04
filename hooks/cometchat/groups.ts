@@ -1,12 +1,16 @@
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useEffect, useState } from "react";
 import { useSendGroupMessage } from "./messages";
+import { useAddCarToWatchlist } from "@/api/hooks/watchlist";
+import { useAuth } from "@/context/AuthContext";
 
 export const useCreateGroup = () => {
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [group, setGroup] = useState<CometChat.Group | null>(null);
   const { sendMessage } = useSendGroupMessage();
+  const { trigger: addCarToWatchlist, isMutating, error: watchListError } = useAddCarToWatchlist();
 
   const createGroup = async (group: CometChat.Group, members: string[]) => {
     setLoading(true);
@@ -60,16 +64,20 @@ export const useCreateGroup = () => {
           if (guid) {
             await CometChat.addMembersToGroup(guid, groupMembers, []);
             if (text.length > 0) sendMessage(guid, text);
+            // TODO: Add car to watchlist
+            // const metadata: { carId?: string } = group.getMetadata();
+            // const carId = metadata?.carId;
+            // console.log({ carId, members, token });
+            // if (carId && members.length === 2 && token) {
+            //   addCarToWatchlist({ carId, userId: members[1], token });
+            // }
           }
-          // setGroup(response);
         } catch (error) {
           if ((error as CometChat.CometChatException).code === "ERR_GUID_ALREADY_EXISTS") {
-            // setGroup(group);
             if (text.length > 0) sendMessage(group.getGuid(), text);
             continue;
           } else {
             if (text.length > 0) sendMessage(group.getGuid(), text);
-            // setError(error as CometChat.CometChatException);
             continue;
           }
         } finally {
@@ -110,4 +118,39 @@ export const useGetGroup = (guid: string) => {
   }, []);
 
   return { getGroup, isGroupLoading: loading, groupError: error, group };
+};
+
+export const useLeaveGroup = () => {
+  const [hasLeft, setHasLeft] = useState<boolean | null>(null);
+  const [error, setError] = useState<CometChat.CometChatException | null>(null);
+
+  const leaveGroup = (guid: string, scope: CometChat.GroupMemberScope) => {
+    if (scope === CometChat.GROUP_MEMBER_SCOPE.PARTICIPANT) {
+      leaveGroupAsParticipant(guid);
+      return;
+    }
+    CometChat.deleteGroup(guid).then(
+      (hasLeft: boolean) => {
+        setHasLeft(hasLeft);
+        console.log("Group left successfully:", hasLeft);
+      },
+      (error: CometChat.CometChatException) => {
+        setError(error);
+        console.log("Group leaving failed with exception:", error);
+      }
+    );
+  };
+
+  const leaveGroupAsParticipant = (guid: string) => {
+    CometChat.leaveGroup(guid).then(
+      (hasLeft: boolean) => {
+        setHasLeft(hasLeft);
+      },
+      (error: CometChat.CometChatException) => {
+        setError(error);
+      }
+    );
+  };
+
+  return { hasLeft, error, leaveGroup, leaveGroupAsParticipant };
 };

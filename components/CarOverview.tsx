@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -11,11 +11,10 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
 
 function CarOverview({ car, context }: { car: any; context: CarsListContext }) {
+  const segments = useSegments();
   const onAnimatePress = (carId: string) => {
     router.push({
-      pathname: `/(tabs)/(${
-        context === "search" || context === "followed" ? "followed" : "stock"
-      })/car/[id]`,
+      pathname: `/(tabs)/${segments[1]}/car/[id]`,
       params: { id: carId },
     });
   };

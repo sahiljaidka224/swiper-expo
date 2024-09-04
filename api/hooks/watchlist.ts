@@ -30,6 +30,21 @@ const removeCarFromWatchlist = async (
   return response.json();
 };
 
+const addCarToWatchlist = async (
+  url: string,
+  { arg }: { arg: { carId: string; token: string; userId: string } }
+) => {
+  const response = await fetch(`${url}${arg.carId}/${arg.userId}/follow`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+  });
+
+  return response.json();
+};
+
 export function useGetWatchlist(
   context: CarsListContext,
   orderBy: string = "dateCreate",
@@ -144,6 +159,20 @@ export function useRemoveCarFromWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/",
     removeCarFromWatchlist
+  );
+
+  return {
+    trigger,
+    newCars: data,
+    isMutating,
+    error,
+  };
+}
+
+export function useAddCarToWatchlist() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/car/",
+    addCarToWatchlist
   );
 
   return {

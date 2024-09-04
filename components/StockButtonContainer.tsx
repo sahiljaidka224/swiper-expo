@@ -41,7 +41,6 @@ function StockButtonContainer({
           <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
         </TouchableOpacity>
       )}
-      {/* // TODO: after comet chat is integrated completely */}
       <Button title="Push to Swiper Users" onPress={onPushToSwiperContacts} />
       {showSMSOption && (
         <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />

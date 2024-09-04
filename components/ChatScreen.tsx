@@ -1,5 +1,13 @@
-import { ImageBackground, StyleSheet, View, Pressable } from "react-native";
-import React, { useState } from "react";
+import {
+  ImageBackground,
+  StyleSheet,
+  View,
+  Pressable,
+  Platform,
+  FlatList,
+  ListRenderItem,
+} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Bubble,
   Composer,
@@ -21,9 +29,8 @@ import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
 import dayjs from "dayjs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
-import { Image } from "expo-image";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
 
 import { ResizeMode, Video } from "expo-av";
 import Text from "@/components/Text";
@@ -31,9 +38,21 @@ import { format } from "date-fns";
 import { useChatContext } from "react-native-gifted-chat/lib/GiftedChatContext";
 import { useAssets } from "expo-asset";
 import { useAuth } from "@/context/AuthContext";
-import { useTypingIndicator } from "@/hooks/cometchat/messages";
+import {
+  useMarkMessageAsRead,
+  useSendGroupMessage,
+  useSendMessage,
+  useTypingIndicator,
+} from "@/hooks/cometchat/messages";
+import * as Linking from "expo-linking";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+
+import * as ImagePicker from "expo-image-picker";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
+import Avatar from "./Avatar";
 
 const backroundPattern = require("@/assets/images/pattern.png");
+const options = ["Gallery", "Camera", "Cancel"];
 
 interface ChatComponentProps {
   userId: string;
@@ -42,14 +61,14 @@ interface ChatComponentProps {
   hasMore: boolean;
   loadingMore: boolean;
   fetchMessages: () => void;
-  pickImage: () => void;
   Header: () => React.ReactNode;
   isTyping: boolean;
   context: "user" | "group";
+  userOrgName?: string;
+  carGroups?: CometChat.Conversation[] | null;
 }
 
 export default function ChatComponent({
-  pickImage,
   userId,
   messages,
   onSend,
@@ -59,18 +78,240 @@ export default function ChatComponent({
   Header,
   isTyping,
   context,
+  userOrgName,
+  carGroups,
 }: ChatComponentProps) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [assets] = useAssets([backroundPattern]);
   const [text, setText] = useState<string>("");
   const { startTyping, endTyping } = useTypingIndicator();
+  const { showActionSheetWithOptions } = useActionSheet();
+  const {
+    sendMediaMessage,
+    loading: isSendMsgInProgress,
+    error,
+    message: sentMessage,
+  } = useSendMessage();
+  const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
+  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
+
+  const { markAsRead } = useMarkMessageAsRead();
+
+  useEffect(() => {}, [messages]);
+
+  const triggerSendMediaMessage = (result: ImagePicker.ImagePickerSuccessResult) => {
+    let files = [];
+    for (let [index, file] of result.assets.entries()) {
+      const uri = file.uri;
+      let name: string | null = "";
+      let type: string | undefined = "";
+
+      if (Platform.OS === "ios" && file.fileName !== undefined) {
+        name = file.fileName;
+        type = file.type;
+      } else {
+        type = file.type;
+        name = `Camera_0${index}.jpeg`;
+      }
+
+      if (type === "video") {
+        type = "video/quicktime";
+        name = `Camera_0${index}.mov`;
+      }
+      // TODO: handle video
+
+      let tempFile = {
+        name: name,
+        type: Platform.OS === "android" ? file.type : type,
+        uri: Platform.OS === "android" ? file.uri : file.uri.replace("file://", ""),
+        size: file.fileSize,
+      };
+
+      files.push(tempFile);
+
+      onSend(
+        [
+          {
+            _id: file.fileName ?? file.assetId ?? Math.floor(Math.random() * 1000),
+            text: "",
+            image: type === "image" ? uri : undefined,
+            video: type === "video" ? uri : undefined,
+            createdAt: new Date(),
+            user: {
+              _id: 1,
+              name: user?.name,
+            },
+            pending: isSendMsgInProgress,
+          },
+        ],
+        ""
+      );
+    }
+    if (context === "group") sendGroupMediaMessage(userId, files);
+    else sendMediaMessage(userId, files, user?.org?.name ?? undefined, userOrgName ?? undefined);
+  };
+
+  const onPickImageFromCamera = async () => {
+    if (cameraStatus) {
+      if (
+        cameraStatus.status === ImagePicker.PermissionStatus.UNDETERMINED ||
+        (cameraStatus.status === ImagePicker.PermissionStatus.DENIED && cameraStatus.canAskAgain)
+      ) {
+        const permission = await requestCameraPermission();
+        if (permission.granted) {
+          await handleLaunchCamera();
+        }
+      } else if (cameraStatus.status === ImagePicker.PermissionStatus.DENIED) {
+        await Linking.openSettings();
+      } else {
+        await handleLaunchCamera();
+      }
+    }
+  };
+
+  const handleLaunchCamera = useCallback(async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.5,
+        aspect: [4, 3],
+        allowsMultipleSelection: true,
+        selectionLimit: 10,
+      });
+      if (!result.canceled) {
+        if (result.assets.length > 0) {
+          triggerSendMediaMessage(result);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const onShowActionSheet = () => {
+    const cancelButtonIndex = options.length - 1;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      (buttonIndex: any) => {
+        if (buttonIndex !== cancelButtonIndex) {
+          switch (buttonIndex) {
+            case 0:
+              onPickImageFromGallery();
+              break;
+
+            default:
+              onPickImageFromCamera();
+              break;
+          }
+        }
+      }
+    );
+  };
+
+  const onPickImageFromGallery = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: 10,
+    });
+
+    if (!result.canceled) {
+      triggerSendMediaMessage(result);
+    }
+  };
+
+  const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
+    ({ item }: { item: CometChat.Conversation }) => {
+      const conversationWith = item.getConversationWith();
+      const icon =
+        conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
+      const name = conversationWith.getName();
+      const groupUID =
+        conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
+
+      const unreadCount = item.getUnreadMessageCount();
+
+      return (
+        <Pressable
+          style={{ maxWidth: 70, alignItems: "center", marginRight: 15 }}
+          onPress={() => {
+            const lastMessage = item.getLastMessage();
+            markAsRead(lastMessage);
+            router.push(`/(tabs)/(chats)/new-chat/${groupUID}`);
+          }}
+        >
+          <View
+            style={{
+              height: 54,
+              width: 54,
+              borderWidth: unreadCount > 0 ? 2 : 0,
+              borderColor: unreadCount > 0 ? Colors.primary : undefined,
+              borderRadius: 27,
+              padding: 2,
+            }}
+          >
+            <Avatar source={icon} />
+          </View>
+          <Text
+            numberOfLines={3}
+            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 13 }}
+          >
+            {name}
+          </Text>
+        </Pressable>
+      );
+    },
+    [carGroups]
+  );
 
   return (
     <ImageBackground
       source={assets ? assets[0] : backroundPattern}
       style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
     >
+      {carGroups && carGroups.length > 0 ? (
+        <View
+          style={{
+            position: "absolute",
+            backgroundColor: "white",
+            marginTop: 5,
+            width: "95%",
+            alignSelf: "center",
+            zIndex: 100,
+            borderRadius: 20,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+
+            elevation: 5,
+          }}
+        >
+          <FlatList<CometChat.Conversation>
+            data={carGroups}
+            style={{ paddingHorizontal: 10, paddingVertical: 5 }}
+            keyExtractor={(item: unknown) => {
+              const conversation = item as CometChat.Conversation;
+              return conversation.getConversationId();
+            }}
+            renderItem={horizontalRenderItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      ) : null}
       <Stack.Screen
         options={{
           headerTitle: () => <Header />,
@@ -120,7 +361,7 @@ export default function ChatComponent({
             )}
             {text.length === 0 && (
               <>
-                <Pressable onPress={pickImage}>
+                <Pressable onPress={onShowActionSheet}>
                   <Ionicons name="camera-outline" color={Colors.primary} size={28} />
                 </Pressable>
               </>
@@ -245,17 +486,37 @@ const MessageText = (messageText: MessageTextProps<IMessage>) => {
 
 const MessageImage = (props: MessageImageProps<IMessage>) => {
   return (
-    <View style={styles.mediaContainer}>
-      <GiftedChatMessageImage
-        {...props}
-        imageProps={{
-          resizeMode: "cover",
-
-          loadingIndicatorSource: { uri: props.currentMessage?.image },
+    <>
+      <Pressable
+        onPress={() =>
+          router.push(
+            "/(tabs)/(chats)/users-list?allowMultiple=true&uri=" + props.currentMessage?.image
+          )
+        }
+        style={{
+          position: "absolute",
+          left: props.currentMessage?.user?._id === 1 ? -40 : null,
+          right: props.currentMessage?.user?._id === 0 ? -40 : null,
+          top: "50%",
+          backgroundColor: Colors.iconGray,
+          padding: 6,
+          borderRadius: 50,
         }}
-        imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 5 }]}
-      />
-    </View>
+      >
+        <FontAwesome name="mail-forward" size={14} color={Colors.background} />
+      </Pressable>
+      <View style={styles.mediaContainer}>
+        <GiftedChatMessageImage
+          {...props}
+          imageProps={{
+            resizeMode: "cover",
+
+            loadingIndicatorSource: { uri: props.currentMessage?.image },
+          }}
+          imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 5 }]}
+        />
+      </View>
+    </>
   );
 };
 

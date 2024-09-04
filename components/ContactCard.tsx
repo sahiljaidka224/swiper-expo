@@ -17,15 +17,8 @@ function ContactCard({
 }) {
   const segments = useSegments();
   const onPress = () => {
-    let path = "(followed)";
-    if (segments.includes("(stock)")) {
-      path = "(stock)";
-    }
-    if (segments.includes("(swiper)")) {
-      path = "(swiper)";
-    }
-    router.push({
-      pathname: `/${path}/user/[userId]`,
+    router.navigate({
+      pathname: `/${segments[1]}/user/[userId]`,
       params: { id: userId },
     });
   };

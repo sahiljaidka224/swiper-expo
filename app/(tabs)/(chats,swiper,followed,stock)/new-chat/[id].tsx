@@ -1,20 +1,20 @@
-import { View, Pressable, Platform, ActivityIndicator, Alert } from "react-native";
-import React, { useCallback } from "react";
+import { View, Pressable, ActivityIndicator, Alert, StyleSheet } from "react-native";
+import React, { useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
 import { router, useLocalSearchParams, useSegments } from "expo-router";
 import Avatar from "@/components/Avatar";
-import * as ImagePicker from "expo-image-picker";
 import Text from "@/components/Text";
-import { useGetGroup } from "@/hooks/cometchat/groups";
+import { useGetGroup, useLeaveGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
 import ChatComponent from "@/components/ChatScreen";
 import Colors from "@/constants/Colors";
-import { useAuth } from "@/context/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
 
 export default function NewGroupChatPage() {
   const { id } = useLocalSearchParams();
-  const { user } = useAuth();
+  const { group, isGroupLoading } = useGetGroup(id as string);
   const {
     messages: chatMessages,
     error: fetchMessagesErr,
@@ -24,69 +24,7 @@ export default function NewGroupChatPage() {
     setMessages,
     isTyping,
   } = useGetGroupMessages(id as string);
-  const { sendMessage, sendMediaMessage } = useSendGroupMessage();
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: 10,
-    });
-
-    if (!result.canceled) {
-      let files = [];
-      for (let [index, file] of result.assets.entries()) {
-        const uri = file.uri;
-        let name: string | null = "";
-        let type: string | undefined = "";
-
-        if (Platform.OS === "ios" && file.fileName !== undefined) {
-          name = file.fileName;
-          type = file.type;
-        } else {
-          type = file.type;
-          name = `Camera_0${index}.jpeg`;
-        }
-
-        if (type === "video") {
-          type = "video/quicktime";
-          name = `Camera_0${index}.mov`;
-        }
-        // TODO: handle video
-
-        let tempFile = {
-          name: name,
-          type: Platform.OS === "android" ? file.type : type,
-          uri: Platform.OS === "android" ? file.uri : file.uri.replace("file://", ""),
-          size: file.fileSize,
-        };
-
-        files.push(tempFile);
-
-        onSend(
-          [
-            {
-              _id: file.fileName ?? file.assetId ?? Math.floor(Math.random() * 1000),
-              text: "",
-              image: type === "image" ? uri : undefined,
-              video: type === "video" ? uri : undefined,
-              createdAt: new Date(),
-              user: {
-                _id: 1,
-                name: user?.name,
-              },
-            },
-          ],
-          ""
-        );
-      }
-
-      sendMediaMessage(id as string, files);
-    }
-  };
+  const { sendMessage } = useSendGroupMessage();
 
   const onSend = useCallback((messages: IMessage[], text: string) => {
     const updatedMessages = messages.map((m) => {
@@ -104,23 +42,41 @@ export default function NewGroupChatPage() {
       onSend={onSend}
       hasMore={hasMore}
       loadingMore={loading}
-      pickImage={pickImage}
       userId={id as string}
-      Header={() => <Header groupUID={id as string} />}
+      Header={() => (
+        <Header groupUID={id as string} group={group} isGroupLoading={isGroupLoading} />
+      )}
       isTyping={isTyping}
       context="group"
     />
   );
 }
 
-const Header = React.memo(({ groupUID }: { groupUID: string }) => {
+const Header = ({
+  groupUID,
+  group,
+  isGroupLoading,
+}: {
+  groupUID: string;
+  group: CometChat.Group | null;
+  isGroupLoading: boolean;
+}) => {
   const segments = useSegments();
-  const { group, isGroupLoading } = useGetGroup(groupUID);
-  if (!group || isGroupLoading) return <ActivityIndicator size="small" color={Colors.primary} />;
+  const { leaveGroup, hasLeft, error } = useLeaveGroup();
+
+  useEffect(() => {
+    if (hasLeft && !error) {
+      router.back();
+    }
+  }, [hasLeft]);
+
+  if (!group && isGroupLoading) return <ActivityIndicator size="small" color={Colors.primary} />;
+  if (!group) return null;
 
   const groupName = group.getName();
   const icon = group.getIcon();
   const metadata = group.getMetadata() as { carId: string; odometer: number; price: number };
+  const memberScope = group.getScope() as CometChat.GroupMemberScope;
 
   const onPress = () => {
     if (!metadata?.carId) return;
@@ -131,34 +87,52 @@ const Header = React.memo(({ groupUID }: { groupUID: string }) => {
     });
   };
 
+  const onLeaveGroup = () => {
+    leaveGroup(groupUID, memberScope);
+  };
+
+  const onLeaveGroupPress = () => {
+    Alert.alert("Delete Chat", "Are you sure? This action cannot be reverted!", [
+      { text: "Cancel" },
+      { text: "Delete", onPress: onLeaveGroup },
+    ]);
+  };
+
   return (
-    <Pressable
-      style={{
-        flexDirection: "row",
-        gap: 10,
-        paddingBottom: 4,
-        alignItems: "center",
-        flex: 1,
-      }}
-      onPress={onPress}
-    >
-      <View style={{ width: 40, height: 40 }}>
-        <Avatar source={icon} />
+    <Pressable style={styles.headerContainer} onPress={onPress}>
+      <View style={styles.leftContainer}>
+        <View style={styles.avatarContainer}>
+          <Avatar source={icon} />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.name} allowFontScaling={false}>
+            {groupName}
+          </Text>
+          <Text allowFontScaling={false} style={styles.extraInfo}>{`${formatNumberWithCommas(
+            metadata.odometer
+          )}KM - $${formatNumberWithCommas(metadata.price)}`}</Text>
+        </View>
       </View>
-      <View style={{ flexDirection: "column" }}>
-        <Text
-          style={{ fontSize: 16, fontFamily: "SF_Pro_Display_Medium" }}
-          allowFontScaling={false}
-        >
-          {groupName}
-        </Text>
-        <Text
-          allowFontScaling={false}
-          style={{ fontSize: 14, fontFamily: "SF_Pro_Display_Medium" }}
-        >{`${formatNumberWithCommas(metadata.odometer)}KM - $${formatNumberWithCommas(
-          metadata.price
-        )}`}</Text>
-      </View>
+      <Pressable onPress={onLeaveGroupPress}>
+        <Ionicons name="exit-outline" size={24} color={Colors.primary} />
+      </Pressable>
     </Pressable>
   );
+};
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    paddingBottom: 4,
+    alignItems: "center",
+    flex: 1,
+    maxWidth: "90%",
+    alignSelf: "flex-start",
+    justifyContent: "space-between",
+  },
+  leftContainer: { flexDirection: "row", gap: 10 },
+  avatarContainer: { width: 40, height: 40, borderRadius: 20 },
+  textContainer: { flexDirection: "column" },
+  name: { fontSize: 16, fontFamily: "SF_Pro_Display_Medium" },
+  extraInfo: { fontSize: 14, fontFamily: "SF_Pro_Display_Medium" },
 });

@@ -38,9 +38,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       0,
       100
     );
-    const chatName = String(
-      `${user?.name.split(" ")[0]} - ${car?.year} ${car?.make} ${car?.model}`
-    ).toUpperCase();
+    const chatName = String(`${car?.year} ${car?.make} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
     const owner = user?.id;
     const members = [owner, car?.organisation?.ownerUserId];
@@ -54,6 +52,8 @@ function CarDetail({ car, context }: CarDetailProps) {
       icon,
     };
 
+    const tags = [owner, car?.organisation?.ownerUserId];
+
     const group = new CometChat.Group(
       GUID,
       chatName,
@@ -63,7 +63,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       undefined
     );
     group.setMetadata(metadata);
-
+    group.setTags(tags);
     group.setOwner(owner);
     group.setMembersCount(2);
 

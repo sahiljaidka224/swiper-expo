@@ -195,9 +195,14 @@ export const useSendMessage = () => {
     }
   };
 
-  const sendMessageToMultiple = async (
+  const sendMediaMessageToMultiple = async (
     receiverID: string[],
-    messageText: string,
+    files: {
+      name: string | null;
+      uri: string;
+      type: string | undefined;
+      size: number | undefined;
+    }[],
     organisationFrom?: string,
     organisationTo?: string,
     metadata?: Record<string, string | number | undefined>
@@ -207,15 +212,15 @@ export const useSendMessage = () => {
 
     try {
       for (let id of receiverID) {
-        const textMessage = new CometChat.TextMessage(id, messageText, "user");
-        textMessage.setMetadata({
+        const mediaMessage = new CometChat.MediaMessage(id, files, "image", "user");
+        mediaMessage.setMetadata({
           organisation_from: organisationFrom,
           organisation_to: organisationTo,
           ...metadata,
         });
 
         try {
-          await CometChat.sendMessage(textMessage);
+          await CometChat.sendMessage(mediaMessage);
         } catch (error) {
           setError(error as CometChat.CometChatException);
           console.log("Message sending failed with error:", error);
@@ -260,7 +265,7 @@ export const useSendMessage = () => {
     }
   };
 
-  return { sendMessage, loading, error, message, sendMediaMessage, sendMessageToMultiple };
+  return { sendMessage, loading, error, message, sendMediaMessage, sendMediaMessageToMultiple };
 };
 
 export const useGetGroupMessages = (toId: string) => {

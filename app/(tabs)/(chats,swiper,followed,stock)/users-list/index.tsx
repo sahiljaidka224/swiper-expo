@@ -7,6 +7,7 @@ import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
+import { useSendMessage } from "@/hooks/cometchat/messages";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { formatTimestamp } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
@@ -29,17 +30,32 @@ import { ScrollView } from "react-native-gesture-handler";
 
 export default function UsersListPage() {
   const segments = useSegments();
-  const multipleSelectionAllowed = segments.includes("(stock)") || segments.includes("(add-stock)");
+  const { carId, allowMultiple, uri } = useLocalSearchParams<{
+    carId?: string;
+    allowMultiple?: string;
+    uri: string;
+  }>();
+
+  const multipleSelectionAllowed =
+    segments.includes("(stock)") ||
+    segments.includes("(add-stock)") ||
+    (segments.includes("(chats)") && allowMultiple === "true");
+  const forwardMediaMode = segments.includes("(chats)") && allowMultiple === "true";
+
   const { user: currentUser } = useAuth();
 
   const { users, error, loading } = useGetCometChatUsers();
+  const {
+    loading: isSendingMessage,
+    sendMediaMessageToMultiple,
+    error: sendMessageError,
+  } = useSendMessage();
 
   const {
     createMultipleGroups,
     loading: isGroupCreateLoading,
     error: groupCreateError,
   } = useCreateGroup();
-  const { carId } = useLocalSearchParams<{ carId?: string }>();
 
   const {
     car,
@@ -62,6 +78,13 @@ export default function UsersListPage() {
       router.back();
     }
   }, [isGroupCreateLoading, groupCreateError]);
+
+  useEffect(() => {
+    if (!isSendingMessage && !sendMessageError && forwardMediaMode && selectedUsers.length) {
+      Alert.alert("Message forwarded successfully!");
+      router.back();
+    }
+  }, [sendMessageError, isSendingMessage]);
 
   const filteredUsers = users.filter((user) => {
     const [firstName, lastName] = user.getName().toLowerCase().split(" ");
@@ -117,6 +140,15 @@ export default function UsersListPage() {
     );
   };
 
+  const onForwardMedia = () => {
+    if (!forwardMediaMode || !uri) return;
+
+    sendMediaMessageToMultiple(
+      selectedUsers.map((user) => user.getUid()),
+      [{ name: "Image", uri, type: "image/jpeg", size: undefined }]
+    );
+  };
+
   const onPressSendNow = () => {
     if (!car && !carDetailsLoading) {
       Alert.alert("Car details not found", "Please try again later");
@@ -125,9 +157,7 @@ export default function UsersListPage() {
     }
 
     if (!currentUser) return;
-    const chatName = String(
-      `${currentUser?.name.split(" ")[0]} - ${car?.year} ${car?.make} ${car?.model}`
-    ).toUpperCase();
+    const chatName = String(`${car?.year} ${car?.make} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
     const owner = currentUser?.id;
     const metadata = {
@@ -144,6 +174,7 @@ export default function UsersListPage() {
       const GUID = String(`${userUID}_${car?.carId}_${currentUser?.id}`).slice(0, 100);
 
       const members = [owner, userUID];
+      const tags = [userUID, currentUser?.id];
 
       const group = new CometChat.Group(
         GUID,
@@ -154,7 +185,7 @@ export default function UsersListPage() {
         undefined
       );
       group.setMetadata(metadata);
-
+      group.setTags(tags);
       group.setOwner(owner);
       group.setMembersCount(2);
 
@@ -188,18 +219,22 @@ export default function UsersListPage() {
               <Pressable
                 disabled={selectedUsers.length === 0}
                 onPress={() => {
-                  setIsModalVisible(true);
+                  forwardMediaMode ? onForwardMedia() : setIsModalVisible(true);
                 }}
               >
-                <Text
-                  style={{
-                    fontFamily: "SF_Pro_Display_Medium",
-                    fontSize: 16,
-                    color: selectedUsers.length > 0 ? Colors.primary : Colors.textLight,
-                  }}
-                >
-                  Push
-                </Text>
+                {isSendingMessage ? (
+                  <ActivityIndicator size="small" color={Colors.primary} />
+                ) : (
+                  <Text
+                    style={{
+                      fontFamily: "SF_Pro_Display_Medium",
+                      fontSize: 16,
+                      color: selectedUsers.length > 0 ? Colors.primary : Colors.textLight,
+                    }}
+                  >
+                    {forwardMediaMode ? "Forward" : "Push"}
+                  </Text>
+                )}
               </Pressable>
             );
           },

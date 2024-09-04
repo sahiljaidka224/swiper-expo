@@ -9,12 +9,12 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#1063FD"
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "3",
+      "buildNumber": "5",
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",

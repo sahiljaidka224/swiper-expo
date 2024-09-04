@@ -18,19 +18,7 @@ interface OrganisationCardProps {
 export default function OrganisationCard({ name, address, orgId }: OrganisationCardProps) {
   const segments = useSegments();
   const onShowStock = () => {
-    let path = "(followed)";
-    if (segments.includes("(stock)")) {
-      path = "(stock)";
-    }
-
-    if (segments.includes("(chats)")) {
-      path = "(chats)";
-    }
-
-    if (segments.includes("(swiper)")) {
-      path = "(swiper)";
-    }
-    router.push({ pathname: `/(tabs)/${path}/org/[listing]`, params: { orgId } });
+    router.navigate({ pathname: `/(tabs)/${segments[1]}/org/[listing]`, params: { orgId } });
   };
 
   const onLocate = () => {

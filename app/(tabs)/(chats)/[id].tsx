@@ -1,20 +1,23 @@
-import { View, Pressable, Platform, Alert } from "react-native";
+import { View, Pressable, Alert, StyleSheet } from "react-native";
 import React, { useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 
 import { useGetMessages, useSendMessage } from "@/hooks/cometchat/messages";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { useGetUserDetails } from "@/api/hooks/user";
-import * as ImagePicker from "expo-image-picker";
 import Text from "@/components/Text";
 import ChatComponent from "@/components/ChatScreen";
 import { useAuth } from "@/context/AuthContext";
+import { useGetGroupConversationsWithTags } from "@/hooks/cometchat/conversations";
+import { useGetCometChatUser } from "@/hooks/cometchat/users";
+import Colors from "@/constants/Colors";
 
 export default function ChatDetailsPage() {
   const { id } = useLocalSearchParams();
   const { user: currentUser } = useAuth();
-
+  const { groupConversations, getGroups } = useGetGroupConversationsWithTags([id as string]);
+  const { user: cometChatUser } = useGetCometChatUser(id as string);
   const { user, isLoading: isUserLoading } = useGetUserDetails(id as string);
 
   const {
@@ -35,72 +38,14 @@ export default function ChatDetailsPage() {
     }
   }, [fetchMessagesErr, loading]);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: 10,
-    });
+  // To clear unread messages
+  useFocusEffect(
+    useCallback(() => {
+      getGroups();
 
-    if (!result.canceled) {
-      let files = [];
-      for (let [index, file] of result.assets.entries()) {
-        const uri = file.uri;
-        let name: string | null = "";
-        let type: string | undefined = "";
-
-        if (Platform.OS === "ios" && file.fileName !== undefined) {
-          name = file.fileName;
-          type = file.type;
-        } else {
-          type = file.type;
-          name = `Camera_0${index}.jpeg`;
-        }
-
-        if (type === "video") {
-          type = "video/quicktime";
-          name = `Camera_0${index}.mov`;
-        }
-        // TODO: handle video
-
-        let tempFile = {
-          name: name,
-          type: Platform.OS === "android" ? file.type : type,
-          uri: Platform.OS === "android" ? file.uri : file.uri.replace("file://", ""),
-          size: file.fileSize,
-        };
-
-        files.push(tempFile);
-
-        onSend(
-          [
-            {
-              _id: file.fileName ?? file.assetId ?? Math.floor(Math.random() * 1000),
-              text: "",
-              image: type === "image" ? uri : undefined,
-              video: type === "video" ? uri : undefined,
-              createdAt: new Date(),
-              user: {
-                _id: 1,
-                name: user?.displayName,
-              },
-            },
-          ],
-          ""
-        );
-      }
-
-      sendMediaMessage(
-        id as string,
-        files,
-        currentUser?.org?.name ?? undefined,
-        user?.organisations[0]?.name ?? undefined
-      );
-    }
-  };
+      return () => {};
+    }, [])
+  );
 
   const onSend = useCallback((messages: IMessage[], text: string) => {
     const updatedMessages = messages.map((m) => {
@@ -124,13 +69,19 @@ export default function ChatDetailsPage() {
       onSend={onSend}
       hasMore={hasMore}
       loadingMore={loading}
-      pickImage={pickImage}
       userId={id as string}
       Header={() => (
-        <Header userId={id as string} isLoading={isUserLoading} name={user?.displayName} />
+        <Header
+          userId={id as string}
+          isLoading={isUserLoading}
+          name={user?.displayName}
+          onlineStatus={cometChatUser?.getStatus() ?? undefined}
+        />
       )}
       isTyping={isTyping}
       context="user"
+      userOrgName={user?.organisations[0]?.name}
+      carGroups={groupConversations}
     />
   );
 }
@@ -139,10 +90,12 @@ const Header = ({
   userId,
   isLoading,
   name,
+  onlineStatus,
 }: {
   isLoading: boolean;
   userId: string;
   name: string;
+  onlineStatus?: string;
 }) => {
   if (isLoading) return;
 
@@ -154,22 +107,36 @@ const Header = ({
   };
 
   return (
-    <Pressable
-      style={{
-        flexDirection: "row",
-        gap: 10,
-        paddingBottom: 4,
-        alignItems: "center",
-        flex: 1,
-      }}
-      onPress={onPress}
-    >
-      <View style={{ width: 40, height: 40 }}>
+    <Pressable style={styles.headerContainer} onPress={onPress}>
+      <View style={styles.avatarContainer}>
+        {onlineStatus && onlineStatus === "online" ? <View style={styles.onlineIndicator} /> : null}
         <Avatar userId={userId} />
       </View>
-      <Text style={{ fontSize: 16, fontFamily: "SF_Pro_Display_Medium" }} allowFontScaling={false}>
+      <Text style={styles.name} allowFontScaling={false}>
         {name}
       </Text>
     </Pressable>
   );
 };
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: "row",
+    gap: 10,
+    paddingBottom: 4,
+    alignItems: "center",
+    flex: 1,
+  },
+  onlineIndicator: {
+    position: "absolute",
+    bottom: 4,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.green,
+    zIndex: 1,
+  },
+  avatarContainer: { width: 40, height: 40 },
+  name: { fontSize: 16, fontFamily: "SF_Pro_Display_Medium" },
+});
