@@ -25,6 +25,7 @@ import * as FileSystem from "expo-file-system";
 import ErrorView from "@/components/Error";
 import { router } from "expo-router";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { createCometChatUser } from "@/hooks/cometchat";
 
 type FormData = {
   firstName: string;
@@ -56,6 +57,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
     handleSubmit,
     formState: { errors, isDirty },
     getValues,
+    watch,
   } = useForm<FormData>({
     defaultValues: {
       firstName: firstName,
@@ -74,10 +76,25 @@ export default function ProfileComponent({ context }: ProfileProps) {
       });
 
       if (context === "create") {
-        router.replace("/(tabs)/(chats)");
+        (async () => {
+          try {
+            const isSignupSuccess = await createCometChatUser(
+              user.id,
+              `${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
+            );
+            if (isSignupSuccess) {
+              router.replace("/(tabs)/(chats)");
+            } else {
+              Alert.alert("Error", "Failed to Create User, Please try again");
+            }
+          } catch (error) {
+            console.log(error);
+            Alert.alert("Error", "An error occurred. Please try again later.");
+          }
+        })();
       }
     }
-  }, [updatedUserDetails]);
+  }, [updatedUserDetails, isMutating, error]);
 
   const onSubmit = ({ firstName, lastName, dealershipName }: FormData) => {
     if (!token || !isEnabled()) return;
@@ -95,13 +112,14 @@ export default function ProfileComponent({ context }: ProfileProps) {
           dealershipName,
           phoneNumber: user?.phoneNumber,
           profileWizardComplete: 1,
+          displayName: `${firstName} ${lastName}`,
         },
         token,
       });
       return;
     }
     updateUserDetails({
-      userDetails: { firstName, lastName },
+      userDetails: { firstName, lastName, displayName: `${firstName} ${lastName}` },
       token,
     });
   };
@@ -199,7 +217,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
   // check if all the mandatory fields are filled
   const isEnabled = () => {
     if (context === "create") {
-      return getValues("firstName").length > 0 && getValues("lastName").length > 0;
+      return watch("firstName").length > 0 && watch("lastName").length > 0;
     }
 
     return isDirty;

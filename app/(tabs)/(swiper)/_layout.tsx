@@ -17,6 +17,12 @@ export default function SwiperLayout() {
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
+        <Stack.Screen
+          name="car/[id]"
+          options={{
+            title: "",
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );

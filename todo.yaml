@@ -37,6 +37,10 @@ push-stock
 - leave a group as a participant ✅
 - message from listing page
 - lisitng page linking ✅
+- update current user details in cometchat
+- logout blocked users
+- create new user in CometChat
+- messgae count in tab chat icon
 
 
 Push notification while sending a message, take reference from Swiper yellow app

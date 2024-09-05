@@ -28,3 +28,19 @@ export async function cometChatInit(userId: string) {
     return false;
   }
 }
+
+// TODO: Move to backend
+export async function createCometChatUser(uid: string, name: string) {
+  const user = new CometChat.User(uid);
+  user.setName(name);
+  try {
+    const newUser = await CometChat.createUser(user, process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY!);
+    if (newUser) {
+      await cometChatInit(newUser.getUid());
+      return true;
+    }
+  } catch (error) {
+    console.log("Create user failed with error:", error);
+    return false;
+  }
+}

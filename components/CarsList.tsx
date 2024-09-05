@@ -12,7 +12,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useAuth } from "@/context/AuthContext";
 import ErrorView from "./Error";
 import Text from "./Text";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 
@@ -42,6 +42,14 @@ export function CarsList({
   const { createGroup, error: errorGroup, group, loading: isGroupLoading } = useCreateGroup();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+
+      return () => {};
+    }, [])
+  );
 
   useEffect(() => {
     if (!isLoading && cars) {

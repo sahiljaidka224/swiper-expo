@@ -32,9 +32,23 @@ const removeCarFromWatchlist = async (
 
 const addCarToWatchlist = async (
   url: string,
-  { arg }: { arg: { carId: string; token: string; userId: string } }
+  { arg }: { arg: { carId: string; token: string; userId: string | undefined } }
 ) => {
-  const response = await fetch(`${url}${arg.carId}/${arg.userId}/follow`, {
+  const fetchUrl = `${url}${arg.carId}/${arg.userId ? `${arg.userId}/follow` : "follow"}`;
+  const response = await fetch(fetchUrl, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+  });
+
+  return response.json();
+};
+
+const markCarAsSeen = async (url: string, { arg }: { arg: { carId: string; token: string } }) => {
+  const fetchUrl = `${url}${arg.carId}/seen`;
+  const response = await fetch(fetchUrl, {
     method: "POST",
     headers: {
       "Content-type": "application/json; charset=UTF-8",
@@ -173,6 +187,20 @@ export function useAddCarToWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/",
     addCarToWatchlist
+  );
+
+  return {
+    trigger,
+    newCars: data,
+    isMutating,
+    error,
+  };
+}
+
+export function useMarkCarAsSeen() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/car/",
+    markCarAsSeen
   );
 
   return {

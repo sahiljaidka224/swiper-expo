@@ -23,7 +23,7 @@ export function useGetSwiperCars(initialPage: number = 1, limit: number = 5) {
     user?.org?.id
   }&includeSeen=false${from > 5 ? `&from=${from}` : ""}`;
   const { data, error, isLoading, mutate, isValidating } = useSWR(
-    token && user?.org?.id ? [fetchUrl, token] : null,
+    token ? [fetchUrl, token] : null,
     ([url, token]) => getSwiperCars(url, { arg: { token } })
   );
 

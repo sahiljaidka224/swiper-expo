@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +12,8 @@ import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import Text from "@/components/Text";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { useCreateGroup } from "@/hooks/cometchat/groups";
 
 export default function OrgListing() {
   // TODO: use Order state
@@ -57,7 +59,10 @@ function CarsListOrgs({
     fetchMore,
   } = useGetOrgCars(context, orderBy, orderDirection, orgId);
   const [watchListData, setWatchlistData] = useState<any[]>([]);
+  const { createGroup, error: errorGroup, group, loading: isGroupLoading } = useCreateGroup();
+
   const [page, setPage] = useState(1);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!isLoading && cars && cars) {
@@ -65,7 +70,12 @@ function CarsListOrgs({
     }
   }, [cars]);
 
-  const onMessagePress = () => {};
+  useEffect(() => {
+    if (group && !isGroupLoading) {
+      const guid = group.getGuid();
+      router.push({ pathname: "/(tabs)/(followed)/new-chat/[id]", params: { id: guid } });
+    }
+  }, [isGroupLoading, group]);
 
   const loadMore = () => {
     if (!isLoading && cars?.length > 0) {
@@ -74,10 +84,50 @@ function CarsListOrgs({
     }
   };
 
-  const onSendToPhoneContacts = () => {};
-
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
+      const onSendToPhoneContacts = () => {
+        router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${item?.carId}` });
+      };
+
+      const onMessagePress = () => {
+        if (!user?.id || !item?.organisation?.ownerUserId) return;
+
+        const GUID = String(`${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`).slice(
+          0,
+          100
+        );
+        const chatName = String(`${item?.year} ${item?.make} ${item?.model}`).toUpperCase();
+        const icon = item?.images[0]?.url ?? "https://picsum.photos/200";
+        const owner = user?.id;
+        const members = [owner, item?.organisation?.ownerUserId];
+        const metadata = {
+          carId: item?.carId,
+          make: item?.make,
+          model: item?.model,
+          year: item?.year,
+          price: item?.price,
+          odometer: item?.odometer,
+          icon,
+        };
+        const tags = [owner, item?.organisation?.ownerUserId];
+
+        const group = new CometChat.Group(
+          GUID,
+          chatName,
+          CometChat.GROUP_TYPE.PRIVATE,
+          undefined,
+          icon,
+          undefined
+        );
+        group.setMetadata(metadata);
+        group.setTags(tags);
+        group.setOwner(owner);
+        group.setMembersCount(2);
+
+        createGroup(group, members);
+      };
+
       return (
         <Animated.View
           style={styles.itemWrapper}
