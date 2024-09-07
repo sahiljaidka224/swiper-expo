@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { IMessage } from "react-native-gifted-chat";
 import * as Haptics from "expo-haptics";
 import { useMessageContext } from "@/context/MessageContext";
+import { showToast } from "@/components/Toast";
 
 function parseCometChatMessageToGiftedChat(
   user: CurrentUser,
@@ -260,6 +261,11 @@ export const useSendMessage = () => {
       // console.log("Media message sent successfully", response);
     } catch (error) {
       setError(error as CometChat.CometChatException);
+      showToast(
+        "Error sending message",
+        `${(error as CometChat.CometChatException)?.message ?? ""}`,
+        "error"
+      );
       console.log("Media message sending failed with error", error);
     } finally {
       setLoading(false);

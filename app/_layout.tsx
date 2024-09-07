@@ -10,6 +10,8 @@ import { fetcher } from "@/utils/fetcher";
 import { cometChatInit } from "@/hooks/cometchat";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { MessageContextProvider } from "@/context/MessageContext";
+import Toast from "react-native-toast-message";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -86,11 +88,14 @@ function BaseLayout() {
 }
 
 export default function RootLayoutNav() {
+  const { top } = useSafeAreaInsets();
+
   return (
     <AuthProvider>
       <MessageContextProvider>
         <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
           <BaseLayout />
+          <Toast topOffset={top} />
         </SWRConfig>
       </MessageContextProvider>
     </AuthProvider>

@@ -27,6 +27,7 @@ import { router, Stack } from "expo-router";
 import { createCometChatUser } from "@/hooks/cometchat";
 import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
+import { showToast } from "./Toast";
 
 type FormData = {
   firstName: string;
@@ -44,7 +45,12 @@ export default function ProfileComponent({ context }: ProfileProps) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { logout, user, token, updateUser } = useAuth();
   const { updateUserDetails, updatedUserDetails, isMutating, error } = useUpdateUserDetails();
-  const { updateUserAvatar, isUserAvatarMutating, error: avatarError } = useUpdateUserAvatar();
+  const {
+    updateUserAvatar,
+    isUserAvatarMutating,
+    error: avatarError,
+    data: avatarUpdateData,
+  } = useUpdateUserAvatar();
   const {
     updateUser: updateCometChatUser,
     loading: isUpdateCometChatUserLoading,
@@ -70,6 +76,12 @@ export default function ProfileComponent({ context }: ProfileProps) {
       dealershipName: user?.org?.name ?? "",
     },
   });
+
+  useEffect(() => {
+    if (avatarUpdateData && !avatarError && !isUserAvatarMutating) {
+      showToast("Success", "Profile Picture Updated Successfully", "success");
+    }
+  }, [avatarUpdateData, avatarError, isUserAvatarMutating]);
 
   useEffect(() => {
     if (!isMutating && updatedUserDetails && !error && user) {

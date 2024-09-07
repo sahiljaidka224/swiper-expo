@@ -38,7 +38,7 @@ export default function Carousel({ images, price }: CarouselProps) {
                 key={`${imageIndex}`}
                 style={styles.imageContainer}
                 activeOpacity={0.75}
-                onPress={() => {
+                onLongPress={() => {
                   setModal(true);
                 }}
               >

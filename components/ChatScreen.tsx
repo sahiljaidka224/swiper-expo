@@ -50,6 +50,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as ImagePicker from "expo-image-picker";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
+import { showToast } from "./Toast";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const options = ["Gallery", "Camera", "Cancel"];
@@ -107,7 +108,7 @@ export default function ChatComponent({
       let name: string | null = "";
       let type: string | undefined = "";
 
-      if (Platform.OS === "ios" && file.fileName !== undefined) {
+      if (Platform.OS === "ios" && file.fileName) {
         name = file.fileName;
         type = file.type;
       } else {
@@ -170,12 +171,12 @@ export default function ChatComponent({
     }
   };
 
-  const handleLaunchCamera = useCallback(async () => {
+  const handleLaunchCamera = async () => {
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        quality: 0.5,
+        quality: 1,
         aspect: [4, 3],
         allowsMultipleSelection: true,
         selectionLimit: 10,
@@ -187,8 +188,9 @@ export default function ChatComponent({
       }
     } catch (error) {
       console.log(error);
+      showToast("Error", "Failed to send image from camera", "error");
     }
-  }, []);
+  };
 
   const onShowActionSheet = () => {
     const cancelButtonIndex = options.length - 1;

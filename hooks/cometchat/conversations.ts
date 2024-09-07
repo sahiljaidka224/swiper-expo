@@ -2,9 +2,14 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useCallback, useEffect, useState } from "react";
 import * as Haptics from "expo-haptics";
 import { useGetUnreadMessages } from "./messages";
+import { showToast } from "@/components/Toast";
+import { usePathname } from "expo-router";
+import { useAuth } from "@/context/AuthContext";
 
 export const useGetConversations = () => {
   const { getUnreadMessages } = useGetUnreadMessages();
+  const { user: currentUser } = useAuth();
+  const pathname = usePathname();
 
   const [conversationList, setConversationList] = useState<CometChat.Conversation[]>([]);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
@@ -36,11 +41,23 @@ export const useGetConversations = () => {
         onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
           fetchConversations();
           getUnreadMessages();
+          const sender = textMessage.getSender();
+          const senderUID = sender.getUid();
+
+          if (!pathname.includes(senderUID) && senderUID !== currentUser?.id) {
+            showToast(sender.getName(), textMessage.getText().substring(0, 40), "info");
+          }
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
         onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
           fetchConversations();
           getUnreadMessages();
+
+          const sender = mediaMessage.getSender();
+          const senderUID = sender.getUid();
+          if (!pathname.includes(senderUID) && senderUID !== currentUser?.id) {
+            showToast(sender.getName(), "New Media", "info");
+          }
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
       })

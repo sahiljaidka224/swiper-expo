@@ -17,6 +17,7 @@ import Colors from "@/constants/Colors";
 import * as SMS from "expo-sms";
 
 import * as Linking from "expo-linking";
+import { showToast } from "@/components/Toast";
 
 export default function InviteFriendsPage() {
   const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
@@ -45,8 +46,8 @@ export default function InviteFriendsPage() {
   const filteredPhoneContacts = phoneContacts.filter((contact) => {
     const [firstName, lastName] = contact.name.toLowerCase().split(" ");
     return (
-      firstName.startsWith(searchText.toLowerCase()) ||
-      lastName.startsWith(searchText.toLowerCase())
+      firstName?.startsWith(searchText.toLowerCase()) ||
+      lastName?.startsWith(searchText.toLowerCase())
     );
   });
 
@@ -85,7 +86,7 @@ export default function InviteFriendsPage() {
           Alert.alert("SMS failed to send");
         }
       } else {
-        Alert.alert("SMS is not available on this device");
+        showToast("Error", "SMS is not available on this device ❌", "error");
       }
     };
 

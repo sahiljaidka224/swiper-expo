@@ -1,3 +1,5 @@
+import * as Linking from "expo-linking";
+
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Colors from "@/constants/Colors";
 import { Link } from "expo-router";
@@ -7,7 +9,17 @@ const welcomePage = require("@/assets/images/welcome.png");
 const welcomeImage = Image.resolveAssetSource(welcomePage).uri;
 
 export default function Index() {
-  const openLink = () => {};
+  const openPrivacyPolicy = async () => {
+    if (await Linking.canOpenURL("https://website.swiper.datalinks.nl/policy.html")) {
+      Linking.openURL("https://website.swiper.datalinks.nl/policy.html");
+    }
+  };
+
+  const openTermsOfService = async () => {
+    if (await Linking.canOpenURL("https://website.swiper.datalinks.nl/terms.html")) {
+      Linking.openURL("https://website.swiper.datalinks.nl/terms.html");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -15,11 +27,11 @@ export default function Index() {
       <Text style={styles.headline}>Welcome to Swiper</Text>
       <Text style={styles.description}>
         Read our{" "}
-        <Text style={styles.link} onPress={openLink}>
+        <Text style={styles.link} onPress={openPrivacyPolicy}>
           Privacy Policy
         </Text>
         . {'Tap "Agree & Continue" to accept the '}
-        <Text style={styles.link} onPress={openLink}>
+        <Text style={styles.link} onPress={openTermsOfService}>
           Terms of Service
         </Text>
         .

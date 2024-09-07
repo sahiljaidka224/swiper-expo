@@ -78,7 +78,7 @@ const postUserAvatar = async (
     throw new Error("Failed to update user avatar");
   }
 
-  return response.json();
+  return { data: { success: true } };
 };
 
 const loginWithPhone = async (
