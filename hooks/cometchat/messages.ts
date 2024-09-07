@@ -3,6 +3,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { IMessage } from "react-native-gifted-chat";
 import * as Haptics from "expo-haptics";
+import { useMessageContext } from "@/context/MessageContext";
 
 function parseCometChatMessageToGiftedChat(
   user: CurrentUser,
@@ -441,9 +442,11 @@ export const useSendGroupMessage = () => {
 };
 
 export const useMarkMessageAsRead = () => {
+  const { getUnreadMessages } = useGetUnreadMessages();
   const markAsRead = async (message: CometChat.BaseMessage) => {
     try {
       await CometChat.markAsRead(message);
+      getUnreadMessages();
     } catch (error) {
       console.log("Error marking message as read:", error);
     }
@@ -484,4 +487,34 @@ export const useTypingIndicator = () => {
   );
 
   return { startTyping, endTyping, isCurrentUserTyping: isTyping };
+};
+
+export const useGetUnreadMessages = () => {
+  const { setUnreadCount } = useMessageContext();
+
+  const getUnreadMessages = async () => {
+    try {
+      const data = (await CometChat.getUnreadMessageCount()) as {
+        groups: Record<string, number>;
+        users: Record<string, number>;
+      };
+      let totalCount = 0;
+      for (let key of Object.keys(data.users)) {
+        totalCount += data.users[key];
+      }
+
+      for (let key of Object.keys(data.groups)) {
+        totalCount += data.groups[key];
+      }
+      setUnreadCount(totalCount);
+    } catch (error) {
+      console.log("Error fetching unread messages:", error);
+    }
+  };
+
+  useEffect(() => {
+    getUnreadMessages();
+  }, []);
+
+  return { getUnreadMessages };
 };

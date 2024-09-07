@@ -1,8 +1,11 @@
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useCallback, useEffect, useState } from "react";
 import * as Haptics from "expo-haptics";
+import { useGetUnreadMessages } from "./messages";
 
 export const useGetConversations = () => {
+  const { getUnreadMessages } = useGetUnreadMessages();
+
   const [conversationList, setConversationList] = useState<CometChat.Conversation[]>([]);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,10 +35,12 @@ export const useGetConversations = () => {
       new CometChat.MessageListener({
         onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
           fetchConversations();
+          getUnreadMessages();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
         onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
           fetchConversations();
+          getUnreadMessages();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
       })

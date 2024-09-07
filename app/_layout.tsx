@@ -9,6 +9,7 @@ import { SWRConfig } from "swr";
 import { fetcher } from "@/utils/fetcher";
 import { cometChatInit } from "@/hooks/cometchat";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { MessageContextProvider } from "@/context/MessageContext";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -87,9 +88,11 @@ function BaseLayout() {
 export default function RootLayoutNav() {
   return (
     <AuthProvider>
-      <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
-        <BaseLayout />
-      </SWRConfig>
+      <MessageContextProvider>
+        <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
+          <BaseLayout />
+        </SWRConfig>
+      </MessageContextProvider>
     </AuthProvider>
   );
 }

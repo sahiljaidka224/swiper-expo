@@ -35,12 +35,24 @@ push-stock
 - auto msg from admin
 - error sending image from Camera
 - leave a group as a participant ✅
-- message from listing page
-- lisitng page linking ✅
-- update current user details in cometchat
-- logout blocked users
-- create new user in CometChat
-- messgae count in tab chat icon
+- message from listing page ✅
+- listing page linking ✅
+- update current user details in cometchat ✅
+- logout blocked users ✅
+- create new user in CometChat ✅
+- message count in tab chat icon ✅
+
+
+- invite contacts 😳
+- add stock page
+
+- forward message not working
+- analytics
+- empty views
+
+- show in app notification when message is received
+- link privacy policy
+- image doesn't load on update, avatar
 
 
 Push notification while sending a message, take reference from Swiper yellow app

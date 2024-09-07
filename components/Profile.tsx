@@ -24,8 +24,8 @@ import * as Linking from "expo-linking";
 import * as FileSystem from "expo-file-system";
 import ErrorView from "@/components/Error";
 import { router } from "expo-router";
-import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { createCometChatUser } from "@/hooks/cometchat";
+import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 
 type FormData = {
   firstName: string;
@@ -44,6 +44,11 @@ export default function ProfileComponent({ context }: ProfileProps) {
   const { logout, user, token, updateUser } = useAuth();
   const { updateUserDetails, updatedUserDetails, isMutating, error } = useUpdateUserDetails();
   const { updateUserAvatar, isUserAvatarMutating, error: avatarError } = useUpdateUserAvatar();
+  const {
+    updateUser: updateCometChatUser,
+    loading: isUpdateCometChatUserLoading,
+    error: errorCometChat,
+  } = useUpdateCometChatUser();
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 0;
 
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
@@ -56,7 +61,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
     control,
     handleSubmit,
     formState: { errors, isDirty },
-    getValues,
     watch,
   } = useForm<FormData>({
     defaultValues: {
@@ -74,6 +78,11 @@ export default function ProfileComponent({ context }: ProfileProps) {
         phoneNumber: updatedUserDetails.phoneNumber,
         profileComplete: true,
       });
+
+      if (context === "update") {
+        updateCometChatUser(`${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`);
+        Alert.alert("Success", "Profile Updated Successfully");
+      }
 
       if (context === "create") {
         (async () => {
@@ -224,7 +233,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
   };
 
   const onLogout = async () => {
-    await CometChat.logout().catch(() => null);
     logout();
   };
 

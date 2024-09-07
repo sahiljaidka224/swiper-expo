@@ -1,12 +1,18 @@
 import { MessageIcon, PushCarIcon, StockIcon, SwiperIcon, WatchListIcon } from "@/components/Icons";
+import Text from "@/components/Text";
 import Colors from "@/constants/Colors";
+import { useMessageContext } from "@/context/MessageContext";
+import { useGetUnreadMessages } from "@/hooks/cometchat/messages";
 import { Image } from "expo-image";
 import { Tabs, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function TabsRootLayout() {
   const segments = useSegments();
+  useGetUnreadMessages();
+  const { unreadCount } = useMessageContext();
 
   useEffect(() => {
     Image.clearMemoryCache();
@@ -50,7 +56,38 @@ export default function TabsRootLayout() {
           options={{
             title: "",
             headerShown: false,
-            tabBarIcon: ({ color }) => <MessageIcon color={color} />,
+            tabBarIcon: ({ color }) => (
+              <View>
+                {unreadCount > 0 ? (
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: -5,
+                      top: -5,
+                      width: 20,
+                      height: 20,
+                      backgroundColor: Colors.muted,
+                      zIndex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontFamily: "SF_Pro_Display_Bold",
+                        fontSize: 16,
+                        textAlign: "center",
+                      }}
+                    >
+                      {unreadCount}
+                    </Text>
+                  </View>
+                ) : null}
+                <MessageIcon color={color} />
+              </View>
+            ),
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,

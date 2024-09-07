@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
+import { CometChat } from "@cometchat/chat-sdk-react-native";
 
 export interface CurrentUser {
   name: string;
@@ -57,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
     setUserInfo(null);
 
+    await CometChat.logout().catch(() => null);
     await SecureStore.deleteItemAsync("authToken");
     await SecureStore.deleteItemAsync("user");
   };

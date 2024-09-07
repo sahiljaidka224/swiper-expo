@@ -67,3 +67,28 @@ export const useGetCometChatUser = (uid: string) => {
 
   return { user, error, loading, fetchUser };
 };
+
+export const useUpdateCometChatUser = () => {
+  const [error, setError] = useState<CometChat.CometChatException | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const updateUser = async (newName: string) => {
+    setLoading(true);
+
+    const user = await CometChat.getLoggedinUser();
+    if (!user) return;
+
+    user.setName(newName);
+
+    try {
+      const updatedUser = await CometChat.updateCurrentUserDetails(user);
+      setLoading(false);
+      return updatedUser;
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
+      setLoading(false);
+    }
+  };
+
+  return { error, loading, updateUser };
+};

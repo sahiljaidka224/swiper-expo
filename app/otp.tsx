@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaskInput from "react-native-mask-input";
@@ -53,6 +54,11 @@ export default function OTPPage() {
 
   useEffect(() => {
     if (!isMutating && userInfo) {
+      console.log("User info", userInfo);
+      if (userInfo && !userInfo.isAccountApproved) {
+        Alert.alert("Account not approved", "Your account is not approved yet. Please try again later.");
+        return;
+      }
       if (userInfo && userInfo?.token) {
         login(userInfo.token, {
           id: userInfo?.userId,
