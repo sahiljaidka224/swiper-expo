@@ -208,12 +208,12 @@ export default function UsersListPage() {
       <Stack.Screen
         options={{
           headerRight: () => {
-            if (!multipleSelectionAllowed)
-              return (
-                <Pressable onPress={() => router.back()}>
-                  <AntDesign name="closecircleo" size={24} color="black" />
-                </Pressable>
-              );
+            if (!multipleSelectionAllowed) return;
+            // return (
+            //   <Pressable onPress={() => router.back()}>
+            //     <AntDesign name="closecircleo" size={24} color="black" />
+            //   </Pressable>
+            // );
 
             return (
               <Pressable

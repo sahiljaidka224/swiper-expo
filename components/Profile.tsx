@@ -23,9 +23,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as FileSystem from "expo-file-system";
 import ErrorView from "@/components/Error";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { createCometChatUser } from "@/hooks/cometchat";
 import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
+import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
 
 type FormData = {
   firstName: string;
@@ -245,6 +246,18 @@ export default function ProfileComponent({ context }: ProfileProps) {
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior="padding"
     >
+      <Stack.Screen
+        options={{
+          headerRight: () => {
+            if (context === "update")
+              return (
+                <Pressable onPress={onLogout}>
+                  <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
+                </Pressable>
+              );
+          },
+        }}
+      />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View style={{ alignItems: "center", marginTop: 10, gap: 10 }}>
           {error || avatarError ? <ErrorView /> : null}
@@ -337,7 +350,19 @@ export default function ProfileComponent({ context }: ProfileProps) {
             disabled={isMutating}
             type={isEnabled() ? "primary" : "disabled"}
           />
-          {context === "update" && <Button type="secondary" title="Logout" onPress={onLogout} />}
+          {context === "update" && (
+            <View
+              style={{
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                title="Invite Friends"
+                onPress={() => router.push("/(tabs)/(chats)/invite-friends")}
+                isLoading={isUpdateCometChatUserLoading}
+              />
+            </View>
+          )}
           <Text style={styles.versionText}>
             Version:{" "}
             {Application.nativeApplicationVersion ? Application.nativeApplicationVersion : ""} (

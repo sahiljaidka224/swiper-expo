@@ -23,8 +23,8 @@ export default function ChatsLayout() {
         return;
       } else {
         updateUser({
-          ...user,
-          id: user?.id,
+          ...currentUser,
+          id: user?.userId,
           name: `${user?.firstName} ${user?.lastName}`,
           phoneNumber: user?.phoneNumber,
           profileComplete: true,
