@@ -1,9 +1,11 @@
+import analytics from "@react-native-firebase/analytics";
 import React from "react";
 import * as SMS from "expo-sms";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Button from "./Button";
 import Colors from "@/constants/Colors";
+import { useAuth } from "@/context/AuthContext";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
@@ -18,6 +20,7 @@ function StockButtonContainer({
   carId,
   showSMSOption = false,
 }: ButtonsContainerProps) {
+  const { user } = useAuth();
   const onDeletePress = () => {
     if (onDelete && carId && carId.trim() !== "") {
       onDelete(carId);
@@ -34,6 +37,11 @@ function StockButtonContainer({
     }
   };
 
+  const onPushToSwiperContactsPress = async () => {
+    await analytics().logEvent("push_to_swiper_contacts", { userId: user?.id });
+    onPushToSwiperContacts();
+  };
+
   return (
     <View style={styles.itemButtonsContainer}>
       {onDelete && (
@@ -41,7 +49,7 @@ function StockButtonContainer({
           <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
         </TouchableOpacity>
       )}
-      <Button title="Push to Swiper Users" onPress={onPushToSwiperContacts} />
+      <Button title="Push to Swiper Users" onPress={onPushToSwiperContactsPress} />
       {/* {showSMSOption && (
         <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
       )} */}

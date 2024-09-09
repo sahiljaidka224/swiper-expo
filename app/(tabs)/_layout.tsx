@@ -8,6 +8,7 @@ import { Tabs, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import analytics from "@react-native-firebase/analytics";
 
 export default function TabsRootLayout() {
   const segments = useSegments();
@@ -17,6 +18,16 @@ export default function TabsRootLayout() {
   useEffect(() => {
     Image.clearMemoryCache();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await analytics().logScreenView({
+          screen_name: segments.length > 1 ? segments[1] : segments[0],
+        });
+      } catch (error) {}
+    })();
+  }, [segments]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

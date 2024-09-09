@@ -1,3 +1,4 @@
+import analytics from "@react-native-firebase/analytics";
 import { useGetSwiperCars } from "@/api/hooks/swiper";
 import ContactCard from "@/components/ContactCard";
 import Colors from "@/constants/Colors";
@@ -53,7 +54,7 @@ interface Car {
 }
 
 export default function SwiperPage() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { cars, isLoading, fetchMore, error, isValidating } = useGetSwiperCars();
   const insets = useSafeAreaInsets();
   const ref = useRef<SwiperCardRefType>();
@@ -75,10 +76,15 @@ export default function SwiperPage() {
     }
   };
 
+  const postAnalytics = async (action: string) => {
+    await analytics().logEvent(action, { userId: user?.id });
+  };
+
   const handleRightSwipe = (cardIndex: number) => {
     if (!token) return;
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
+
     // setCardIndex(cardIndex);
     addCarToWatchlist({ carId, token, userId: undefined });
     markCarAsSeen({ carId, token });
@@ -86,6 +92,8 @@ export default function SwiperPage() {
     if (watchListData.length - cardIndex === 4) {
       loadMore();
     }
+
+    postAnalytics("right_swipe");
   };
 
   const handleLeftSwiper = (cardIndex: number) => {
@@ -94,11 +102,13 @@ export default function SwiperPage() {
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
     // setCardIndex(cardIndex);
+
     markCarAsSeen({ carId, token });
 
     if (watchListData.length - cardIndex === 4) {
       loadMore();
     }
+    postAnalytics("left_swiper");
   };
 
   const renderCard = (item: Car) => {

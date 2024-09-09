@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "93114914243",
+    "project_id": "swiper-new-c6dc2",
+    "storage_bucket": "swiper-new-c6dc2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93114914243:android:0c6257282775ebf85c1976",
+        "android_client_info": {
+          "package_name": "com.galaxies.swiper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeQqFDUKFqyrg-jE3hUCMAKmA8Yju-v78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
