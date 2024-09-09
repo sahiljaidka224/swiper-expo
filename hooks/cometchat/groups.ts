@@ -154,3 +154,36 @@ export const useLeaveGroup = () => {
 
   return { hasLeft, error, leaveGroup, leaveGroupAsParticipant };
 };
+
+
+export const useGetGroupMembers = (guid: string) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<CometChat.CometChatException | null>(null);
+  const [groupMembers, setGroupMembers] = useState<CometChat.GroupMember[]>([]);
+
+  const fetchGroupMembers = async () => {
+    if (!guid) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const groupMembersRequest = new CometChat.GroupMembersRequestBuilder(guid)
+        .setLimit(10)
+        .build();
+
+      const members = await groupMembersRequest.fetchNext();
+      setGroupMembers(members);
+    } catch (error) {
+      setError(error as CometChat.CometChatException);
+      console.log("Group Member list fetching failed with exception:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroupMembers();
+  }, []);
+
+  return { loading, error, groupMembers };
+};

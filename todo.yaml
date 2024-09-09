@@ -54,6 +54,8 @@ push-stock
 - analytics
 - empty views
 
+- bug: able to msg on own stock ✅
+
 - add stock page
 
 Push notification while sending a message, take reference from Swiper yellow app

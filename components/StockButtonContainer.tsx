@@ -42,9 +42,9 @@ function StockButtonContainer({
         </TouchableOpacity>
       )}
       <Button title="Push to Swiper Users" onPress={onPushToSwiperContacts} />
-      {showSMSOption && (
+      {/* {showSMSOption && (
         <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
-      )}
+      )} */}
     </View>
   );
 }

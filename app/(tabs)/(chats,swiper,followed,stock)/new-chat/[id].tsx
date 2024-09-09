@@ -48,6 +48,7 @@ export default function NewGroupChatPage() {
       )}
       isTyping={isTyping}
       context="group"
+      group={group}
     />
   );
 }
@@ -102,7 +103,7 @@ const Header = ({
     <Pressable style={styles.headerContainer} onPress={onPress}>
       <View style={styles.leftContainer}>
         <View style={styles.avatarContainer}>
-          <Avatar source={icon} />
+          <Avatar source={icon} borderRadius={10}/>
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.name} allowFontScaling={false}>

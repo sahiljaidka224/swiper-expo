@@ -92,7 +92,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       <DescriptionView title="VIN" value={car?.vin} uppercase />
       <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
 
-      {context.includes("stock") ? (
+      {context.includes("stock") || (car?.organisationId === user?.org?.id) ? (
         <StockButtonContainer
           carId=""
           onPushToSwiperContacts={onSendToPhoneContacts}

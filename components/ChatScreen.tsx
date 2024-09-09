@@ -51,6 +51,7 @@ import * as ImagePicker from "expo-image-picker";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { showToast } from "./Toast";
+import { useGetGroupMembers } from "@/hooks/cometchat/groups";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const options = ["Gallery", "Camera", "Cancel"];
@@ -67,6 +68,7 @@ interface ChatComponentProps {
   context: "user" | "group";
   userOrgName?: string;
   carGroups?: CometChat.Conversation[] | null;
+  group?: CometChat.Group | null;
 }
 
 export default function ChatComponent({
@@ -98,8 +100,7 @@ export default function ChatComponent({
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
   const { markAsRead } = useMarkMessageAsRead();
-
-  useEffect(() => {}, [messages]);
+  const {groupMembers} = useGetGroupMembers(userId);
 
   const triggerSendMediaMessage = (result: ImagePicker.ImagePickerSuccessResult) => {
     let files = [];
@@ -282,24 +283,7 @@ export default function ChatComponent({
     >
       {carGroups && carGroups.length > 0 ? (
         <View
-          style={{
-            position: "absolute",
-            backgroundColor: "white",
-            marginTop: 5,
-            width: "95%",
-            alignSelf: "center",
-            zIndex: 100,
-            borderRadius: 20,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-
-            elevation: 5,
-          }}
+          style={styles.carGroupWrapper}
         >
           <FlatList<CometChat.Conversation>
             data={carGroups}
@@ -314,6 +298,33 @@ export default function ChatComponent({
           />
         </View>
       ) : null}
+      {
+        groupMembers && groupMembers.length > 0 ? (
+          <View style={styles.carGroupWrapper}>
+            {
+              groupMembers.map((member) => {
+                const memberUID = member.getUid();
+                if (memberUID === user?.id) {
+                  return null;
+                }
+                return (
+                  <Pressable
+                    style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
+                    
+                  >
+                    <View style={{width: 40, height: 40}}>
+                    <Avatar userId={member.getUid()} />
+                    </View>
+                    <Text style={{ marginLeft: 10 }}>{member.getName()}</Text>
+                  </Pressable>
+                );
+              }
+            )
+            }
+          </View>
+
+        ) : null
+      }
       <Stack.Screen
         options={{
           headerTitle: () => <Header />,
@@ -546,6 +557,24 @@ const Day = ({
 };
 
 const styles = StyleSheet.create({
+  carGroupWrapper: {
+    position: "absolute",
+    backgroundColor: "white",
+    marginTop: 5,
+    width: "95%",
+    alignSelf: "center",
+    zIndex: 100,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
   composer: {
     backgroundColor: "#fff",
     borderRadius: 15,
