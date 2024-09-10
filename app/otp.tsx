@@ -54,7 +54,6 @@ export default function OTPPage() {
 
   useEffect(() => {
     if (!isMutating && userInfo) {
-      console.log("User info", userInfo);
       if (userInfo && !userInfo.isAccountApproved) {
         Alert.alert("Account not approved", "Your account is not approved yet. Please try again later.");
         return;

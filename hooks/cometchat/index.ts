@@ -1,4 +1,51 @@
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { Platform } from "react-native";
+import messaging from "@react-native-firebase/messaging";
+
+function handleRegistrationError(errorMessage: string) {
+  throw new Error(errorMessage);
+}
+
+async function registerForPushNotificationsAsync() {
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+        },
+      });
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      handleRegistrationError("Permission not granted to get push token for push notification!");
+      return;
+    }
+
+    try {
+      const FCM_TOKEN = await messaging().getToken();
+      return FCM_TOKEN;
+    } catch (e: unknown) {
+      handleRegistrationError(`${e}`);
+    }
+  } else {
+    handleRegistrationError("Must use physical device for push notifications");
+  }
+}
 
 export async function cometChatInit(userId: string) {
   let appSetting = new CometChat.AppSettingsBuilder()
@@ -14,9 +61,27 @@ export async function cometChatInit(userId: string) {
     try {
       if (!user) {
         await CometChat.login(userId, process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY);
+        registerForPushNotificationsAsync()
+          .then(async (FCM_TOKEN) => {
+            if (FCM_TOKEN) {
+              await CometChat.registerTokenForPushNotification(FCM_TOKEN);
+            }
+          })
+          .catch((error) => {
+            console.log("Error while trying to register token for push notification", error);
+          });
 
         return true;
       } else {
+        registerForPushNotificationsAsync()
+          .then(async (FCM_TOKEN) => {
+            if (FCM_TOKEN) {
+              await CometChat.registerTokenForPushNotification(FCM_TOKEN);
+            }
+          })
+          .catch((error) => {
+            console.log("Error while trying to register token for push notification", error);
+          });
         return true;
       }
     } catch (loginError) {

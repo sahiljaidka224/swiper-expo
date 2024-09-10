@@ -1,10 +1,12 @@
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
 
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { showToast } from "./Toast";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
@@ -24,6 +26,7 @@ export default function AddStock({
   selectedImages: SelectedImage[];
   setSelectedImages: (selImage: SelectedImage[]) => void;
 }) {
+  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const { showActionSheetWithOptions } = useActionSheet();
 
   const onShowActionSheet = () => {
@@ -37,12 +40,12 @@ export default function AddStock({
       (buttonIndex) => {
         if (buttonIndex !== cancelButtonIndex) {
           if (buttonIndex === 0) {
-            onAddImagePress();
+            onPickImageFromGallery();
             return;
           }
 
           if (buttonIndex === 1) {
-            Alert.alert("Coming soon..", "This feature will be available soon!");
+            onPickImageFromCamera();
             return;
           }
         }
@@ -50,40 +53,88 @@ export default function AddStock({
     );
   };
 
-  const onAddImagePress = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: 10 - selectedImages.length,
-    });
-
-    if (!result.canceled) {
-      const files = [];
-      for (let file of result.assets) {
-        const uri = file.uri;
-        let name: string | null = "";
-        let type: string | undefined = "";
-
-        if (Platform.OS === "ios" && file.fileName !== undefined) {
-          name = file.fileName;
-          type = file.type;
-        } else {
-          type = file.type;
-          name = "Camera_001.jpeg";
+  const onPickImageFromCamera = async () => {
+    if (cameraStatus) {
+      if (
+        cameraStatus.status === ImagePicker.PermissionStatus.UNDETERMINED ||
+        (cameraStatus.status === ImagePicker.PermissionStatus.DENIED && cameraStatus.canAskAgain)
+      ) {
+        const permission = await requestCameraPermission();
+        if (permission.granted) {
+          await handleLaunchCamera();
         }
-
-        let tempFile = {
-          name: name,
-          type: Platform.OS === "android" ? file.type : type,
-          uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
-          size: file.fileSize,
-        };
-        files.push(tempFile);
+      } else if (cameraStatus.status === ImagePicker.PermissionStatus.DENIED) {
+        await Linking.openSettings();
+      } else {
+        await handleLaunchCamera();
       }
-      setSelectedImages([...selectedImages, ...files]);
+    }
+  };
+
+  const triggerImageSelection = (result: ImagePicker.ImagePickerSuccessResult) => {
+    const files = [];
+    for (let [index, file] of result.assets.entries()) {
+      const uri = file.uri;
+      let name: string | null = "";
+      let type: string | undefined = "";
+
+      if (Platform.OS === "ios" && file.fileName) {
+        name = file.fileName;
+        type = file.type;
+      } else {
+        type = file.type;
+        name = `Camera_0${index}.jpeg`;
+      }
+
+      let tempFile = {
+        name: name,
+        type: Platform.OS === "android" ? file.type : type,
+        uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
+        size: file.fileSize,
+      };
+      files.push(tempFile);
+    }
+    setSelectedImages([...selectedImages, ...files]);
+  };
+
+  const handleLaunchCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+        aspect: [4, 3],
+        allowsMultipleSelection: true,
+        selectionLimit: 10,
+      });
+      if (!result.canceled) {
+        if (result.assets.length > 0) {
+          triggerImageSelection(result);
+        }
+      }
+    } catch (error) {
+      showToast("Error", "Failed to load image from camera", "error");
+    }
+  };
+
+  const onPickImageFromGallery = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        aspect: [4, 3],
+        quality: 0.8,
+        allowsMultipleSelection: true,
+        selectionLimit: 10 - selectedImages.length,
+      });
+
+      if (!result.canceled) {
+        if (result.assets.length > 0) {
+          triggerImageSelection(result);
+        }
+      }
+    } catch (error) {
+      showToast("Error", "Failed to load image from Gallery", "error");
     }
   };
 

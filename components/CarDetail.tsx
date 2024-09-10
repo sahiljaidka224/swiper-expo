@@ -13,7 +13,7 @@ import { useCreateGroup } from "@/hooks/cometchat/groups";
 
 interface CarDetailProps {
   car: any;
-  context: CarsListContext;
+  context: CarsListContext | null;
 }
 
 function CarDetail({ car, context }: CarDetailProps) {
@@ -92,13 +92,13 @@ function CarDetail({ car, context }: CarDetailProps) {
       <DescriptionView title="VIN" value={car?.vin} uppercase />
       <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
 
-      {context.includes("stock") || (car?.organisationId === user?.org?.id) ? (
+      {context && context?.includes("stock") || (car?.organisationId === user?.org?.id) ? (
         <StockButtonContainer
           carId=""
           onPushToSwiperContacts={onSendToPhoneContacts}
           showSMSOption
         />
-      ) : (
+      ) : context ?  (
         <>
           <ContactCard
             name={car?.primaryContact?.displayName ?? ""}
@@ -112,7 +112,7 @@ function CarDetail({ car, context }: CarDetailProps) {
             isPrimaryButtonLoading={loading}
           />
         </>
-      )}
+      ) : null}
     </View>
   );
 }

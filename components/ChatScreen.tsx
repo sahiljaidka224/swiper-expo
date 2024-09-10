@@ -100,7 +100,7 @@ export default function ChatComponent({
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
   const { markAsRead } = useMarkMessageAsRead();
-  const {groupMembers} = useGetGroupMembers(userId);
+  const { groupMembers } = useGetGroupMembers(userId);
 
   const triggerSendMediaMessage = (result: ImagePicker.ImagePickerSuccessResult) => {
     let files = [];
@@ -282,9 +282,7 @@ export default function ChatComponent({
       style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
     >
       {carGroups && carGroups.length > 0 ? (
-        <View
-          style={styles.carGroupWrapper}
-        >
+        <View style={styles.carGroupWrapper}>
           <FlatList<CometChat.Conversation>
             data={carGroups}
             style={{ paddingHorizontal: 10, paddingVertical: 5 }}
@@ -298,33 +296,24 @@ export default function ChatComponent({
           />
         </View>
       ) : null}
-      {
-        groupMembers && groupMembers.length > 0 ? (
-          <View style={styles.carGroupWrapper}>
-            {
-              groupMembers.map((member) => {
-                const memberUID = member.getUid();
-                if (memberUID === user?.id) {
-                  return null;
-                }
-                return (
-                  <Pressable
-                    style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
-                    
-                  >
-                    <View style={{width: 40, height: 40}}>
-                    <Avatar userId={member.getUid()} />
-                    </View>
-                    <Text style={{ marginLeft: 10 }}>{member.getName()}</Text>
-                  </Pressable>
-                );
-              }
-            )
+      {groupMembers && groupMembers.length > 0 ? (
+        <View style={styles.carGroupWrapper}>
+          {groupMembers.map((member) => {
+            const memberUID = member.getUid();
+            if (memberUID === user?.id) {
+              return null;
             }
-          </View>
-
-        ) : null
-      }
+            return (
+              <Pressable style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+                <View style={{ width: 40, height: 40 }}>
+                  <Avatar userId={member.getUid()} />
+                </View>
+                <Text style={{ marginLeft: 10 }}>{member.getName()}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : null}
       <Stack.Screen
         options={{
           headerTitle: () => <Header />,
