@@ -80,7 +80,11 @@ export default function ChatDetailsPage() {
       )}
       isTyping={isTyping}
       context="user"
-      userOrgName={user?.organisations[0]?.name}
+      userOrgName={
+        user?.organisations && user?.organisations.length > 0
+          ? user?.organisations[0]?.name
+          : undefined
+      }
       carGroups={groupConversations}
     />
   );

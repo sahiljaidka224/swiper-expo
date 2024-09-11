@@ -172,6 +172,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
         quality: 0.5,
         aspect: [4, 3],
         allowsMultipleSelection: false,
+        cameraType: ImagePicker.CameraType.front,
       });
       if (!result.canceled) {
         if (result.assets.length > 0) {

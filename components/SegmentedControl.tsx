@@ -5,7 +5,7 @@ import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
 import Text from "./Text";
 
 const Palette = {
-  baseGray05: Colors.lightGray,
+  baseGray05: Colors.primary,
   baseGray80: "#ff00ff",
   background: "#fff",
 };
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     height: 40,
-    backgroundColor: Palette.baseGray05,
+    backgroundColor: Colors.lightGray,
     justifyContent: "center",
   },
   activeBox: {
@@ -84,12 +84,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     height: "80%",
     top: "10%",
-    backgroundColor: Palette.background,
+    backgroundColor: Colors.background,
+    borderColor: Colors.primary,
+    borderWidth: 1,
   },
   labelContainer: { justifyContent: "center", alignItems: "center" },
   label: {
     fontSize: 18,
     fontFamily: "SF_Pro_Display_Regular",
+    color: Colors.textDark,
   },
 });
 

@@ -106,6 +106,7 @@ export default function AddStock({
         aspect: [4, 3],
         allowsMultipleSelection: true,
         selectionLimit: 10,
+        orderedSelection: true,
       });
       if (!result.canceled) {
         if (result.assets.length > 0) {
@@ -126,6 +127,7 @@ export default function AddStock({
         quality: 0.8,
         allowsMultipleSelection: true,
         selectionLimit: 10 - selectedImages.length,
+        orderedSelection: true,
       });
 
       if (!result.canceled) {

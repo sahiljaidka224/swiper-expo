@@ -77,6 +77,20 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
       <View style={styles.regoWrapper}>
         <Controller
           control={control}
+          name="state"
+          defaultValue="State"
+          render={({ field: { value } }) => (
+            <Pressable
+              onPress={() => openActionSheet([...states, "Cancel"], "state")}
+              style={styles.regoSelector}
+            >
+              <Text style={styles.regoText}>{value ? value : "Open Action Sheet"}</Text>
+              <AntDesign name="caretdown" size={16} color={Colors.iconGray} />
+            </Pressable>
+          )}
+        />
+        <Controller
+          control={control}
           rules={{
             required: true,
           }}
@@ -92,20 +106,6 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
             />
           )}
           name="rego"
-        />
-        <Controller
-          control={control}
-          name="state"
-          defaultValue="State"
-          render={({ field: { value } }) => (
-            <Pressable
-              onPress={() => openActionSheet([...states, "Cancel"], "state")}
-              style={styles.regoSelector}
-            >
-              <Text style={styles.regoText}>{value ? value : "Open Action Sheet"}</Text>
-              <AntDesign name="caretdown" size={16} color={Colors.iconGray} />
-            </Pressable>
-          )}
         />
       </View>
       <Controller
