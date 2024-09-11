@@ -30,6 +30,22 @@ const removeCarFromWatchlist = async (
   return response.json();
 };
 
+const removeCarFromStock = async (
+  url: string,
+  { arg }: { arg: { carId: string; token: string | null } }
+) => {
+  const response = await fetch(`${url}/delete_from_stock`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${arg.token}`,
+    },
+    body: JSON.stringify({ carId: arg.carId }),
+  });
+
+  return response.json();
+};
+
 const addCarToWatchlist = async (
   url: string,
   { arg }: { arg: { carId: string; token: string; userId: string | undefined } }
@@ -173,6 +189,20 @@ export function useRemoveCarFromWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "https://backend-swiper.datalinks.nl/car/",
     removeCarFromWatchlist
+  );
+
+  return {
+    trigger,
+    newCars: data,
+    isMutating,
+    error,
+  };
+}
+
+export function useRemoveCarFromStock() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    "https://backend-swiper.datalinks.nl/car/",
+    removeCarFromStock
   );
 
   return {

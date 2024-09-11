@@ -35,7 +35,7 @@ const uploadFilesToStock = async (
     return response.data; // Axios automatically parses JSON responses
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("Axios error:", error.response?.data);
+      console.error("Axios error:", error);
       throw new Error("Failed to upload files");
     } else {
       console.error("Unexpected error:", error);

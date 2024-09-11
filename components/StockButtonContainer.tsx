@@ -61,7 +61,7 @@ export default React.memo(StockButtonContainer);
 
 const styles = StyleSheet.create({
   itemButtonsContainer: {
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "space-between",
     paddingTop: 15,
     paddingBottom: 5,

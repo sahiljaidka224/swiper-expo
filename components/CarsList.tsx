@@ -3,7 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 
-import { useGetWatchlist, useRemoveCarFromWatchlist } from "@/api/hooks/watchlist";
+import {
+  useGetWatchlist,
+  useRemoveCarFromStock,
+  useRemoveCarFromWatchlist,
+} from "@/api/hooks/watchlist";
 import CarOverview from "./CarOverview";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import StockButtonContainer from "./StockButtonContainer";
@@ -15,6 +19,7 @@ import Text from "./Text";
 import { router, useFocusEffect } from "expo-router";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { showToast } from "./Toast";
 
 interface CarsListProps {
   context: CarsListContext;
@@ -38,8 +43,18 @@ export function CarsList({
     refresh,
     fetchMore,
   } = useGetWatchlist(context, orderBy, orderDirection, orgId);
-  const { trigger, isMutating, error: mutationError, newCars } = useRemoveCarFromWatchlist();
-  const { createGroup, error: errorGroup, group, loading: isGroupLoading } = useCreateGroup();
+  const {
+    trigger,
+    isMutating,
+    error: mutationError,
+    newCars: watchlistCars,
+  } = useRemoveCarFromWatchlist();
+  const {
+    trigger: removeFromStock,
+    isMutating: isStockDelMutating,
+    newCars: stockCars,
+  } = useRemoveCarFromStock();
+  const { createGroup, group, loading: isGroupLoading } = useCreateGroup();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
@@ -50,6 +65,12 @@ export function CarsList({
       return () => {};
     }, [])
   );
+
+  useEffect(() => {
+    if (watchlistCars || stockCars) {
+      showToast("Success", "Updated successfully", "success");
+    }
+  }, [watchlistCars, stockCars]);
 
   useEffect(() => {
     if (!isLoading && cars) {
@@ -64,7 +85,7 @@ export function CarsList({
     }
   }, [isGroupLoading, group]);
 
-  const onDeletePress = useCallback(
+  const onDeleteFromWatchlistPress = useCallback(
     (carId: any) => {
       setWatchlistData((prevData) => prevData.filter((i) => i.carId !== carId));
       try {
@@ -77,7 +98,26 @@ export function CarsList({
       } catch (error) {
         // Revert state if there's an error
         setWatchlistData(cars);
-        console.error("Failed to remove car from watchlist:", error);
+        showToast("Error", "Failed to remove car from watchlist", "error");
+      }
+    },
+    [trigger, cars]
+  );
+
+  const onDeleteFromStockPress = useCallback(
+    (carId: any) => {
+      setWatchlistData((prevData) => prevData.filter((i) => i.carId !== carId));
+      try {
+        removeFromStock(
+          { carId: carId, token: token },
+          {
+            revalidate: true,
+          }
+        );
+      } catch (error) {
+        // Revert state if there's an error
+        setWatchlistData(cars);
+        showToast("Error", "Failed to remove car from stock", "error");
       }
     },
     [trigger, cars]
@@ -146,16 +186,20 @@ export function CarsList({
               carId={item?.carId}
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
-              onDelete={onDeletePress}
+              onDelete={onDeleteFromWatchlistPress}
               isPrimaryButtonLoading={isGroupLoading}
             />
           ) : (
-            <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
+            <StockButtonContainer
+              carId={item?.carId}
+              onPushToSwiperContacts={onSendToPhoneContacts}
+              onDelete={item?.importSource === "regopage" ? onDeleteFromStockPress : undefined}
+            />
           )}
         </Animated.View>
       );
     },
-    [onDeletePress, watchListData]
+    [onDeleteFromWatchlistPress, watchListData, onDeleteFromStockPress]
   );
 
   return (
@@ -170,6 +214,9 @@ export function CarsList({
         </View>
       )}
       {getError && !isLoading && !cars ? <ErrorView /> : null}
+      {isMutating || isStockDelMutating ? (
+        <ActivityIndicator size="large" color={Colors.primary} />
+      ) : null}
       <FlashList
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ paddingBottom: 40 }}

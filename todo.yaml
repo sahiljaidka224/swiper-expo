@@ -1,61 +1,22 @@
-chats 
-  - index ✅
-    - fetch all conversations
-    - display list of conversations
-    - split based on Chats/Groups
-    - add msg listeners to update UI, maybe just trigger fetchConversations() but be quicker to update UI with unread count 
+- rss feed
+- delete conversation
+- disable ability to message from listing page
+- delete car from stock
 
-  - [id]
-    - fetch all messages
-    - parse msgs for gifted chat
-    - display list of messages
-    - add msg listeners to update UI? how to manage state and keep it in sync with the server
-    - when new msg received, add it to UI, 
-    - when open mark all msgs as read
-    - scroll to bottom component 
-    - typing indicator 
-    - fix group messages 
-    - make image clickable ✅ done till here
-    
-    - add image from camera
-    - live chat msg read/unread
-    - forward media message
-
-
-push-stock
-  - button press
-    - opens list of users
-    - select multiple 
-    - pass the car information to users list
-    - send car message to all users ✅
-
-
-- add to their watchlist when pushing to stock
-- online indicator ✅
-
-
-- leave a group as a participant ✅
-- message from listing page ✅
-- listing page linking ✅
-- update current user details in cometchat ✅
-- logout blocked users ✅
-- create new user in CometChat ✅
-- message count in tab chat icon ✅
-- invite contacts ✅
-- forward message not working ✅
-- show in app notification when message is received ✅
-- link privacy policy ✅
-
-
-
-- image doesn't load on update, avatar 🙄
-- auto msg from admin ✅
-- error sending image from Camera - TEST in new build ✅
-- analytics ✅
+- live chat msg read/unread
+- image doesn't load on update, avatar 
+- swipe stable
 - empty views
+- chat view back scroll
+- swipe UI update
+- error handling
+- add to their watchlist when pushing to stock
 
-- bug: able to msg on own stock ✅
+- code review
+  - add stock page
+  - swiper page
+  - chat page
+  - watchlist page
+  - listing page
 
-- add stock page
-
-Push notification while sending a message, take reference from Swiper yellow app ✅
+- extract URL into env variable and update eas

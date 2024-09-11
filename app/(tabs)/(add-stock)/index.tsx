@@ -55,13 +55,26 @@ export default function AddStockPage() {
 
           for (let index = 0; index < selectedImages.length; index++) {
             const file = selectedImages[index];
+            // const fileUri = file.uri;
+            // formData.append(
+            //   `file${index}`,
+            //   new Blob([file.uri], { type: "image/jpg" }),
+            //   `image${index}.jpg`
+            // );
+
+            // const uriResult = await fetch(fileUri);
+            // const blob = await uriResult.blob();
+            // formData.append(`file${index}`, blob, `image${index}.jpg`);
 
             formData.append(`file${index}`, {
               name: `image${index}.jpg`,
+              fileName: `image`,
               type: "image/jpg",
               uri: Platform.OS === "ios" ? file.uri.replace("file://", "") : file.uri,
-            });
+            } as any);
           }
+
+          console.log(formData);
           try {
             if (!token) return;
             uploadFiles({ formData, token });
@@ -81,6 +94,9 @@ export default function AddStockPage() {
           if (pushMode) {
             router.push({ pathname: `/(tabs)/(add-stock)/users-list?carId=${savedCar?.carId}` });
           }
+          setCarDetails(null);
+          setSelectedImages([]);
+          setPushMode(false);
         }
       }
     };
