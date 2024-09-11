@@ -8,7 +8,7 @@ import {
   I18nManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { Component, PropsWithChildren } from "react";
+import React, { Component, PropsWithChildren, useEffect } from "react";
 
 import { RectButton } from "react-native-gesture-handler";
 import Text from "@/components/Text";
@@ -19,15 +19,19 @@ import { formatTimestamp, isOutgoingMessage } from "@/utils/cometchat";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
+import { useDeleteConversation } from "@/hooks/cometchat/conversations";
+import { showToast } from "./Toast";
 
 interface ChatRowProps {
   conversation: CometChat.Conversation;
   index: number;
+  refetch: () => void;
 }
 
-export default function ChatRow({ conversation, index }: ChatRowProps) {
+export default function ChatRow({ conversation, index, refetch }: ChatRowProps) {
   const { user } = useAuth();
   const { markAsRead } = useMarkMessageAsRead();
+  const { deleteConversation, deletedConversation } = useDeleteConversation();
   const conversationWith = conversation.getConversationWith();
   const unreadMessageCount = conversation.getUnreadMessageCount();
 
@@ -66,11 +70,23 @@ export default function ChatRow({ conversation, index }: ChatRowProps) {
   const onPress = () => {
     if (unreadMessageCount > 0) {
       markAsRead(lastMessage);
+      refetch();
     }
   };
 
+  useEffect(() => {
+    if (deletedConversation) {
+      refetch();
+      showToast("Success", "This conversation has been deleted!", "info");
+    }
+  }, [deletedConversation]);
+
   return (
-    <AppleStyleSwipeableRow>
+    <AppleStyleSwipeableRow
+      onDelete={() => {
+        deleteConversation(userUID as string);
+      }}
+    >
       <Animated.View entering={FadeInUp.delay(index * 10)} exiting={FadeOutUp}>
         <Link
           href={userUID ? `/(tabs)/(chats)/${userUID}` : `/(tabs)/(chats)/new-chat/${groupUID}`}
@@ -164,7 +180,10 @@ function MessageText({
   }
 }
 
-class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
+class AppleStyleSwipeableRow extends Component<PropsWithChildren<{ onDelete: () => void }>> {
+  constructor(props: PropsWithChildren<{ onDelete: () => void }>) {
+    super(props);
+  }
   private renderRightAction = (
     text: string,
     color: string,
@@ -178,7 +197,8 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<unknown>> {
     const pressHandler = () => {
       this.close();
       // eslint-disable-next-line no-alert
-      window.alert(text);
+      this.props.onDelete();
+      // window.alert(text);
     };
 
     return (

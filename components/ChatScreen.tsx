@@ -7,7 +7,7 @@ import {
   FlatList,
   ListRenderItem,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Bubble,
   Composer,
@@ -334,6 +334,14 @@ export default function ChatComponent({
           } else if (text.length === 0) {
             endTyping(userId, context);
           }
+        }}
+        messagesContainerStyle={{
+          paddingTop:
+            carGroups && carGroups.length > 0
+              ? 100
+              : groupMembers && groupMembers.length > 0
+              ? 60
+              : 0,
         }}
         bottomOffset={insets.bottom}
         renderAvatar={null}

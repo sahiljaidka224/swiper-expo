@@ -53,7 +53,13 @@ export default function Chats() {
 
   const renderItem: ListRenderItem<unknown> = useCallback(
     ({ item, index }) => {
-      return <ChatRow conversation={item as CometChat.Conversation} index={index} />;
+      return (
+        <ChatRow
+          conversation={item as CometChat.Conversation}
+          index={index}
+          refetch={fetchConversations}
+        />
+      );
     },
     [userConversations]
   );
