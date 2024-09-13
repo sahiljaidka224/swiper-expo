@@ -11,7 +11,7 @@ import { useGetConversations } from "@/hooks/cometchat/conversations";
 import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
 import ErrorView from "@/components/Error";
 import { router, Stack, useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import Colors from "@/constants/Colors";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
@@ -23,10 +23,41 @@ import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 
+import * as Notifications from "expo-notifications";
+
 const transition = CurvedTransition.delay(100);
+
+function useNotificationObserver(fetchConversations: () => void) {
+  useEffect(() => {
+    let isMounted = true;
+
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      console.log("index.tsx: getLastNotificationResponseAsync", {
+        response: response?.notification.request,
+      });
+      if (!isMounted || !response?.notification) {
+        return;
+      }
+      fetchConversations();
+    });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log("index.tsx: addNotificationResponseReceivedListener", {
+        response: response.notification.request,
+      });
+      fetchConversations();
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, []);
+}
 export default function Chats() {
   const { conversationList, error, loading, fetchConversations } = useGetConversations();
   const { markAsRead } = useMarkMessageAsRead();
+  useNotificationObserver(fetchConversations);
 
   const groups = conversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();

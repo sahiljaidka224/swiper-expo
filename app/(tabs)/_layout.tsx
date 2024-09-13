@@ -9,7 +9,6 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import analytics from "@react-native-firebase/analytics";
-import * as Notifications from "expo-notifications";
 
 export default function TabsRootLayout() {
   const segments = useSegments();
@@ -29,10 +28,6 @@ export default function TabsRootLayout() {
       } catch (error) {}
     })();
   }, [segments]);
-
-  useEffect(() => {
-    Notifications.setBadgeCountAsync(0);
-  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
