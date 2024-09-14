@@ -557,11 +557,9 @@ const styles = StyleSheet.create({
   carGroupWrapper: {
     position: "absolute",
     backgroundColor: "white",
-    marginTop: 5,
-    width: "95%",
+    width: "100%",
     alignSelf: "center",
     zIndex: 100,
-    borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
