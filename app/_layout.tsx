@@ -20,7 +20,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: false,
-    shouldSetBadge: true,
+    shouldSetBadge: false,
   }),
 });
 
@@ -52,6 +52,15 @@ function BaseLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    async function handleNotification() {
+      await Notifications.setBadgeCountAsync(0);
+      await Notifications.dismissAllNotificationsAsync();
+    }
+
+    handleNotification();
+  }, []);
 
   useEffect(() => {
     if (isAuthLoading) return;
