@@ -111,7 +111,20 @@ export const useGetGroupConversationsWithTags = (tags: string[]) => {
 
       const conversations = await conversationsRequest.fetchNext();
 
-      setGroups(conversations);
+      const sortedConversations = conversations.sort((a, b) => {
+        const sentAtA = a.getLastMessage().getSentAt();
+        const sentAtB = b.getLastMessage().getSentAt();
+        const unreadCountA = a.getUnreadMessageCount();
+        const unreadCountB = b.getUnreadMessageCount();
+
+        if (unreadCountA !== unreadCountB) {
+          return unreadCountB - unreadCountA;
+        }
+
+        return sentAtB - sentAtA;
+      });
+
+      setGroups(sortedConversations);
     } catch (error) {
       setError(error as CometChat.CometChatException);
       console.log("Group fetch failed with error:", error);

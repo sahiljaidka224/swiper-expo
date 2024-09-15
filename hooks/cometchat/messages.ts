@@ -76,7 +76,8 @@ export const useGetMessages = (toId: string) => {
       new CometChat.MessageListener({
         onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
           const senderId = textMessage.getSender().getUid();
-          if (senderId !== toId || !user) return;
+          const receiverType = textMessage.getReceiverType();
+          if (senderId !== toId || !user || receiverType === "group") return;
           const parsedMessage = parseCometChatMessageToGiftedChat(user, textMessage);
 
           if (!parsedMessage || Array.isArray(parsedMessage)) return;
@@ -86,7 +87,8 @@ export const useGetMessages = (toId: string) => {
         },
         onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
           const senderId = mediaMessage.getSender().getUid();
-          if (senderId !== toId || !user) return;
+          const receiverType = mediaMessage.getReceiverType();
+          if (senderId !== toId || !user || receiverType === "group") return;
           const parsedMessages = parseCometChatMessageToGiftedChat(user, mediaMessage);
 
           if (!parsedMessages || !Array.isArray(parsedMessages)) return;
@@ -96,12 +98,14 @@ export const useGetMessages = (toId: string) => {
         },
         onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID !== toId) return;
+          const receiverType = typingIndicator.getReceiverType();
+          if (senderUID !== toId || receiverType === "group") return;
           setIsTyping(true);
         },
         onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID !== toId) return;
+          const receiverType = typingIndicator.getReceiverType();
+          if (senderUID !== toId || receiverType === "group") return;
           setIsTyping(false);
         },
       })
@@ -293,7 +297,9 @@ export const useGetGroupMessages = (toId: string) => {
       listenerID,
       new CometChat.MessageListener({
         onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
-          if (!user) return;
+          const receiverType = textMessage.getReceiverType();
+          const receiverID = textMessage.getReceiverId();
+          if (!user || receiverType === "user" || receiverID !== toId) return;
           const parsedMessage = parseCometChatMessageToGiftedChat(user, textMessage);
 
           if (!parsedMessage || Array.isArray(parsedMessage)) return;
@@ -302,7 +308,9 @@ export const useGetGroupMessages = (toId: string) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
         onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
-          if (!user) return;
+          const receiverID = mediaMessage.getReceiverId();
+          const receiverType = mediaMessage.getReceiverType();
+          if (!user || receiverType === "user" || receiverID !== toId) return;
           const parsedMessages = parseCometChatMessageToGiftedChat(user, mediaMessage);
 
           if (!parsedMessages || !Array.isArray(parsedMessages)) return;
@@ -312,12 +320,14 @@ export const useGetGroupMessages = (toId: string) => {
         },
         onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID === user?.id) return;
+          const receiverId = typingIndicator.getReceiverId();
+          if (senderUID !== receiverId) return;
           setIsTyping(true);
         },
         onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
+          const receiverId = typingIndicator.getReceiverId();
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID === user?.id) return;
+          if (senderUID !== receiverId) return;
           setIsTyping(false);
         },
       })
