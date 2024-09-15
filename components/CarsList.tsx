@@ -285,6 +285,6 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    padding: 15,
+    padding: 10,
   },
 });

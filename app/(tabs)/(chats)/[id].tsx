@@ -29,7 +29,7 @@ export default function ChatDetailsPage() {
     setMessages,
     isTyping,
   } = useGetMessages(id as string);
-  const { sendMessage, sendMediaMessage } = useSendMessage();
+  const { sendMessage } = useSendMessage();
 
   useEffect(() => {
     if (fetchMessagesErr && !loading) {

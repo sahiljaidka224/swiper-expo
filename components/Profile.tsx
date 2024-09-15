@@ -17,7 +17,6 @@ import { Controller, useForm } from "react-hook-form";
 import Button from "@/components/Button";
 import { useUpdateUserAvatar, useUpdateUserDetails } from "@/api/hooks/user";
 import { useCallback, useEffect } from "react";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -280,11 +279,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
 
           {user && context === "update" ? (
             <Pressable style={{ height: 125, width: 125 }} onPress={onShowActionSheet}>
-              <View style={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
-                <Pressable>
-                  <MaterialIcons name="mode-edit" size={30} color={Colors.primary} />
-                </Pressable>
-              </View>
               <Avatar userId={user?.id} />
             </Pressable>
           ) : (

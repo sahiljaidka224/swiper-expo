@@ -12,6 +12,9 @@
 - error handling
 - add to their watchlist when pushing to stock
 
+- Analytics
+- bug: saw car related msg in chat
+
 - code review
   - add stock page
   - swiper page
@@ -20,3 +23,9 @@
   - listing page
 
 - extract URL into env variable and update eas
+
+- watch from stock page
+- main screen comes
+- pinch and enlarge
+
+- search bar on chat screen

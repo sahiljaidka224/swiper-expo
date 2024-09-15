@@ -18,7 +18,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Animated, { CurvedTransition } from "react-native-reanimated";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
@@ -158,7 +158,7 @@ export default function Chats() {
           ),
           headerRight: () => (
             <TouchableOpacity onPress={() => router.push("/(tabs)/(chats)/users-list")}>
-              <FontAwesome6 name="user-plus" size={22} color={Colors.primary} />
+              <FontAwesome5 name="user-friends" size={24} color={Colors.primary} />
             </TouchableOpacity>
           ),
         }}
@@ -175,14 +175,6 @@ export default function Chats() {
         </>
       )}
       {error && <ErrorView />}
-      {/* <View style={{ alignItems: "center", marginVertical: 10 }}>
-        <SegmentedControl
-          options={["Chats", "Groups"]}
-          selectedOption={selectedOption}
-          onOptionPress={setSelectedOption}
-          width={275}
-        />
-      </View> */}
       {groups && groups.length > 0 ? (
         <View
           style={{
