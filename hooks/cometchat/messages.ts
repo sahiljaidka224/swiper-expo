@@ -312,12 +312,12 @@ export const useGetGroupMessages = (toId: string) => {
         },
         onTypingStarted: (typingIndicator: CometChat.TypingIndicator) => {
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID === user?.id) return;
+          if (senderUID !== toId) return;
           setIsTyping(true);
         },
         onTypingEnded: (typingIndicator: CometChat.TypingIndicator) => {
           const senderUID = typingIndicator.getSender().getUid();
-          if (senderUID === user?.id) return;
+          if (senderUID !== toId) return;
           setIsTyping(false);
         },
       })
