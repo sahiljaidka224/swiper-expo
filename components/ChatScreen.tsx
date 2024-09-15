@@ -100,7 +100,7 @@ export default function ChatComponent({
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
   const { markAsRead } = useMarkMessageAsRead();
-  const { groupMembers } = useGetGroupMembers(userId);
+  const { groupMembers } = useGetGroupMembers(context === "group" ? userId : null);
 
   const triggerSendMediaMessage = (result: ImagePicker.ImagePickerSuccessResult) => {
     let files = [];

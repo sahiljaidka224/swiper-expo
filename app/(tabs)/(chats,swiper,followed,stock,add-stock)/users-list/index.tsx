@@ -157,7 +157,7 @@ export default function UsersListPage() {
     }
 
     if (!currentUser) return;
-    const chatName = String(`${car?.year} ${car?.make} ${car?.model}`).toUpperCase();
+    const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
     const owner = currentUser?.id;
     const metadata = {

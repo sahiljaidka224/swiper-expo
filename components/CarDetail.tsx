@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
 import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from "react-native";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import ContactCard from "./ContactCard";
 import StockButtonContainer from "./StockButtonContainer";
@@ -10,6 +10,13 @@ import { router } from "expo-router";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
+import {
+  useAddCarToWatchlist,
+  useMarkCarAsSeen,
+  useRemoveCarFromWatchlist,
+} from "@/api/hooks/watchlist";
+import { AntDesign } from "@expo/vector-icons";
+import { showToast } from "./Toast";
 
 interface CarDetailProps {
   car: any;
@@ -17,8 +24,21 @@ interface CarDetailProps {
 }
 
 function CarDetail({ car, context }: CarDetailProps) {
-  const { user } = useAuth();
+  const [carFollowed, setCarFollowed] = React.useState<boolean>(car?.followed);
+  const { user, token } = useAuth();
   const { createGroup, loading, group, error } = useCreateGroup();
+  const {
+    trigger: addCarToWatchlist,
+    isMutating: addCarMutating,
+    newCars,
+  } = useAddCarToWatchlist();
+  const { trigger: markCarAsSeen, isMutating: markCarSeenMutating } = useMarkCarAsSeen();
+  const {
+    trigger: removeFromWatchlist,
+    isMutating: removeMutating,
+    error: mutationError,
+    newCars: removedCars,
+  } = useRemoveCarFromWatchlist();
 
   useEffect(() => {
     if (group && !loading) {
@@ -26,6 +46,31 @@ function CarDetail({ car, context }: CarDetailProps) {
       router.push({ pathname: "/(tabs)/(followed)/new-chat/[id]", params: { id: guid } });
     }
   }, [loading, group]);
+
+  useEffect(() => {
+    if (newCars) {
+      showToast("Success", "Car added to watchlist", "success");
+    }
+
+    if (removedCars) {
+      showToast("Success", "Car removed from watchlist", "success");
+    }
+  }, [newCars, removedCars]);
+
+  const onAddToWatchlist = () => {
+    if (!user?.id || !car?.carId || !token) return;
+
+    if (addCarMutating || removeMutating || markCarSeenMutating) return;
+
+    if (car?.followed) {
+      removeFromWatchlist({ carId: car?.carId, token });
+      setCarFollowed(false);
+      return;
+    }
+    markCarAsSeen({ token, carId: car?.carId });
+    addCarToWatchlist({ userId: user?.id, carId: car?.carId, token });
+    setCarFollowed(true);
+  };
 
   const onSendToPhoneContacts = () => {
     router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${car?.carId}` });
@@ -38,7 +83,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       0,
       100
     );
-    const chatName = String(`${car?.year} ${car?.make} ${car?.model}`).toUpperCase();
+    const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
     const owner = user?.id;
     const members = [owner, car?.organisation?.ownerUserId];
@@ -70,8 +115,25 @@ function CarDetail({ car, context }: CarDetailProps) {
     createGroup(group, members);
   };
 
+  const ifFollowAllowed = context && !context?.includes("(stock)");
+
   return (
     <View style={styles.detailsContainer}>
+      <TouchableOpacity
+        onPress={onAddToWatchlist}
+        style={{
+          top: 0,
+          position: "absolute",
+          right: 0,
+          padding: 10,
+        }}
+      >
+        {addCarMutating || removeMutating || markCarSeenMutating ? (
+          <ActivityIndicator size="small" color={Colors.primary} />
+        ) : ifFollowAllowed ? (
+          <AntDesign name={carFollowed ? "heart" : "hearto"} size={30} color={Colors.primary} />
+        ) : null}
+      </TouchableOpacity>
       <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
       <DescriptionView
         title="Mileage"
@@ -153,6 +215,7 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     color: Colors.textDark,
     marginBottom: 10,
+    marginRight: 20,
   },
   descriptionContainer: {
     display: "flex",

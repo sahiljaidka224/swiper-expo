@@ -155,8 +155,7 @@ export const useLeaveGroup = () => {
   return { hasLeft, error, leaveGroup, leaveGroupAsParticipant };
 };
 
-
-export const useGetGroupMembers = (guid: string) => {
+export const useGetGroupMembers = (guid: string | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [groupMembers, setGroupMembers] = useState<CometChat.GroupMember[]>([]);
