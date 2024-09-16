@@ -185,7 +185,11 @@ export function CarsList({
             <WatchlistButtonsContainer
               carId={item?.carId}
               onMessage={onMessagePress}
-              phoneNumber={item?.organisation?.phoneNumber}
+              phoneNumber={
+                item?.organisation?.phoneNumber && item?.organisation?.phoneNumber !== ""
+                  ? item?.organisation?.phoneNumber
+                  : item?.primaryContact?.phoneNumber
+              }
               onDelete={onDeleteFromWatchlistPress}
               isPrimaryButtonLoading={isGroupLoading}
             />
