@@ -37,6 +37,7 @@ interface Car {
   series: string;
   transmission: string | null;
   year: string;
+  body: string;
   primaryContact: {
     userId: string;
     firstName: string;
@@ -52,6 +53,13 @@ interface Car {
     state: "string";
   };
 }
+
+const checkNull = (value: string | null) => {
+  if (!value || value === "") {
+    return "-";
+  }
+  return value;
+};
 
 export default function SwiperPage() {
   const { token, user } = useAuth();
@@ -85,7 +93,6 @@ export default function SwiperPage() {
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
 
-    // setCardIndex(cardIndex);
     addCarToWatchlist({ carId, token, userId: undefined });
     markCarAsSeen({ carId, token });
 
@@ -101,7 +108,6 @@ export default function SwiperPage() {
 
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
-    // setCardIndex(cardIndex);
 
     markCarAsSeen({ carId, token });
 
@@ -112,19 +118,6 @@ export default function SwiperPage() {
   };
 
   const renderCard = (item: Car) => {
-    const badges = [
-      { data: item?.transmission, uppercase: false },
-      { data: item?.fuelType, uppercase: false },
-      { data: item?.series, uppercase: true },
-      { data: item?.badge, uppercase: false },
-      { data: item?.rego, uppercase: true },
-      { data: item?.capacity, uppercase: false },
-      {
-        data: item?.odometer ? `${formatNumberWithCommas(item?.odometer)} KMS` : null,
-        uppercase: false,
-      },
-    ];
-
     return (
       <Pressable
         style={styles.renderCardContainer}
@@ -169,45 +162,34 @@ export default function SwiperPage() {
               </View>
             ) : null}
           </View>
-
-          <View style={styles.badgeWrapper}>
-            {badges.map((badge, index) => {
-              if (!badge.data || String(badge.data).trim() === "") {
-                return null;
-              }
-
-              return (
-                <View style={styles.badgeContainer} key={index}>
-                  <Text
-                    style={[
-                      styles.badgeText,
-                      { textTransform: badge?.uppercase ? "uppercase" : "capitalize" },
-                    ]}
-                  >
-                    {badge.data}
-                  </Text>
-                </View>
-              );
-            })}
+          <View style={{ paddingHorizontal: 10 }}>
+            <DetailsWithoutTitle
+              valueLeft={`${formatNumberWithCommas(item?.odometer)} km`}
+              valueRight={`${checkNull(item?.capacity)} L`}
+            />
+            <DetailsWithoutTitle
+              valueLeft={`${checkNull(item?.cylinders)} cyl`}
+              valueRight={checkNull(item?.fuelType)}
+            />
+            <View style={styles.separator} />
+            <DetailsWithTitle
+              titleLeft="Series"
+              valueLeft={checkNull(item?.series)}
+              titleRight="Rego"
+              valueRight={checkNull(item?.rego)}
+            />
+            <DetailsWithTitle
+              titleLeft="Badge"
+              valueLeft={checkNull(item?.badge)}
+              titleRight="Transmission"
+              valueRight={checkNull(item?.transmission)}
+            />
           </View>
           <ContactCard
             name={item?.primaryContact?.displayName}
             organisationName={item?.organisation?.name}
             userId={item?.primaryContact?.userId}
           />
-
-          <View
-            style={{
-              paddingHorizontal: 30,
-            }}
-          >
-            <WatchlistButtonsContainer
-              carId={item?.carId}
-              phoneNumber={item?.organisation?.phoneNumber}
-              userId={item?.primaryContact?.userId}
-              buttonsType="primary"
-            />
-          </View>
         </View>
       </Pressable>
     );
@@ -240,7 +222,7 @@ export default function SwiperPage() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={[styles.container, { marginTop: insets.top + 30 }]}>
+    <GestureHandlerRootView style={[styles.container, { marginTop: insets.top }]}>
       <View style={styles.subContainer}>
         {watchListData.length > 0 ? (
           <Swiper
@@ -262,15 +244,59 @@ export default function SwiperPage() {
   );
 }
 
+function DetailsWithoutTitle({ valueLeft, valueRight }: { valueRight: string; valueLeft: string }) {
+  return (
+    <View style={styles.detailsWrapper}>
+      <Text style={styles.descriptionValue}>{valueLeft}</Text>
+      <Text style={styles.descriptionValue}>{valueRight}</Text>
+    </View>
+  );
+}
+
+function DetailsWithTitle({
+  valueLeft,
+  valueRight,
+  titleLeft,
+  titleRight,
+}: {
+  titleLeft: string;
+  titleRight: string;
+  valueLeft: string;
+  valueRight: string;
+}) {
+  return (
+    <View style={styles.detailsWrapper}>
+      <View
+        style={{
+          width: "50%",
+          gap: 5,
+        }}
+      >
+        <Text style={styles.descriptionTitle}>{titleLeft}</Text>
+        <Text style={styles.descriptionValue}>{valueLeft}</Text>
+      </View>
+      <View
+        style={{
+          width: "50%",
+          gap: 5,
+        }}
+      >
+        <Text style={styles.descriptionTitle}>{titleRight}</Text>
+        <Text style={[styles.descriptionValue, { textTransform: "uppercase" }]}>{valueRight}</Text>
+      </View>
+    </View>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 5,
   },
   cardStyle: {
     width: "95%",
-    height: "92%",
+    height: "100%",
     borderRadius: 15,
   },
   renderCardContainer: {
@@ -295,7 +321,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
     flex: 0.4,
   },
-
   subContainer: {
     flex: 1,
     alignItems: "center",
@@ -350,5 +375,29 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Medium",
     textTransform: "capitalize",
     fontSize: 16,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.lightGray,
+  },
+  descriptionTitle: {
+    color: Colors.textLight,
+    fontFamily: "SF_Pro_Display_Light",
+    fontSize: 16,
+    textAlign: "left",
+  },
+  descriptionValue: {
+    color: Colors.textDark,
+    fontFamily: "SF_Pro_Display_Regular",
+    fontSize: 18,
+    width: "50%",
+    textAlign: "left",
+    textTransform: "capitalize",
+  },
+  detailsWrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 5,
   },
 });

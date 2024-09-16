@@ -87,10 +87,14 @@ export default function UsersListPage() {
   }, [sendMessageError, isSendingMessage]);
 
   const filteredUsers = users.filter((user) => {
-    const [firstName, lastName] = user.getName().toLowerCase().split(" ");
+    if (!searchText) return true;
+    const searchLower = searchText.toLowerCase().trimEnd();
+    const [firstName, lastName] = user.getName().toLowerCase().replace(/\s+/g, " ").split(" ");
+
     return (
-      firstName.startsWith(searchText.toLowerCase()) ||
-      lastName.startsWith(searchText.toLowerCase())
+      firstName.startsWith(searchLower) ||
+      lastName.startsWith(searchLower) ||
+      `${firstName} ${lastName}`.startsWith(searchLower)
     );
   });
 

@@ -5,6 +5,7 @@ import Avatar from "./Avatar";
 import { router } from "expo-router";
 import { useSegments } from "expo-router";
 import Text from "./Text";
+import MaterialCommunityIcons from "@expo/vector-icons/build/MaterialCommunityIcons";
 
 function ContactCard({
   userId,
@@ -31,6 +32,7 @@ function ContactCard({
         <Text style={styles.contactName}>{name}</Text>
         <Text style={styles.organisationName}>{organisationName}</Text>
       </View>
+      <MaterialCommunityIcons name="chat-plus" size={24} color={Colors.primary} />
     </Pressable>
   );
 }

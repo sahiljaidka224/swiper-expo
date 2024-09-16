@@ -10,6 +10,7 @@ export default function SwiperLayout() {
           name="index"
           options={{
             title: "Swiper",
+            headerShown: false,
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
