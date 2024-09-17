@@ -1,9 +1,11 @@
 import Colors from "@/constants/Colors";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
 import WebView from "react-native-webview";
 
-export default function FeedPage() {
+export default function ReadmorePage() {
+  const { uri } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
 
   return (
@@ -13,7 +15,7 @@ export default function FeedPage() {
         style={styles.container}
         originWhitelist={["*"]}
         onLoadEnd={() => setLoading(false)}
-        source={{ uri: "https://www.carexpert.com.au/" }}
+        source={{ uri: uri as string }}
       />
     </>
   );

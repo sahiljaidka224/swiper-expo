@@ -247,8 +247,8 @@ export default function SwiperPage() {
 function DetailsWithoutTitle({ valueLeft, valueRight }: { valueRight: string; valueLeft: string }) {
   return (
     <View style={styles.detailsWrapper}>
-      <Text style={styles.descriptionValue}>{valueLeft}</Text>
-      <Text style={styles.descriptionValue}>{valueRight}</Text>
+      <Text style={[styles.descriptionValue, { width: "50%" }]}>{valueLeft}</Text>
+      <Text style={[styles.descriptionValue, { width: "50%" }]}>{valueRight}</Text>
     </View>
   );
 }
@@ -390,7 +390,6 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     fontFamily: "SF_Pro_Display_Regular",
     fontSize: 18,
-    width: "50%",
     textAlign: "left",
     textTransform: "capitalize",
   },
