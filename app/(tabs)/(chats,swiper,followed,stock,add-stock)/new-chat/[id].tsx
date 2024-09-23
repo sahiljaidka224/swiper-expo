@@ -103,7 +103,7 @@ const Header = ({
     <Pressable style={styles.headerContainer} onPress={onPress}>
       <View style={styles.leftContainer}>
         <View style={styles.avatarContainer}>
-          <Avatar source={icon} borderRadius={10}/>
+          <Avatar source={icon} borderRadius={10} isCar />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.name} allowFontScaling={false}>

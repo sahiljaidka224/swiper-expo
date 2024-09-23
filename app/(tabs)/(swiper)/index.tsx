@@ -3,13 +3,12 @@ import { useGetSwiperCars } from "@/api/hooks/swiper";
 import ContactCard from "@/components/ContactCard";
 import Colors from "@/constants/Colors";
 import React, { useRef, useCallback, useState, useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, Pressable } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Pressable, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import Text from "@/components/Text";
 import { formatNumberWithCommas } from "@/utils";
 import { useAddCarToWatchlist, useMarkCarAsSeen } from "@/api/hooks/watchlist";
@@ -148,6 +147,7 @@ export default function SwiperPage() {
               <View
                 style={{
                   padding: 4,
+                  paddingHorizontal: 8,
                   borderRadius: 8,
                   backgroundColor: Colors.primary,
                   alignItems: "center",
@@ -162,34 +162,28 @@ export default function SwiperPage() {
               </View>
             ) : null}
           </View>
-          <View style={{ paddingHorizontal: 10 }}>
-            <DetailsWithoutTitle
-              valueLeft={`${formatNumberWithCommas(item?.odometer)} km`}
-              valueRight={`${checkNull(item?.capacity)} L`}
-            />
-            <DetailsWithoutTitle
-              valueLeft={`${checkNull(item?.cylinders)} cyl`}
-              valueRight={checkNull(item?.fuelType)}
-            />
-            <View style={styles.separator} />
-            <DetailsWithTitle
-              titleLeft="Series"
-              valueLeft={checkNull(item?.series)}
-              titleRight="Rego"
-              valueRight={checkNull(item?.rego)}
-            />
-            <DetailsWithTitle
-              titleLeft="Badge"
-              valueLeft={checkNull(item?.badge)}
-              titleRight="Transmission"
-              valueRight={checkNull(item?.transmission)}
+          <View style={{ paddingHorizontal: 10, gap: 12 }}>
+            <Text style={styles.descriptionValue}>{`${formatNumberWithCommas(
+              item?.odometer
+            )} km`}</Text>
+            <Text style={styles.descriptionValue}>{checkNull(item?.fuelType)}</Text>
+            {item?.rego && (
+              <Text style={[styles.descriptionValue, { textTransform: "uppercase" }]}>
+                {checkNull(item?.rego)}
+              </Text>
+            )}
+            {item?.transmission && (
+              <Text style={styles.descriptionValue}>{checkNull(item?.transmission)}</Text>
+            )}
+            {item?.series && <Text style={styles.descriptionValue}>{checkNull(item?.series)}</Text>}
+          </View>
+          <View style={{ position: "absolute", bottom: 20, flex: 1, right: 10, left: 10 }}>
+            <ContactCard
+              name={item?.primaryContact?.displayName}
+              organisationName={item?.organisation?.name}
+              userId={item?.primaryContact?.userId}
             />
           </View>
-          <ContactCard
-            name={item?.primaryContact?.displayName}
-            organisationName={item?.organisation?.name}
-            userId={item?.primaryContact?.userId}
-          />
         </View>
       </Pressable>
     );
@@ -222,7 +216,8 @@ export default function SwiperPage() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={[styles.container, { marginTop: insets.top }]}>
+    <GestureHandlerRootView style={[styles.container, {}]}>
+      <StatusBar barStyle="dark-content" />
       <View style={styles.subContainer}>
         {watchListData.length > 0 ? (
           <Swiper
@@ -244,64 +239,18 @@ export default function SwiperPage() {
   );
 }
 
-function DetailsWithoutTitle({ valueLeft, valueRight }: { valueRight: string; valueLeft: string }) {
-  return (
-    <View style={styles.detailsWrapper}>
-      <Text style={[styles.descriptionValue, { width: "50%" }]}>{valueLeft}</Text>
-      <Text style={[styles.descriptionValue, { width: "50%" }]}>{valueRight}</Text>
-    </View>
-  );
-}
-
-function DetailsWithTitle({
-  valueLeft,
-  valueRight,
-  titleLeft,
-  titleRight,
-}: {
-  titleLeft: string;
-  titleRight: string;
-  valueLeft: string;
-  valueRight: string;
-}) {
-  return (
-    <View style={styles.detailsWrapper}>
-      <View
-        style={{
-          width: "50%",
-          gap: 5,
-        }}
-      >
-        <Text style={styles.descriptionTitle}>{titleLeft}</Text>
-        <Text style={styles.descriptionValue}>{valueLeft}</Text>
-      </View>
-      <View
-        style={{
-          width: "50%",
-          gap: 5,
-        }}
-      >
-        <Text style={styles.descriptionTitle}>{titleRight}</Text>
-        <Text style={[styles.descriptionValue, { textTransform: "uppercase" }]}>{valueRight}</Text>
-      </View>
-    </View>
-  );
-}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 5,
   },
   cardStyle: {
-    width: "95%",
+    width: "100%",
     height: "100%",
-    borderRadius: 15,
   },
   renderCardContainer: {
     flex: 1,
-    borderRadius: 15,
     height: "100%",
     backgroundColor: Colors.background,
     width: "100%",
@@ -316,10 +265,9 @@ const styles = StyleSheet.create({
   },
   renderCardImage: {
     width: "100%",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+
     zIndex: 1,
-    flex: 0.4,
+    flex: 0.65,
   },
   subContainer: {
     flex: 1,
@@ -329,13 +277,11 @@ const styles = StyleSheet.create({
   overlayLabelContainer: {
     width: "100%",
     height: "100%",
-    borderRadius: 15,
   },
   absoluteCenteredView: {
     zIndex: 100,
     justifyContent: "flex-start",
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+
     paddingHorizontal: 10,
     paddingVertical: 10,
     overflow: "hidden",
@@ -345,58 +291,18 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     color: Colors.textDark,
-    fontSize: 24,
+    fontSize: 26,
     marginVertical: 10,
     fontFamily: "SF_Pro_Display_Bold",
     textTransform: "capitalize",
     marginLeft: 10,
     flex: 0.9,
   },
-  badgeWrapper: {
-    marginHorizontal: 5,
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 5,
-    flex: 1,
-    overflow: "hidden",
-  },
-  badgeContainer: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: Colors.background,
-    alignSelf: "flex-start",
-    borderColor: Colors.primary,
-    borderWidth: 1,
-  },
-  badgeText: {
-    color: Colors.textDark,
-    fontFamily: "SF_Pro_Display_Medium",
-    textTransform: "capitalize",
-    fontSize: 16,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.lightGray,
-  },
-  descriptionTitle: {
-    color: Colors.textLight,
-    fontFamily: "SF_Pro_Display_Light",
-    fontSize: 16,
-    textAlign: "left",
-  },
   descriptionValue: {
     color: Colors.textDark,
     fontFamily: "SF_Pro_Display_Regular",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "left",
     textTransform: "capitalize",
-  },
-  detailsWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 5,
   },
 });

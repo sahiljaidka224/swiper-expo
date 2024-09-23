@@ -1,6 +1,5 @@
 import Colors from "@/constants/Colors";
 import { Pressable, StyleSheet, View, Platform, Linking, Alert } from "react-native";
-import Avatar from "./Avatar";
 import Button from "./Button";
 import { router, useSegments } from "expo-router";
 import Text from "./Text";
@@ -43,9 +42,6 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
   return (
     <Pressable style={styles.contactCardContainer} onPress={() => {}}>
       <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-          <Avatar userId="" />
-        </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.contactName}>{name}</Text>
         </View>

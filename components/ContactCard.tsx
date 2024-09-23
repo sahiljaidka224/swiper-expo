@@ -32,7 +32,9 @@ function ContactCard({
         <Text style={styles.contactName}>{name}</Text>
         <Text style={styles.organisationName}>{organisationName}</Text>
       </View>
-      <MaterialCommunityIcons name="chat-plus" size={24} color={Colors.primary} />
+      {segments.includes("(swiper)") ? (
+        <MaterialCommunityIcons name="chat-plus" size={24} color={Colors.primary} />
+      ) : null}
     </Pressable>
   );
 }

@@ -126,7 +126,7 @@ export default function Chats() {
               padding: 2,
             }}
           >
-            <Avatar source={icon} />
+            <Avatar source={icon} isCar />
           </View>
           <Text numberOfLines={3} style={{ textAlign: "center" }}>
             {name}

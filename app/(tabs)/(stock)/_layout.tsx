@@ -1,9 +1,8 @@
 import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { router, Stack } from "expo-router";
-import { Pressable, TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import Text from "@/components/Text";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function MyStockLayout() {
   return (
@@ -17,11 +16,6 @@ export default function MyStockLayout() {
             headerShadowVisible: false,
             headerBlurEffect: "regular",
             headerTransparent: true,
-            headerLeft: () => (
-              <TouchableOpacity onPress={() => router.push("/(stock)/feed")}>
-                <FontAwesome name="newspaper-o" size={24} color={Colors.primary} />
-              </TouchableOpacity>
-            ),
           }}
         />
         <Stack.Screen
@@ -36,20 +30,7 @@ export default function MyStockLayout() {
             title: "",
           }}
         />
-        <Stack.Screen
-          name="feed"
-          options={{
-            title: "Car News",
-            headerStyle: { backgroundColor: Colors.background },
-          }}
-        />
-        <Stack.Screen
-          name="feed-readmore"
-          options={{
-            title: "",
-            headerStyle: { backgroundColor: Colors.background },
-          }}
-        />
+
         <Stack.Screen
           name="users-list/index"
           options={{

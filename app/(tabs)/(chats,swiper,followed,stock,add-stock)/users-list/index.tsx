@@ -2,8 +2,8 @@ import { useGetCarDetails } from "@/api/hooks/car-detail";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import ErrorView from "@/components/Error";
-import Modal from "@/components/Modal";
 import Text from "@/components/Text";
+import { showToast } from "@/components/Toast";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
@@ -12,12 +12,11 @@ import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { formatTimestamp } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
+import { router, useLocalSearchParams, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -65,7 +64,6 @@ export default function UsersListPage() {
 
   const [selectedUsers, setSelectedUsers] = useState<CometChat.User[]>([]);
   const [searchText, setSearchText] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [textInputValue, setTextInputValue] = useState("");
 
   const keyboardVerticalOffset = Platform.OS === "ios" ? 100 : 0;
@@ -74,14 +72,13 @@ export default function UsersListPage() {
     if (!isGroupCreateLoading && selectedUsers.length && multipleSelectionAllowed) {
       setTextInputValue("");
       setSelectedUsers([]);
-      setIsModalVisible(false);
       router.back();
     }
   }, [isGroupCreateLoading, groupCreateError]);
 
   useEffect(() => {
     if (!isSendingMessage && !sendMessageError && forwardMediaMode && selectedUsers.length) {
-      Alert.alert("Message forwarded successfully!");
+      showToast("Success", "Message forwarded successfully!", "success");
       router.back();
     }
   }, [sendMessageError, isSendingMessage]);
@@ -154,15 +151,20 @@ export default function UsersListPage() {
   };
 
   const onPressSendNow = () => {
+    if (forwardMediaMode) {
+      onForwardMedia();
+      return;
+    }
+
     if (!car && !carDetailsLoading) {
-      Alert.alert("Car details not found", "Please try again later");
+      showToast("Error", "Car details not found", "error");
       router.back();
       return;
     }
 
     if (!currentUser) return;
     const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
-    const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
+    const icon = car?.images[0]?.url ?? undefined;
     const owner = currentUser?.id;
     const metadata = {
       carId: car?.carId,
@@ -196,7 +198,7 @@ export default function UsersListPage() {
       return {
         members,
         group,
-        text: textInputValue.trimEnd().length > 0 ? textInputValue : "",
+        text: textInputValue.trimEnd().length > 0 ? textInputValue : "Hey, check this out!",
       };
     });
 
@@ -209,47 +211,13 @@ export default function UsersListPage() {
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior="padding"
     >
-      <Stack.Screen
-        options={{
-          headerRight: () => {
-            if (!multipleSelectionAllowed) return;
-            // return (
-            //   <Pressable onPress={() => router.back()}>
-            //     <AntDesign name="closecircleo" size={24} color="black" />
-            //   </Pressable>
-            // );
-
-            return (
-              <Pressable
-                disabled={selectedUsers.length === 0}
-                onPress={() => {
-                  forwardMediaMode ? onForwardMedia() : setIsModalVisible(true);
-                }}
-              >
-                {isSendingMessage ? (
-                  <ActivityIndicator size="small" color={Colors.primary} />
-                ) : (
-                  <Text
-                    style={{
-                      fontFamily: "SF_Pro_Display_Medium",
-                      fontSize: 16,
-                      color: selectedUsers.length > 0 ? Colors.primary : Colors.textLight,
-                    }}
-                  >
-                    {forwardMediaMode ? "Forward" : "Push"}
-                  </Text>
-                )}
-              </Pressable>
-            );
-          },
-        }}
-      />
       <TextInput
         style={styles.searchInput}
         placeholder="Search Swiper users..."
         value={searchText}
         onChangeText={setSearchText}
         clearButtonMode="while-editing"
+        maxFontSizeMultiplier={1.3}
       />
       {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
@@ -262,55 +230,61 @@ export default function UsersListPage() {
             <Text style={styles.sectionHeaderText}>{title}</Text>
           </View>
         )}
+        ListHeaderComponent={
+          multipleSelectionAllowed && selectedUsers && selectedUsers.length > 0 ? (
+            <>
+              <Text
+                style={{
+                  fontFamily: "SF_Pro_Display_Regular",
+                  fontSize: 18,
+                  textAlign: "center",
+                  marginTop: 10,
+                }}
+              >
+                {forwardMediaMode
+                  ? "Forwarding to these Swiper Users"
+                  : "Pushing to these Swiper Users"}
+              </Text>
+              <ScrollView
+                style={{ backgroundColor: Colors.background, padding: 10, minHeight: 100 }}
+                horizontal
+              >
+                {selectedUsers.map((user) => {
+                  const userUID = user.getUid();
+                  const userName = user.getName();
+
+                  return (
+                    <View key={userUID} style={{ margin: 5, alignItems: "center" }}>
+                      <View style={styles.avatarContainer}>
+                        <Avatar userId={userUID} />
+                      </View>
+                      <Text style={styles.name}>{userName.split(" ")[0]}</Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+              {!forwardMediaMode ? (
+                <TextInput
+                  placeholder="Write a message"
+                  style={styles.sendMessageInput}
+                  multiline
+                  value={textInputValue}
+                  onChangeText={setTextInputValue}
+                  maxFontSizeMultiplier={1.3}
+                />
+              ) : null}
+              <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
+                <Button
+                  title="Send Now"
+                  onPress={onPressSendNow}
+                  type="primary"
+                  isLoading={isGroupCreateLoading || isSendingMessage}
+                />
+              </View>
+            </>
+          ) : null
+        }
       />
-      <Modal isVisible={isModalVisible} onClose={() => router.dismissAll()}>
-        <View>
-          <Text
-            style={{
-              fontFamily: "SF_Pro_Display_Regular",
-              fontSize: 18,
-              textAlign: "center",
-              marginTop: 10,
-            }}
-          >
-            Pushing to these Swiper Users:
-          </Text>
-          <ScrollView
-            style={{ backgroundColor: Colors.background, padding: 10, height: 100 }}
-            horizontal
-          >
-            {selectedUsers.map((user) => {
-              const userUID = user.getUid();
-              const userName = user.getName();
-
-              return (
-                <View key={userUID} style={{ margin: 5, alignItems: "center" }}>
-                  <View style={styles.avatarContainer}>
-                    <Avatar userId={userUID} />
-                  </View>
-                  <Text style={styles.name}>{userName.split(" ")[0]}</Text>
-                </View>
-              );
-            })}
-          </ScrollView>
-
-          <TextInput
-            placeholder="Write a message"
-            style={styles.sendMessageInput}
-            multiline
-            value={textInputValue}
-            onChangeText={setTextInputValue}
-          />
-          <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
-            <Button
-              title="Send Now"
-              onPress={onPressSendNow}
-              type="primary"
-              isLoading={isGroupCreateLoading}
-            />
-          </View>
-        </View>
-      </Modal>
     </KeyboardAvoidingView>
   );
 }

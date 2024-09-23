@@ -98,7 +98,7 @@ function CarsListOrgs({
           100
         );
         const chatName = String(`${item?.year} ${item?.model}`).toUpperCase();
-        const icon = item?.images[0]?.url ?? "https://picsum.photos/200";
+        const icon = item?.images[0]?.url ?? undefined;
         const owner = user?.id;
         const members = [owner, item?.organisation?.ownerUserId];
         const metadata = {

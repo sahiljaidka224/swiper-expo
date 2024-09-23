@@ -84,7 +84,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       100
     );
     const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
-    const icon = car?.images[0]?.url ?? "https://picsum.photos/200";
+    const icon = car?.images[0]?.url ?? undefined;
     const owner = user?.id;
     const members = [owner, car?.organisation?.ownerUserId];
     const metadata = {
@@ -115,7 +115,7 @@ function CarDetail({ car, context }: CarDetailProps) {
     createGroup(group, members);
   };
 
-  const ifFollowAllowed = context && !context?.includes("(stock)");
+  const ifFollowAllowed = context && !context?.includes("(stock)") && !context?.includes("(chats)");
 
   return (
     <View style={styles.detailsContainer}>

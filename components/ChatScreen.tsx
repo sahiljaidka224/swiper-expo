@@ -262,7 +262,7 @@ export default function ChatComponent({
               padding: 2,
             }}
           >
-            <Avatar source={icon} />
+            <Avatar source={icon} isCar={Boolean(conversationWith instanceof CometChat.Group)} />
           </View>
           <Text
             numberOfLines={3}

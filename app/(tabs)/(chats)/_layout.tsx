@@ -61,6 +61,13 @@ export default function ChatsLayout() {
           }}
         />
         <Stack.Screen
+          name="feed-readmore"
+          options={{
+            title: "",
+            headerStyle: { backgroundColor: Colors.background },
+          }}
+        />
+        <Stack.Screen
           name="car/[id]"
           options={{
             title: "",
