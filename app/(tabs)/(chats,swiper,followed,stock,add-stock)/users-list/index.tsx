@@ -289,7 +289,7 @@ export default function UsersListPage() {
   );
 }
 
-const User = React.memo(
+export const User = React.memo(
   ({
     user,
     onPress,
@@ -313,7 +313,7 @@ const User = React.memo(
           </View>
           <View>
             <Text style={styles.name}>{userName}</Text>
-            <Text style={styles.orgName}>{`Last seen: ${formatTimestamp(lastSeen)}`}</Text>
+            <Text style={styles.orgName}>{`Last seen: ${formatTimestamp(lastSeen, true)}`}</Text>
           </View>
         </View>
         {multipleSelectionAllowed ? (

@@ -5,7 +5,6 @@ import Colors from "@/constants/Colors";
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, Pressable, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -60,10 +59,46 @@ const checkNull = (value: string | null) => {
   return value;
 };
 
+const WatchOrPass = ({ type }: { type: "Watch" | "Pass" }) => {
+  return (
+    <View
+      style={[
+        styles.overlayLabelContainer,
+        {
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      ]}
+    >
+      <View
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: 60,
+          backgroundColor: "white",
+          borderWidth: 5,
+          borderColor: type === "Watch" ? Colors.primary : Colors.borderGray,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            color: type === "Watch" ? Colors.primary : Colors.borderGray,
+            fontSize: 22,
+            fontFamily: "SF_Pro_Display_Bold",
+          }}
+        >
+          {type}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
 export default function SwiperPage() {
   const { token, user } = useAuth();
   const { cars, isLoading, fetchMore, error, isValidating } = useGetSwiperCars();
-  const insets = useSafeAreaInsets();
   const ref = useRef<SwiperCardRefType>();
   const [watchListData, setWatchlistData] = useState<Car[]>([]);
   const [page, setPage] = useState(1);
@@ -177,7 +212,7 @@ export default function SwiperPage() {
             )}
             {item?.series && <Text style={styles.descriptionValue}>{checkNull(item?.series)}</Text>}
           </View>
-          <View style={{ position: "absolute", bottom: 20, flex: 1, right: 10, left: 10 }}>
+          <View style={styles.stickyContactCard}>
             <ContactCard
               name={item?.primaryContact?.displayName}
               organisationName={item?.organisation?.name}
@@ -190,29 +225,11 @@ export default function SwiperPage() {
   };
 
   const OverlayLabelRight = useCallback(() => {
-    return (
-      <View
-        style={[
-          styles.overlayLabelContainer,
-          {
-            backgroundColor: Colors.primary,
-          },
-        ]}
-      />
-    );
+    return <WatchOrPass type="Watch" />;
   }, []);
 
   const OverlayLabelLeft = useCallback(() => {
-    return (
-      <View
-        style={[
-          styles.overlayLabelContainer,
-          {
-            backgroundColor: "red",
-          },
-        ]}
-      />
-    );
+    return <WatchOrPass type="Pass" />;
   }, []);
 
   return (
@@ -305,4 +322,5 @@ const styles = StyleSheet.create({
     textAlign: "left",
     textTransform: "capitalize",
   },
+  stickyContactCard: { position: "absolute", bottom: 20, flex: 1, right: 10, left: 10 },
 });

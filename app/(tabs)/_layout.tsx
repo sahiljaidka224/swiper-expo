@@ -91,6 +91,7 @@ export default function TabsRootLayout() {
                         fontSize: 16,
                         textAlign: "center",
                       }}
+                      maxFontSizeMultiplier={1}
                     >
                       {unreadCount}
                     </Text>

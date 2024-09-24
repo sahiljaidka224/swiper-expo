@@ -10,9 +10,10 @@ import {
 } from "react-native";
 import axios from "axios";
 import xml2js from "xml2js";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaView, SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { router } from "expo-router";
+import FeedVideos from "@/components/FeedVideos";
 
 // Type declarations
 interface FeedItem {
@@ -112,7 +113,7 @@ const fetchRSSFeed = async (
       }
 
       const items: FeedItem[] = result?.rss?.channel[0]?.item || [];
-      setFeedData(items);
+      setFeedData((prevItems) => [...prevItems, ...items]);
       setLoading(false);
     });
   } catch (error) {
@@ -124,21 +125,15 @@ const fetchRSSFeed = async (
 const AutomotiveRSSFeed: React.FC = () => {
   const [feedData, setFeedData] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [sourceTitle, setSourceTitle] = useState<string>(rssFeeds[0].title);
-  const [rssUrl, setRssUrl] = useState<string>(rssFeeds[0].url);
-  const [selectedFeedIndex, setSelectedFeedIndex] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState<string>("News");
+  const { top, bottom } = useSafeAreaInsets();
 
   useEffect(() => {
-    fetchRSSFeed(rssUrl, setFeedData, setLoading);
-  }, [rssUrl]);
-
-  const handleSourceChange = (url: string, title: string, index: number) => {
-    if (rssUrl !== url) {
-      setRssUrl(url);
-      setSourceTitle(title);
-      setSelectedFeedIndex(index);
-    }
-  };
+    setFeedData([]);
+    rssFeeds.forEach((feed) => {
+      fetchRSSFeed(feed.url, setFeedData, setLoading);
+    });
+  }, []);
 
   const handleReadMore = (url: string) => {
     router.push({ pathname: "(chats)/feed-readmore", params: { uri: url } });
@@ -149,61 +144,69 @@ const AutomotiveRSSFeed: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <>
           <View style={styles.buttonContainer}>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}
+            <TouchableOpacity
+              style={[styles.button, selectedTab === "News" && styles.selectedButton]}
+              onPress={() => {
+                setSelectedTab("News");
+              }}
             >
-              {rssFeeds.map((feed, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[styles.button, selectedFeedIndex === index && styles.selectedButton]}
-                  onPress={() => handleSourceChange(feed.url, feed.title, index)}
-                >
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      selectedFeedIndex === index && styles.selectedButtonText,
-                    ]}
-                  >
-                    {feed.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+              <Text
+                style={[styles.buttonText, selectedTab === "News" && styles.selectedButtonText]}
+              >
+                News
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, selectedTab === "Videos" && styles.selectedButton]}
+              onPress={() => {
+                setSelectedTab("Videos");
+              }}
+            >
+              <Text
+                style={[styles.buttonText, selectedTab === "Videos" && styles.selectedButtonText]}
+              >
+                Videos
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <Text style={styles.title}>{sourceTitle}</Text>
-          <ScrollView contentContainerStyle={styles.feedContainer}>
-            {loading ? (
-              <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
-            ) : (
-              feedData.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.feedItem}
-                  onPress={() => handleReadMore(item.link[0])} // Make the whole item clickable
-                >
-                  <View style={styles.feedContent}>
-                    {item.description && extractImageUrl(item) && (
-                      <Image source={{ uri: extractImageUrl(item) }} style={styles.thumbnail} />
-                    )}
-                    <View style={styles.textContainer}>
-                      <Text style={styles.itemTitle}>{item.title[0]}</Text>
-                      <Text style={styles.description}>{removeHTMLTags(item.description[0])}</Text>
-                      {/* "Read More" Button */}
-                      <TouchableOpacity
-                        style={styles.readMoreButton}
-                        onPress={() => handleReadMore(item.link[0])}
-                      >
-                        <Text style={styles.readMoreText}>Read More</Text>
-                      </TouchableOpacity>
+          {selectedTab === "News" ? (
+            <ScrollView contentContainerStyle={styles.feedContainer}>
+              {loading ? (
+                <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
+              ) : (
+                feedData.map((item, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.feedItem}
+                    onPress={() => handleReadMore(item.link[0])} // Make the whole item clickable
+                  >
+                    <View style={styles.feedContent}>
+                      {item.description && extractImageUrl(item) && (
+                        <Image source={{ uri: extractImageUrl(item) }} style={styles.thumbnail} />
+                      )}
+                      <View style={styles.textContainer}>
+                        <Text style={styles.itemTitle}>{item.title[0]}</Text>
+                        <Text style={styles.description}>
+                          {removeHTMLTags(item.description[0])}
+                        </Text>
+                        {/* "Read More" Button */}
+                        <TouchableOpacity
+                          style={styles.readMoreButton}
+                          onPress={() => handleReadMore(item.link[0])}
+                        >
+                          <Text style={styles.readMoreText}>Read More</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))
-            )}
-          </ScrollView>
+                  </TouchableOpacity>
+                ))
+              )}
+            </ScrollView>
+          ) : (
+            <>
+              <FeedVideos top={top} bottom={bottom} />
+            </>
+          )}
         </>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -219,9 +222,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 10,
     backgroundColor: Colors.background,
-  },
-  scrollContainer: {
     paddingHorizontal: 10,
+    justifyContent: "center",
   },
   button: {
     backgroundColor: Colors.primaryLight,

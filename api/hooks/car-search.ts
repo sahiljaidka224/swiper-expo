@@ -32,7 +32,7 @@ const fetchMakeList = async (
 
 export const useMakeList = () => {
   const { token } = useAuth();
-  const fetchUrl = "https://backend-swiper.datalinks.nl/cardb";
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/cardb`;
   const { data, error, isLoading } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
     fetchMakeList(url, { arg: { token } })
   );
@@ -46,7 +46,7 @@ export const useMakeList = () => {
 
 export const useModelList = () => {
   const { trigger, isMutating, data, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/cardb",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/cardb`,
     fetchMakeList
   );
 
@@ -64,7 +64,7 @@ export const useCarYear = () => {
     isMutating,
     data,
     error,
-  } = useSWRMutation("https://backend-swiper.datalinks.nl/cardb", fetchMakeList);
+  } = useSWRMutation(`${process.env.EXPO_PUBLIC_API_BASE_URL}/cardb`, fetchMakeList);
 
   return {
     isCarYearLoading: isMutating,

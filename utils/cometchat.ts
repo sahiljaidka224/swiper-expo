@@ -1,6 +1,6 @@
 import { differenceInDays, format, isToday, isYesterday } from "date-fns";
 
-export function formatTimestamp(timestamp: number): string {
+export function formatTimestamp(timestamp: number, showRecently?: boolean): string {
   const date = new Date(timestamp * 1000);
   const now = new Date();
 
@@ -17,6 +17,10 @@ export function formatTimestamp(timestamp: number): string {
   const daysDifference = differenceInDays(now, date);
   if (daysDifference < 7) {
     return format(date, "EEEE");
+  }
+
+  if (showRecently) {
+    return "Recently";
   }
 
   return format(date, "dd/MM/yy");

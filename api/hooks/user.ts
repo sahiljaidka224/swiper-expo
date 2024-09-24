@@ -118,7 +118,7 @@ const loginWithPhone = async (
 
 export function useGetUserDetails(userId: string) {
   const { token } = useAuth();
-  const fetchUrl = `https://backend-swiper.datalinks.nl/user/${userId}`;
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/${userId}`;
   const { data, error, isLoading } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
     getUserDetails(url, { arg: { token } })
   );
@@ -132,7 +132,7 @@ export function useGetUserDetails(userId: string) {
 
 export function useLoginWithPhone() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/user/phoneLogin/",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/phoneLogin/`,
     loginWithPhone
   );
 
@@ -147,7 +147,9 @@ export function useLoginWithPhone() {
 export function useGetUserOrgDetails() {
   const { token, user, updateUser } = useAuth();
   const fetchUrl =
-    user && user.id ? `https://backend-swiper.datalinks.nl/organisation/userid/${user?.id}` : "";
+    user && user.id
+      ? `${process.env.EXPO_PUBLIC_API_BASE_URL}/organisation/userid/${user?.id}`
+      : "";
 
   const {
     data,
@@ -178,7 +180,7 @@ export function useGetUserOrgDetails() {
 
 export function useUpdateUserDetails() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/user",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/user`,
     postUserDetails
   );
 
@@ -192,7 +194,7 @@ export function useUpdateUserDetails() {
 
 export function useUpdateUserAvatar() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/user",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/user`,
     postUserAvatar
   );
 

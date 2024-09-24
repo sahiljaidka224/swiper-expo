@@ -23,6 +23,7 @@ import {
   SystemMessageProps,
   TimeProps,
   MessageImage as GiftedChatMessageImage,
+  MessageText as GiftedChatMessageText,
 } from "react-native-gifted-chat";
 import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
 
@@ -408,6 +409,13 @@ export default function ChatComponent({
             )}
           />
         )}
+        parsePatterns={(linkStyle) => [
+          {
+            type: "url",
+            style: { ...linkStyle, textDecorationLine: "underline" },
+            onPress: (url: string) => Linking.openURL(url),
+          },
+        ]}
         renderFooter={() => <TypingIndicator isTyping={isTyping} />}
       />
     </ImageBackground>
@@ -476,21 +484,24 @@ const SystemMessageText = (props: SystemMessageProps<IMessage>) => {
   );
 };
 
-const MessageText = (messageText: MessageTextProps<IMessage>) => {
+const MessageText = (props: MessageTextProps<IMessage>) => {
   return (
-    <View style={styles.messageTextWrapper}>
-      <Text
-        {...messageText}
-        style={[
-          styles.messageText,
-          {
-            color: messageText.position === "left" ? Colors.textDark : "#fff",
-          },
-        ]}
-      >
-        {messageText.currentMessage?.text}
-      </Text>
-    </View>
+    <GiftedChatMessageText
+      {...props}
+      textProps={{ maxFontSizeMultiplier: 1.3 }}
+      linkStyle={{
+        right: {
+          color: "#fff",
+        },
+        left: {
+          color: Colors.primary,
+        },
+      }}
+      textStyle={{
+        left: { ...styles.messageText, color: Colors.textDark },
+        right: { ...styles.messageText, color: "#fff" },
+      }}
+    />
   );
 };
 
@@ -590,9 +601,6 @@ const styles = StyleSheet.create({
   },
   video: { width: "100%", height: "100%", borderRadius: 5 },
   mediaContainer: { borderRadius: 30, padding: 5, height: 175, width: 250 },
-  messageTextWrapper: {
-    padding: 8,
-  },
   messageText: {
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 16,

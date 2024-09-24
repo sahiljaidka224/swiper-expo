@@ -11,7 +11,7 @@ import { useGetConversations } from "@/hooks/cometchat/conversations";
 import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
 import ErrorView from "@/components/Error";
 import { router, Stack, useFocusEffect } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Colors from "@/constants/Colors";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
@@ -24,6 +24,8 @@ import Text from "@/components/Text";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 
 import * as Notifications from "expo-notifications";
+import { useGetCometChatUsers } from "@/hooks/cometchat/users";
+import { User } from "../(chats,swiper,followed,stock,add-stock)/users-list";
 
 const transition = CurvedTransition.delay(100);
 
@@ -32,9 +34,6 @@ function useNotificationObserver(fetchConversations: () => void) {
     let isMounted = true;
 
     Notifications.getLastNotificationResponseAsync().then((response) => {
-      console.log("index.tsx: getLastNotificationResponseAsync", {
-        response: response?.notification.request,
-      });
       if (!isMounted || !response?.notification) {
         return;
       }
@@ -42,9 +41,6 @@ function useNotificationObserver(fetchConversations: () => void) {
     });
 
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log("index.tsx: addNotificationResponseReceivedListener", {
-        response: response.notification.request,
-      });
       fetchConversations();
     });
 
@@ -55,8 +51,10 @@ function useNotificationObserver(fetchConversations: () => void) {
   }, []);
 }
 export default function Chats() {
+  const { users } = useGetCometChatUsers();
   const { conversationList, error, loading, fetchConversations } = useGetConversations();
   const { markAsRead } = useMarkMessageAsRead();
+  const [searchText, setSearchText] = useState<string | null>(null);
   useNotificationObserver(fetchConversations);
 
   const groups = conversationList.filter((c) => {
@@ -73,6 +71,50 @@ export default function Chats() {
       return () => {};
     }, [])
   );
+
+  const filteredUserConversations = userConversations.filter((c) => {
+    const conversationWith = c.getConversationWith();
+    if (!searchText) return true;
+
+    if (conversationWith instanceof CometChat.User) {
+      const user = conversationWith as CometChat.User;
+
+      const searchLower = searchText.toLowerCase().trimEnd();
+      const [firstName, lastName] = user.getName().toLowerCase().replace(/\s+/g, " ").split(" ");
+
+      return (
+        firstName.startsWith(searchLower) ||
+        lastName.startsWith(searchLower) ||
+        `${firstName} ${lastName}`.startsWith(searchLower)
+      );
+    }
+    return false;
+  });
+
+  const filteredUsers = users.filter((user) => {
+    if (!searchText) return false;
+    if (
+      filteredUserConversations.some((c) => {
+        const conversationWith = c.getConversationWith();
+        if (conversationWith instanceof CometChat.User) {
+          return conversationWith.getUid() === user.getUid();
+        }
+
+        return false;
+      })
+    ) {
+      return false;
+    }
+
+    const searchLower = searchText.toLowerCase().trimEnd();
+    const [firstName, lastName] = user.getName().toLowerCase().replace(/\s+/g, " ").split(" ");
+
+    return (
+      firstName.startsWith(searchLower) ||
+      lastName.startsWith(searchLower) ||
+      `${firstName} ${lastName}`.startsWith(searchLower)
+    );
+  });
 
   const onProfilePress = () => {
     router.push("/(chats)/settings");
@@ -92,7 +134,26 @@ export default function Chats() {
         />
       );
     },
-    [userConversations]
+    [filteredUserConversations]
+  );
+
+  const renderUserItem: ListRenderItem<unknown> = useCallback(
+    ({ item }) => {
+      const onPress = () => {
+        const userUID = (item as CometChat.User).getUid();
+        router.push(`/(tabs)/(chats)/${userUID}`);
+      };
+
+      return (
+        <User
+          user={item as CometChat.User}
+          onPress={onPress}
+          selected={false}
+          multipleSelectionAllowed={false}
+        />
+      );
+    },
+    [filteredUsers]
   );
 
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
@@ -146,6 +207,18 @@ export default function Chats() {
       <Stack.Screen
         options={{
           title: "Chats",
+          headerSearchBarOptions: {
+            placeholder: "Search Users",
+            onChangeText: (e) => {
+              setSearchText(e.nativeEvent.text);
+            },
+            onCancelButtonPress: () => {
+              setSearchText(null);
+            },
+            onSearchButtonPress: (e) => {
+              setSearchText(e.nativeEvent.text);
+            },
+          },
           headerLeft: () => (
             <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
@@ -157,7 +230,10 @@ export default function Chats() {
             </View>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={() => router.push("/(tabs)/(chats)/users-list")}>
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/(chats)/users-list")}
+              style={{ flexDirection: "row" }}
+            >
               <FontAwesome5 name="user-friends" size={24} color={Colors.primary} />
             </TouchableOpacity>
           ),
@@ -213,7 +289,7 @@ export default function Chats() {
           contentInsetAdjustmentBehavior="automatic"
           skipEnteringExitingAnimations
           scrollEnabled={false}
-          data={userConversations}
+          data={filteredUserConversations}
           refreshing={loading}
           itemLayoutAnimation={transition}
           keyExtractor={(item: unknown) => {
@@ -223,6 +299,21 @@ export default function Chats() {
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={ItemSeparator}
           renderItem={renderItem}
+        />
+        <Animated.FlatList
+          contentInsetAdjustmentBehavior="automatic"
+          skipEnteringExitingAnimations
+          scrollEnabled={false}
+          data={filteredUsers}
+          refreshing={loading}
+          itemLayoutAnimation={transition}
+          keyExtractor={(item: unknown) => {
+            const user = item as CometChat.User;
+            return user.getUid();
+          }}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={renderUserItem}
         />
       </Animated.View>
     </ScrollView>

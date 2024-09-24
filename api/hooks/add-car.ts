@@ -46,7 +46,7 @@ const uploadFilesToStock = async (
 
 export function useSaveToStock() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/save_to_stock",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/save_to_stock`,
     // "http://localhost:9091/car/save_to_stock",
 
     saveToStock
@@ -62,7 +62,7 @@ export function useSaveToStock() {
 
 export function useUploadFilesToStock() {
   const { trigger, data, error, isMutating } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/save_files_to_stock",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/save_files_to_stock`,
     // "http://localhost:9091/car/save_files_to_stock",
     uploadFilesToStock
   );

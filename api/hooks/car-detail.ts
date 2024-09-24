@@ -45,7 +45,7 @@ const getCarDetailsFromNedVis = async (url: string, { arg }: { arg: { token: str
 
 export function useGetCarDetails(carId: string) {
   const { token } = useAuth();
-  const fetchUrl = `https://backend-swiper.datalinks.nl/car/${carId}`;
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/${carId}`;
   const { data, error, isLoading } = useSWR(
     carId && token ? [fetchUrl, token] : null,
     ([url, token]) => getCarDetails(url, { arg: { token } })
@@ -62,7 +62,7 @@ export const useCarDetailsFromNedVis = () => {
   const { token } = useAuth();
   const [state, setState] = useState<{ rego: string; state: string }>();
   const fetchUrl = state
-    ? `https://backend-swiper.datalinks.nl/offers/cardetailsnedvis/${state.rego}/${state.state}`
+    ? `${process.env.EXPO_PUBLIC_API_BASE_URL}/offers/cardetailsnedvis/${state.rego}/${state.state}`
     : "";
 
   const { data, error, isLoading } = useSWR(

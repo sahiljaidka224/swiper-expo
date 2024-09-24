@@ -22,21 +22,21 @@
   - watchlist page
   - listing page
 
-- extract URL into env variable and update eas
-
 - watch from stock page ✅
 
-
-
-- pinch and enlarge
-- search bar on chat screen
-
-
-
-
-
+Before launch:
 - analytics
-- search page
-- plus icon on users list
+
+- update comet chat credentials
+- update env variables
+- update screenshots
+- extract URL into env variable and update eas ✅
+- make sure new comet chat is working
+- url clickability ✅
+
+todo:
+- search page on chat screen ✅
+- search page on stock screen
 - font scaling issues
-- swipe left right design
+- pinch and enlarge
+- plus icon on users list

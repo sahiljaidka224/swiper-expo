@@ -87,7 +87,7 @@ export function useGetWatchlist(
   const [page, setPage] = useState(initialPage);
   const [cars, setCars] = useState<any[]>([]);
 
-  let fetchUrl = `https://backend-swiper.datalinks.nl/car/${context}?from=${
+  let fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/${context}?from=${
     (page - 1) * limit
   }&limit=${limit}&order_by=${orderBy}&order_direction=${orderDirection}`;
 
@@ -142,7 +142,7 @@ export function useGetOrgCars(
   const [page, setPage] = useState(initialPage);
   const [cars, setCars] = useState<any[]>([]);
 
-  let fetchUrl = `https://backend-swiper.datalinks.nl/car/${context}?from=${
+  let fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/${context}?from=${
     (page - 1) * limit
   }&limit=${limit}&order_by=${orderBy}&order_direction=${orderDirection}`;
 
@@ -187,7 +187,7 @@ export function useGetOrgCars(
 
 export function useRemoveCarFromWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/`,
     removeCarFromWatchlist
   );
 
@@ -201,7 +201,7 @@ export function useRemoveCarFromWatchlist() {
 
 export function useRemoveCarFromStock() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/`,
     removeCarFromStock
   );
 
@@ -215,7 +215,7 @@ export function useRemoveCarFromStock() {
 
 export function useAddCarToWatchlist() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/`,
     addCarToWatchlist
   );
 
@@ -229,7 +229,7 @@ export function useAddCarToWatchlist() {
 
 export function useMarkCarAsSeen() {
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "https://backend-swiper.datalinks.nl/car/",
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/`,
     markCarAsSeen
   );
 

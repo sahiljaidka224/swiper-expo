@@ -19,7 +19,7 @@ export function useGetSwiperCars(initialPage: number = 1, limit: number = 5) {
   const [page, setPage] = useState(initialPage);
   const from = page * limit;
 
-  const fetchUrl = `https://backend-swiper.datalinks.nl/car/swiper?count=false&noOrganisationId=${
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/swiper?count=false&noOrganisationId=${
     user?.org?.id
   }&includeSeen=false${from > 5 ? `&from=${from}` : ""}`;
   const { data, error, isLoading, mutate, isValidating } = useSWR(
