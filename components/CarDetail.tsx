@@ -115,7 +115,11 @@ function CarDetail({ car, context }: CarDetailProps) {
     createGroup(group, members);
   };
 
-  const ifFollowAllowed = context && !context?.includes("(stock)") && !context?.includes("(chats)");
+  const ifFollowAllowed =
+    context &&
+    !context?.includes("(stock)") &&
+    !context?.includes("(chats)") &&
+    !context?.includes("(swiper)");
 
   return (
     <View style={styles.detailsContainer}>
