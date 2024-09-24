@@ -14,6 +14,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@clerk/clerk-expo": "^1.2.1",
     "@cometchat/chat-sdk-react-native": "^4.0.9",
     "@cometchat/chat-uikit-react-native": "^4.3.13",
     "@expo/react-native-action-sheet": "^4.1.0",

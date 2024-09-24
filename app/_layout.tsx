@@ -94,6 +94,10 @@ function BaseLayout() {
         name="otp"
         options={{ headerTitle: "Enter Your Phone Number", headerBackVisible: false }}
       />
+      <Stack.Screen
+        name="verify/[phone]"
+        options={{ headerTitle: "Verify Your Phone Number", headerBackTitle: "Edit Number" }}
+      />
       <Stack.Screen name="profile" options={{ title: "Your Details", headerBackVisible: false }} />
 
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

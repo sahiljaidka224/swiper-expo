@@ -1,150 +1,151 @@
-// import Colors from "@/constants/Colors";
-// import { Stack, useLocalSearchParams } from "expo-router";
-// import { useEffect, useState } from "react";
-// import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import Colors from "@/constants/Colors";
+import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 
-// import {
-//   CodeField,
-//   Cursor,
-//   useBlurOnFulfill,
-//   useClearByFocusCell,
-// } from "react-native-confirmation-code-field";
-// import Text from "@/components/Text";
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from "react-native-confirmation-code-field";
+import Text from "@/components/Text";
 
-// const CELL_COUNT = 6;
-// export default function PhonePage() {
-//   const { phone, signin } = useLocalSearchParams<{ phone: string; signin: string }>();
-//   const [code, setCode] = useState("");
+const CELL_COUNT = 6;
+export default function PhonePage() {
+  const { phone, signin } = useLocalSearchParams<{ phone: string; signin: string }>();
+  const [code, setCode] = useState("");
 
-//   const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
-//   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-//     value: code,
-//     setValue: setCode,
-//   });
-//   const { signUp, setActive } = useSignUp();
-//   const { signIn } = useSignIn();
+  const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value: code,
+    setValue: setCode,
+  });
+  const { signUp, setActive } = useSignUp();
+  const { signIn } = useSignIn();
 
-//   useEffect(() => {
-//     if (code.length !== 6) return;
+  useEffect(() => {
+    if (code.length !== 6) return;
 
-//     if (signin === "true") {
-//       verifySignIn();
-//       return;
-//     }
+    if (signin === "true") {
+      verifySignIn();
+      return;
+    }
 
-//     verifyCode();
-//   }, [code]);
+    verifyCode();
+  }, [code]);
 
-//   const verifySignIn = async () => {
-//     try {
-//       await signIn!.attemptFirstFactor({
-//         strategy: "phone_code",
-//         code,
-//       });
+  const verifySignIn = async () => {
+    try {
+      await signIn!.attemptFirstFactor({
+        strategy: "phone_code",
+        code,
+      });
 
-//       await setActive!({ session: signIn!.createdSessionId });
-//     } catch (err) {
-//       if (isClerkAPIResponseError(err)) {
-//         Alert.alert("Error", err.errors[0].message);
-//       }
-//     }
-//   };
+      await setActive!({ session: signIn!.createdSessionId });
+    } catch (err) {
+      if (isClerkAPIResponseError(err)) {
+        Alert.alert("Error", err.errors[0].message);
+      }
+    }
+  };
 
-//   const verifyCode = async () => {
-//     try {
-//       await signUp?.attemptPhoneNumberVerification({ code });
-//       await setActive!({ session: signUp?.createdSessionId });
-//     } catch (err) {
-//       if (isClerkAPIResponseError(err)) {
-//         Alert.alert("Error", err.errors[0].message);
-//       }
-//     }
-//   };
+  const verifyCode = async () => {
+    try {
+      await signUp?.attemptPhoneNumberVerification({ code });
+      await setActive!({ session: signUp?.createdSessionId });
+    } catch (err) {
+      if (isClerkAPIResponseError(err)) {
+        Alert.alert("Error", err.errors[0].message);
+      }
+    }
+  };
 
-//   const resendCode = async () => {};
+  const resendCode = async () => {};
 
-//   return (
-//     <View style={styles.container}>
-//       <Stack.Screen options={{ headerTitle: phone }} />
-//       <Text style={styles.legal}>We have sent you a SMS with a code to the number above.</Text>
-//       <Text style={styles.legal}>
-//         To complete your phone number verification, please enter the 6-digit code.
-//       </Text>
+  return (
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerTitle: phone }} />
+      <Text style={styles.legal}>We have sent you a SMS with a code to the number above.</Text>
+      <Text style={styles.legal}>
+        To complete your phone number verification, please enter the 6-digit code.
+      </Text>
 
-//       <CodeField
-//         ref={ref}
-//         {...props}
-//         value={code}
-//         onChangeText={setCode}
-//         cellCount={CELL_COUNT}
-//         rootStyle={styles.codeFieldRoot}
-//         keyboardType="number-pad"
-//         textContentType="oneTimeCode"
-//         // autoComplete={Platform.select({ android: "sms-otp", default: "one-time-code" })}
-//         testID="my-code-input"
-//         renderCell={({ index, symbol, isFocused }) => (
-//           <View
-//             key={index}
-//             style={[styles.cellRoot, isFocused && styles.focusCell]}
-//             onLayout={getCellOnLayoutHandler(index)}
-//           >
-//             <Text style={styles.cellText}>{symbol || (isFocused ? <Cursor /> : null)}</Text>
-//           </View>
-//         )}
-//       />
+      <CodeField
+        ref={ref}
+        {...props}
+        value={code}
+        onChangeText={setCode}
+        cellCount={CELL_COUNT}
+        rootStyle={styles.codeFieldRoot}
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        // autoComplete={Platform.select({ android: "sms-otp", default: "one-time-code" })}
+        testID="my-code-input"
+        renderCell={({ index, symbol, isFocused }) => (
+          <View
+            key={index}
+            style={[styles.cellRoot, isFocused && styles.focusCell]}
+            onLayout={getCellOnLayoutHandler(index)}
+          >
+            <Text style={styles.cellText}>{symbol || (isFocused ? <Cursor /> : null)}</Text>
+          </View>
+        )}
+      />
 
-//       <TouchableOpacity style={styles.button} onPress={resendCode}>
-//         <Text style={styles.buttonText}>Didn't receive a verification code?</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
+      <TouchableOpacity style={styles.button} onPress={resendCode}>
+        <Text style={styles.buttonText}>Didn't receive a verification code?</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     padding: 20,
-//     backgroundColor: Colors.background,
-//     gap: 20,
-//   },
-//   legal: {
-//     fontSize: 12,
-//     textAlign: "center",
-//     color: "#000",
-//   },
-//   button: {
-//     width: "100%",
-//     alignItems: "center",
-//   },
-//   buttonText: {
-//     color: Colors.primary,
-//     fontSize: 18,
-//   },
-//   codeFieldRoot: {
-//     marginTop: 20,
-//     width: 260,
-//     marginLeft: "auto",
-//     marginRight: "auto",
-//     gap: 6,
-//   },
-//   cellRoot: {
-//     width: 40,
-//     height: 40,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     borderBottomColor: "#ccc",
-//     borderBottomWidth: 1,
-//   },
-//   cellText: {
-//     color: "#000",
-//     fontSize: 36,
-//     textAlign: "center",
-//     fontWeight: 400,
-//   },
-//   focusCell: {
-//     borderColor: "#000",
-//     paddingBottom: 4,
-//     borderBottomWidth: 2,
-//   },
-// });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: Colors.background,
+    gap: 20,
+  },
+  legal: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#000",
+  },
+  button: {
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: Colors.primary,
+    fontSize: 18,
+  },
+  codeFieldRoot: {
+    marginTop: 20,
+    width: 260,
+    marginLeft: "auto",
+    marginRight: "auto",
+    gap: 6,
+  },
+  cellRoot: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 1,
+  },
+  cellText: {
+    color: "#000",
+    fontSize: 36,
+    textAlign: "center",
+    fontWeight: 400,
+  },
+  focusCell: {
+    borderColor: "#000",
+    paddingBottom: 4,
+    borderBottomWidth: 2,
+  },
+});
