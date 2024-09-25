@@ -1,102 +1,94 @@
-import Colors from "@/constants/Colors";
-import { Video, ResizeMode } from "expo-av";
-import React, { useCallback, useRef, useState } from "react";
-import { Dimensions, View, FlatList, StyleSheet, ViewToken } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, StyleSheet, FlatList, Dimensions, TouchableWithoutFeedback } from "react-native";
+import { ResizeMode, Video } from "expo-av";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { height } = Dimensions.get("screen");
-
-const data = [
-  "https://videos.pexels.com/video-files/6873503/6873503-uhd_1440_2560_25fps.mp4",
-  "https://videos.pexels.com/video-files/3066463/3066463-uhd_2732_1440_24fps.mp4",
-  "https://videos.pexels.com/video-files/6872087/6872087-uhd_1440_2560_25fps.mp4",
-  "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
+const videos = [
+  { id: "1", uri: "https://videos.pexels.com/video-files/6873503/6873503-uhd_1440_2560_25fps.mp4" },
+  { id: "2", uri: "https://videos.pexels.com/video-files/3066463/3066463-uhd_2732_1440_24fps.mp4" },
+  { id: "3", uri: "https://videos.pexels.com/video-files/6872087/6872087-uhd_1440_2560_25fps.mp4" },
+  { id: "4", uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4" },
 ];
 
-export default function FeedVideos({ top, bottom }: { top: number; bottom: number }) {
+const FullScreenVideoList = () => {
+  const { top, bottom } = useSafeAreaInsets();
   const [visibleIndex, setVisibleIndex] = useState(0);
 
-  const onHandleViewableItemsChanged = useCallback(({ changed }: { changed: Array<ViewToken> }) => {
-    const newVisibleIndex = changed.find((item) => item.isViewable)?.index;
-    if (typeof newVisibleIndex === "number") {
-      setVisibleIndex(newVisibleIndex);
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: any[] }) => {
+    if (viewableItems.length > 0) {
+      setVisibleIndex(viewableItems[0].index);
     }
   }, []);
 
+  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.background,
-        marginTop: 5,
-      }}
-    >
+    <View style={{ marginTop: 10 }}>
       <FlatList
-        style={{ flexGrow: 0, backgroundColor: Colors.background }}
-        data={data}
-        keyExtractor={(item, index) => String(index)}
+        data={videos}
         renderItem={({ item, index }) => (
-          <VideoPlayer item={{ uri: item, top, bottom, isPlaying: visibleIndex === index }} />
+          <Post post={{ ...item, isPlaying: visibleIndex === index }} />
         )}
-        pagingEnabled
         showsVerticalScrollIndicator={false}
-        getItemLayout={(_, index) => {
-          const ITEM_HEIGHT = height - top - bottom - 135;
-          return {
-            length: ITEM_HEIGHT,
-            offset: ITEM_HEIGHT * index,
-            index,
-          };
-        }}
-        onViewableItemsChanged={onHandleViewableItemsChanged}
-        onEndReachedThreshold={0.5}
+        snapToInterval={Dimensions.get("window").height - 130}
+        snapToAlignment={"start"}
+        decelerationRate={"fast"}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
       />
     </View>
   );
-}
+};
 
-function VideoPlayer({
-  item,
-}: {
-  item: { uri: string; top: number; bottom: number; isPlaying: boolean };
-}) {
-  const { uri, top, bottom, isPlaying } = item;
-  const video = useRef(null);
+const Post = (props: { post: { uri: string; id: string; isPlaying: boolean } }) => {
+  const [isPlaying, setPlaying] = useState(props.post.isPlaying);
+
+  const onPlayPausePress = () => {
+    setPlaying(!isPlaying);
+  };
+
+  useEffect(() => {
+    setPlaying(props.post.isPlaying);
+  }, [props.post.isPlaying]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.background,
-        justifyContent: "center",
-        height: height - top - bottom - 135,
-      }}
-    >
-      <Video
-        ref={video}
-        style={styles.video}
-        source={{
-          uri,
-        }}
-        useNativeControls={false}
-        shouldPlay={isPlaying}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-      />
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={onPlayPausePress}>
+        <View>
+          <Video
+            source={{ uri: props.post.uri }}
+            style={styles.video}
+            onError={(e) => console.log(e)}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay={isPlaying}
+            isLooping
+            useNativeControls={false}
+          />
+
+          <View style={styles.uiContainer}></View>
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  video: {
-    alignSelf: "stretch",
-    flex: 1,
+  container: {
+    width: "100%",
+    height: Dimensions.get("window").height - 130,
   },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+
+  video: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+  uiContainer: {
+    height: "100%",
+    justifyContent: "flex-end",
   },
 });
+
+export default FullScreenVideoList;

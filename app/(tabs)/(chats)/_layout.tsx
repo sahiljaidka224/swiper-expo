@@ -56,7 +56,7 @@ export default function ChatsLayout() {
         <Stack.Screen
           name="feed"
           options={{
-            title: "Car News",
+            title: "Media",
             headerStyle: { backgroundColor: Colors.background },
           }}
         />

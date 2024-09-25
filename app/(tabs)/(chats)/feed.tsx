@@ -136,7 +136,7 @@ const AutomotiveRSSFeed: React.FC = () => {
   }, []);
 
   const handleReadMore = (url: string) => {
-    router.push({ pathname: "(chats)/feed-readmore", params: { uri: url } });
+    router.push({ pathname: "/(chats)/feed-readmore", params: { uri: url } });
   };
 
   return (
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     paddingHorizontal: 10,
     justifyContent: "center",
+    gap: 10,
   },
   button: {
     backgroundColor: Colors.primaryLight,
