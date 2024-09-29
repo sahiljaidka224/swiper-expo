@@ -130,6 +130,8 @@ export default function AddStockPage() {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <AddStockImages selectedImages={selectedImages} setSelectedImages={setSelectedImages} />
 
