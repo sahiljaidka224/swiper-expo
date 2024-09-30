@@ -47,7 +47,7 @@ async function registerForPushNotificationsAsync() {
   }
 }
 
-export async function cometChatInit(userId: string) {
+export async function cometChatInit(userId: string, userName: string | null = null) {
   let appSetting = new CometChat.AppSettingsBuilder()
     .subscribePresenceForAllUsers()
     .setRegion(process.env.EXPO_PUBLIC_COMET_CHAT_APP_REGION ?? "")
@@ -86,6 +86,11 @@ export async function cometChatInit(userId: string) {
       }
     } catch (loginError) {
       console.log("Login failed with exception:", { loginError });
+      if (userName && (loginError as any).code === "ERR_UID_NOT_FOUND") {
+        return createCometChatUser(userId, userName);
+      } else {
+        console.log("Failed to create user as no name provided");
+      }
       return false;
     }
   } catch (error) {
@@ -96,23 +101,30 @@ export async function cometChatInit(userId: string) {
 
 // TODO: Move to backend
 export async function createCometChatUser(uid: string, name: string) {
-  const user = new CometChat.User(uid);
-  user.setName(name);
   try {
-    const newUser = await CometChat.createUser(user, process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY!);
-    if (newUser) {
-      const newUserUID = newUser.getUid();
-      await cometChatInit(newUserUID);
+    const user = new CometChat.User(uid);
+    user.setName(name);
+    try {
+      const newUser = await CometChat.createUser(
+        user,
+        process.env.EXPO_PUBLIC_COMET_CHAT_AUTH_KEY!
+      );
+      if (newUser) {
+        const newUserUID = newUser.getUid();
+        await cometChatInit(newUserUID);
 
-      const messages = [
-        `Hello ${name}, Welcome to swiper messaging app... we hope its a great experience for you!`,
-        "Have a look around the app. There are loads of great features and if you have any questions at all, you can always message us here.",
-        "Find your phone and Swiper contacts via the search on the Chat page. \n \nGet chatting, create opportunities and buy and sell some cars!!",
-      ];
-      for (const message of messages) {
-        await sendBotMessage(newUserUID, message);
+        const messages = [
+          `Hello ${name}, Welcome to swiper messaging app... we hope its a great experience for you!`,
+          "Have a look around the app. There are loads of great features and if you have any questions at all, you can always message us here.",
+          "Find your phone and Swiper contacts via the search on the Chat page. \n \nGet chatting, create opportunities and buy and sell some cars!!",
+        ];
+        for (const message of messages) {
+          await sendBotMessage(newUserUID, message);
+        }
+        return true;
       }
-      return true;
+    } catch (error) {
+      console.log("Error while creating USER in CometChat", error);
     }
   } catch (error) {
     console.log("Create user failed with error:", error);

@@ -23,7 +23,7 @@ import * as Linking from "expo-linking";
 import * as FileSystem from "expo-file-system";
 import ErrorView from "@/components/Error";
 import { router, Stack } from "expo-router";
-import { createCometChatUser } from "@/hooks/cometchat";
+import { cometChatInit } from "@/hooks/cometchat";
 import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
 import { showToast } from "./Toast";
@@ -99,7 +99,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
       if (context === "create") {
         (async () => {
           try {
-            const isSignupSuccess = await createCometChatUser(
+            const isSignupSuccess = await cometChatInit(
               user.id,
               `${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
             );
@@ -259,16 +259,18 @@ export default function ProfileComponent({ context }: ProfileProps) {
       behavior="padding"
     >
       <Stack.Screen
-        options={{
-          headerRight: () => {
-            if (context === "update")
-              return (
-                <Pressable onPress={onLogout}>
-                  <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
-                </Pressable>
-              );
-          },
-        }}
+        options={
+          {
+            // headerRight: () => {
+            //   if (context === "update")
+            //     return (
+            //       <Pressable onPress={onLogout}>
+            //         <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
+            //       </Pressable>
+            //     );
+            // },
+          }
+        }
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View style={{ alignItems: "center", marginTop: 10, gap: 10 }}>

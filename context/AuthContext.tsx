@@ -57,11 +57,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setToken(null);
     setUserInfo(null);
-
-    await CometChat.logout().catch(() => null);
     await messaging().deleteToken();
     await SecureStore.deleteItemAsync("authToken");
     await SecureStore.deleteItemAsync("user");
+    await CometChat.logout().catch((e) => console.log("Error while logging out", e));
   };
 
   const updateUser = async (user: CurrentUser) => {

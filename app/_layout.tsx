@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useSegments, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -30,8 +30,11 @@ if (__DEV__) {
   require("../ReactotronConfig");
 }
 
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: "index",
+};
 function BaseLayout() {
-  const router = useRouter();
   const segments = useSegments();
   const { isAuthLoading, user, token } = useAuth();
 
@@ -70,7 +73,7 @@ function BaseLayout() {
     if (token && !inTabsGroup && user) {
       (async () => {
         if (user?.profileComplete) {
-          const isSuccess = await cometChatInit(user?.id);
+          const isSuccess = await cometChatInit(user?.id, user?.name);
           if (isSuccess) {
             router.replace("/(tabs)/(chats)");
           }

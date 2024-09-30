@@ -506,6 +506,7 @@ export const useTypingIndicator = () => {
 };
 
 export const useGetUnreadMessages = () => {
+  const { logout } = useAuth();
   const { setUnreadCount } = useMessageContext();
 
   const getUnreadMessages = async () => {
@@ -525,6 +526,10 @@ export const useGetUnreadMessages = () => {
       setUnreadCount(totalCount);
     } catch (error) {
       console.log("Error fetching unread messages:", error);
+      if ((error as any).code === "USER_NOT_LOGED_IN") {
+        showToast("Session expired", "Please login again", "error");
+        logout();
+      }
     }
   };
 

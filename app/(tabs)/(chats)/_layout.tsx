@@ -2,10 +2,9 @@ import { useGetUserDetails, useGetUserOrgDetails } from "@/api/hooks/user";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import AntDesign from "@expo/vector-icons/build/AntDesign";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { useEffect } from "react";
-import { Alert, Pressable } from "react-native";
+import { Alert } from "react-native";
 
 export default function ChatsLayout() {
   const { user: currentUser, logout, updateUser } = useAuth();
