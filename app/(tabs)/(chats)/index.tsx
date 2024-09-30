@@ -52,21 +52,27 @@ function useNotificationObserver(fetchConversations: () => void) {
 }
 export default function Chats() {
   const { users } = useGetCometChatUsers();
-  const { conversationList, error, loading, fetchConversations } = useGetConversations();
+  const {
+    conversationList: userConversations,
+    error,
+    loading,
+    fetchConversations,
+  } = useGetConversations("user");
+  const { conversationList: groupConversationList, fetchConversations: fetchGroupConversations } =
+    useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   const [searchText, setSearchText] = useState<string | null>(null);
   useNotificationObserver(fetchConversations);
 
-  const groups = conversationList.filter((c) => {
+  const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();
-    return unreadCount > 0 && c.getConversationType() === "group";
+    return unreadCount > 0;
   });
-
-  const userConversations = conversationList.filter((c) => c.getConversationType() === "user");
 
   useFocusEffect(
     useCallback(() => {
       fetchConversations();
+      fetchGroupConversations();
 
       return () => {};
     }, [])

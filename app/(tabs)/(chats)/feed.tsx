@@ -10,10 +10,11 @@ import {
 } from "react-native";
 import axios from "axios";
 import xml2js from "xml2js";
-import { SafeAreaView, SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import FeedVideos from "@/components/FeedVideos";
+import { SegmentedControl } from "@/components/SegmentedControl";
 
 // Type declarations
 interface FeedItem {
@@ -125,8 +126,7 @@ const fetchRSSFeed = async (
 const AutomotiveRSSFeed: React.FC = () => {
   const [feedData, setFeedData] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedTab, setSelectedTab] = useState<string>("News");
-  const { top, bottom } = useSafeAreaInsets();
+  const [mode, setMode] = useState<string>("Videos");
 
   useEffect(() => {
     setFeedData([]);
@@ -143,33 +143,18 @@ const AutomotiveRSSFeed: React.FC = () => {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, selectedTab === "News" && styles.selectedButton]}
-              onPress={() => {
-                setSelectedTab("News");
-              }}
-            >
-              <Text
-                style={[styles.buttonText, selectedTab === "News" && styles.selectedButtonText]}
-              >
-                News
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, selectedTab === "Videos" && styles.selectedButton]}
-              onPress={() => {
-                setSelectedTab("Videos");
-              }}
-            >
-              <Text
-                style={[styles.buttonText, selectedTab === "Videos" && styles.selectedButtonText]}
-              >
-                Videos
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {selectedTab === "News" ? (
+          <Stack.Screen
+            options={{
+              headerTitle: () => (
+                <SegmentedControl
+                  options={["Videos", "News"]}
+                  selectedOption={mode}
+                  onOptionPress={setMode}
+                />
+              ),
+            }}
+          />
+          {mode === "News" ? (
             <ScrollView contentContainerStyle={styles.feedContainer}>
               {loading ? (
                 <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
@@ -203,9 +188,7 @@ const AutomotiveRSSFeed: React.FC = () => {
               )}
             </ScrollView>
           ) : (
-            <>
-              <FeedVideos top={top} bottom={bottom} />
-            </>
+            <FeedVideos />
           )}
         </>
       </SafeAreaView>
@@ -217,31 +200,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 10,
-    backgroundColor: Colors.background,
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    gap: 10,
-  },
-  button: {
-    backgroundColor: Colors.primaryLight,
-    padding: 10,
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  buttonText: {
-    color: Colors.textPrimary,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  selectedButton: {
-    backgroundColor: Colors.primary,
-  },
-  selectedButtonText: {
-    color: Colors.textPrimary,
   },
   title: {
     fontSize: 24,

@@ -6,7 +6,7 @@ import { showToast } from "@/components/Toast";
 import { usePathname } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 
-export const useGetConversations = () => {
+export const useGetConversations = (type: "user" | "group" = "user") => {
   const { getUnreadMessages } = useGetUnreadMessages();
   const { user: currentUser } = useAuth();
   const pathname = usePathname();
@@ -16,7 +16,10 @@ export const useGetConversations = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchConversations = async () => {
-    const conversationsRequest = new CometChat.ConversationsRequestBuilder().setLimit(50).build();
+    const conversationsRequest = new CometChat.ConversationsRequestBuilder()
+      .setConversationType(type)
+      .setLimit(50)
+      .build();
 
     try {
       const conversations = await conversationsRequest.fetchNext();
