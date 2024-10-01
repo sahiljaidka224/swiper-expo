@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { ResizeMode, Video } from "expo-av";
+import Colors from "@/constants/Colors";
 
 const videos = [
   {
@@ -116,13 +117,14 @@ const Post = (props: {
   post: { uri: string; id: string; isPlaying: boolean; isLoading: boolean };
 }) => {
   const [isPlaying, setPlaying] = useState(props.post.isPlaying);
-  const [loading, setLoading] = useState(props.post.isLoading);
+  const [loading, setLoading] = useState(true);
 
   const onPlayPausePress = () => {
     setPlaying(!isPlaying);
   };
 
   useEffect(() => {
+    setLoading(true);
     setPlaying(props.post.isPlaying);
   }, [props.post.isPlaying]);
 
@@ -130,9 +132,13 @@ const Post = (props: {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={onPlayPausePress}>
         <View>
-          {loading && (
-            <ActivityIndicator size="large" color="white" style={{ position: "absolute" }} />
-          )}
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color={Colors.primary}
+              style={{ position: "absolute", top: 0, zIndex: 2, left: 0, right: 0 }}
+            />
+          ) : null}
           <Video
             source={{ uri: props.post.uri }}
             style={styles.video}

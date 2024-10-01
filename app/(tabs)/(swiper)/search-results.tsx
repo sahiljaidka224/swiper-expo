@@ -95,7 +95,7 @@ function CarsListOrgs({
   useEffect(() => {
     if (group && !isGroupLoading) {
       const guid = group.getGuid();
-      router.push({ pathname: "/(tabs)/(followed)/new-chat/[id]", params: { id: guid } });
+      router.push({ pathname: "/(tabs)/(swiper)/new-chat/[id]", params: { id: guid } });
     }
   }, [isGroupLoading, group]);
 
@@ -109,7 +109,7 @@ function CarsListOrgs({
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       const onSendToPhoneContacts = () => {
-        router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${item?.carId}` });
+        router.push({ pathname: `/(tabs)/(swiper)/users-list?carId=${item?.carId}` });
       };
 
       const onMessagePress = () => {
@@ -157,7 +157,7 @@ function CarsListOrgs({
           exiting={FadeOutUp}
         >
           <CarOverview car={item} context={context} />
-          {item?.organisationId === user?.org?.id ? (
+          {/* {item?.organisationId === user?.org?.id ? (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
           ) : (
             <WatchlistButtonsContainer
@@ -165,7 +165,7 @@ function CarsListOrgs({
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
             />
-          )}
+          )} */}
         </Animated.View>
       );
     },

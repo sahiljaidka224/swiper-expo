@@ -100,7 +100,7 @@ export default function ManualSearch() {
   const renderItemCars = useCallback(
     ({ item, index }: { item: any; index: number }) => {
       const onSendToPhoneContacts = () => {
-        router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${item?.carId}` });
+        router.push({ pathname: `/(tabs)/(swiper)/users-list?carId=${item?.carId}` });
       };
 
       const onMessagePress = () => {
@@ -148,7 +148,7 @@ export default function ManualSearch() {
           exiting={FadeOutUp}
         >
           <CarOverview car={item} context={"swiper"} />
-          {item?.organisationId === user?.org?.id ? (
+          {/* {item?.organisationId === user?.org?.id ? (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
           ) : (
             <WatchlistButtonsContainer
@@ -156,7 +156,7 @@ export default function ManualSearch() {
               onMessage={onMessagePress}
               phoneNumber={item?.organisation?.phoneNumber}
             />
-          )}
+          )} */}
         </Animated.View>
       );
     },
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    padding: 15,
+    paddingVertical: 15,
   },
   leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
   avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },

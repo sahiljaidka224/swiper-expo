@@ -531,10 +531,9 @@ const MessageImage = (props: MessageImageProps<IMessage>) => {
           {...props}
           imageProps={{
             resizeMode: "cover",
-
             loadingIndicatorSource: { uri: props.currentMessage?.image },
           }}
-          imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 5 }]}
+          imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 15 }]}
         />
       </View>
     </>
@@ -600,7 +599,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   video: { width: "100%", height: "100%", borderRadius: 5 },
-  mediaContainer: { borderRadius: 30, padding: 5, height: 175, width: 250 },
+  mediaContainer: { borderRadius: 30, padding: 1, height: 225, width: 275 },
   messageText: {
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 16,
