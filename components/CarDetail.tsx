@@ -97,7 +97,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       icon,
     };
 
-    const tags = [owner, car?.organisation?.ownerUserId];
+    const tags = [owner, car?.organisation?.ownerUserId, car?.carId];
 
     const group = new CometChat.Group(
       GUID,

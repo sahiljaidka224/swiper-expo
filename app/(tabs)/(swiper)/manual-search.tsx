@@ -123,7 +123,7 @@ export default function ManualSearch() {
           odometer: item?.odometer,
           icon,
         };
-        const tags = [owner, item?.organisation?.ownerUserId];
+        const tags = [owner, item?.organisation?.ownerUserId, item?.carId];
 
         const group = new CometChat.Group(
           GUID,

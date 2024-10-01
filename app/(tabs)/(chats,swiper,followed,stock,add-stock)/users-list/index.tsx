@@ -180,7 +180,7 @@ export default function UsersListPage() {
       const GUID = String(`${userUID}_${car?.carId}_${currentUser?.id}`).slice(0, 100);
 
       const members = [owner, userUID];
-      const tags = [userUID, currentUser?.id];
+      const tags = [userUID, currentUser?.id, car?.carId];
 
       const group = new CometChat.Group(
         GUID,
