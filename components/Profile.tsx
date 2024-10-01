@@ -259,18 +259,16 @@ export default function ProfileComponent({ context }: ProfileProps) {
       behavior="padding"
     >
       <Stack.Screen
-        options={
-          {
-            // headerRight: () => {
-            //   if (context === "update")
-            //     return (
-            //       <Pressable onPress={onLogout}>
-            //         <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
-            //       </Pressable>
-            //     );
-            // },
-          }
-        }
+        options={{
+          headerRight: () => {
+            if (context === "update")
+              return (
+                <Pressable onPress={onLogout}>
+                  <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
+                </Pressable>
+              );
+          },
+        }}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic">
         <View style={{ alignItems: "center", marginTop: 10, gap: 10 }}>

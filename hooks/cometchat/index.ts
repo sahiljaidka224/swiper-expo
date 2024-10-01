@@ -113,14 +113,15 @@ export async function createCometChatUser(uid: string, name: string) {
         const newUserUID = newUser.getUid();
         await cometChatInit(newUserUID);
 
-        const messages = [
-          `Hello ${name}, Welcome to swiper messaging app... we hope its a great experience for you!`,
-          "Have a look around the app. There are loads of great features and if you have any questions at all, you can always message us here.",
-          "Find your phone and Swiper contacts via the search on the Chat page. \n \nGet chatting, create opportunities and buy and sell some cars!!",
-        ];
-        for (const message of messages) {
-          await sendBotMessage(newUserUID, message);
+        const splitName = name.split(" ");
+        let firstName: string = name;
+        if (splitName.length > 1) {
+          firstName = splitName[0];
         }
+
+        const message = `Hello ${firstName}, Welcome to Swiper messaging..\n\nFor a great experience invite your phone contacts.\n\nGet chatting, create opportunites and enjoy!!`;
+        await sendBotMessage(newUserUID, message);
+
         return true;
       }
     } catch (error) {

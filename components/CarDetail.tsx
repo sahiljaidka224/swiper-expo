@@ -43,7 +43,7 @@ function CarDetail({ car, context }: CarDetailProps) {
   useEffect(() => {
     if (group && !loading) {
       const guid = group.getGuid();
-      router.push({ pathname: "/(tabs)/(followed)/new-chat/[id]", params: { id: guid } });
+      router.push({ pathname: `/(tabs)/${context}/new-chat/[id]`, params: { id: guid } });
     }
   }, [loading, group]);
 
@@ -73,7 +73,7 @@ function CarDetail({ car, context }: CarDetailProps) {
   };
 
   const onSendToPhoneContacts = () => {
-    router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${car?.carId}` });
+    router.push({ pathname: `/(tabs)/${context}/users-list?carId=${car?.carId}` });
   };
 
   const onMessagePress = () => {

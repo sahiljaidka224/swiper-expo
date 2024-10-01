@@ -26,6 +26,7 @@ import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 import * as Notifications from "expo-notifications";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { User } from "../(chats,swiper,followed,stock,add-stock)/users-list";
+import NoConversations from "@/components/NoConversations";
 
 const transition = CurvedTransition.delay(100);
 
@@ -208,7 +209,10 @@ export default function Chats() {
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 20, backgroundColor: Colors.background }}
+      contentContainerStyle={{
+        paddingBottom: 20,
+        backgroundColor: Colors.background,
+      }}
     >
       <Stack.Screen
         options={{
@@ -305,6 +309,9 @@ export default function Chats() {
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={ItemSeparator}
           renderItem={renderItem}
+          ListFooterComponent={
+            filteredUserConversations.length <= 3 && !searchText ? <NoConversations /> : null
+          }
         />
         <Animated.FlatList
           contentInsetAdjustmentBehavior="automatic"
