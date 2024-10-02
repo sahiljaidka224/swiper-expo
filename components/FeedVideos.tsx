@@ -98,9 +98,7 @@ const FullScreenVideoList = () => {
       <FlatList
         data={videos}
         renderItem={({ item, index }) => (
-          <Post
-            post={{ ...item, isPlaying: visibleIndex === index, isLoading: visibleIndex === index }}
-          />
+          <Post post={{ ...item, isPlaying: visibleIndex === index }} />
         )}
         showsVerticalScrollIndicator={false}
         snapToInterval={Dimensions.get("window").height - 130}
@@ -108,19 +106,18 @@ const FullScreenVideoList = () => {
         decelerationRate={"fast"}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        keyExtractor={(item) => item.id.toString()}
       />
     </View>
   );
 };
 
-const Post = (props: {
-  post: { uri: string; id: string; isPlaying: boolean; isLoading: boolean };
-}) => {
+const Post = (props: { post: { uri: string; id: string; isPlaying: boolean } }) => {
   const [isPlaying, setPlaying] = useState(props.post.isPlaying);
   const [loading, setLoading] = useState(true);
 
   const onPlayPausePress = () => {
-    setPlaying(!isPlaying);
+    setPlaying((prev) => !prev);
   };
 
   useEffect(() => {
@@ -132,13 +129,13 @@ const Post = (props: {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={onPlayPausePress}>
         <View>
-          {loading ? (
+          {loading && (
             <ActivityIndicator
               size="large"
               color={Colors.primary}
               style={{ position: "absolute", top: 0, zIndex: 2, left: 0, right: 0 }}
             />
-          ) : null}
+          )}
           <Video
             source={{ uri: props.post.uri }}
             style={styles.video}
@@ -147,11 +144,14 @@ const Post = (props: {
             shouldPlay={isPlaying}
             isLooping
             useNativeControls={false}
-            onLoad={() => {
-              setLoading(false);
+            onLoadStart={() => setLoading(true)}
+            onLoad={() => setLoading(false)}
+            onPlaybackStatusUpdate={(status) => {
+              if (loading && status.isLoaded) {
+                setLoading(false);
+              }
             }}
           />
-
           <View style={styles.uiContainer}></View>
         </View>
       </TouchableWithoutFeedback>
