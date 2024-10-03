@@ -26,7 +26,8 @@ import {
   MessageText as GiftedChatMessageText,
 } from "react-native-gifted-chat";
 import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
-
+import { Image } from "expo-image";
+import Lightbox from "react-native-lightbox-v2";
 import dayjs from "dayjs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
@@ -514,27 +515,27 @@ const MessageImage = (props: MessageImageProps<IMessage>) => {
             "/(tabs)/(chats)/users-list?allowMultiple=true&uri=" + props.currentMessage?.image
           )
         }
-        style={{
-          position: "absolute",
-          left: props.currentMessage?.user?._id === 1 ? -40 : null,
-          right: props.currentMessage?.user?._id === 0 ? -40 : null,
-          top: "50%",
-          backgroundColor: Colors.iconGray,
-          padding: 6,
-          borderRadius: 50,
-        }}
+        style={[
+          styles.forwardContainer,
+          {
+            left: props.currentMessage?.user?._id === 1 ? -40 : null,
+            right: props.currentMessage?.user?._id === 0 ? -40 : null,
+          },
+        ]}
       >
         <FontAwesome name="mail-forward" size={14} color={Colors.background} />
       </Pressable>
       <View style={styles.mediaContainer}>
-        <GiftedChatMessageImage
-          {...props}
-          imageProps={{
-            resizeMode: "cover",
-            loadingIndicatorSource: { uri: props.currentMessage?.image },
-          }}
-          imageStyle={[props.imageStyle, { width: "98%", height: "97%", borderRadius: 15 }]}
-        />
+        {/* Doesn't work if I put it in renderItem 🤷 */}
+        <Lightbox>
+          <Image
+            allowDownscaling
+            alt="image"
+            contentFit="cover"
+            source={{ uri: props?.currentMessage?.image }}
+            style={[props.imageStyle, styles.image]}
+          />
+        </Lightbox>
       </View>
     </>
   );
@@ -599,7 +600,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   video: { width: "100%", height: "100%", borderRadius: 5 },
-  mediaContainer: { borderRadius: 30, padding: 1, height: 225, width: 275 },
+  mediaContainer: { borderRadius: 30, padding: 4, height: 225, width: 275 },
   messageText: {
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 16,
@@ -617,4 +618,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
+  forwardContainer: {
+    position: "absolute",
+
+    top: "50%",
+    backgroundColor: Colors.iconGray,
+    padding: 6,
+    borderRadius: 50,
+  },
+  image: { width: "100%", height: "97%", borderRadius: 15 },
 });
