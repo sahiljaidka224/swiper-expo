@@ -6,6 +6,9 @@ import {
   Platform,
   FlatList,
   ListRenderItem,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import {
@@ -22,7 +25,6 @@ import {
   Send,
   SystemMessageProps,
   TimeProps,
-  MessageImage as GiftedChatMessageImage,
   MessageText as GiftedChatMessageText,
 } from "react-native-gifted-chat";
 import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
@@ -54,6 +56,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { showToast } from "./Toast";
 import { useGetGroupMembers } from "@/hooks/cometchat/groups";
+import Animated from "react-native-reanimated";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const options = ["Gallery", "Camera", "Cancel"];
@@ -73,6 +76,7 @@ interface ChatComponentProps {
   group?: CometChat.Group | null;
 }
 
+const { width: WINDOW_WIDTH } = Dimensions.get("window");
 export default function ChatComponent({
   userId,
   messages,
@@ -506,7 +510,15 @@ const MessageText = (props: MessageTextProps<IMessage>) => {
   );
 };
 
-const MessageImage = (props: MessageImageProps<IMessage>) => {
+const MessageImage = (
+  props: MessageImageProps<IMessage> & {
+    isVisible: boolean;
+    onClose: () => void;
+    onOpen: () => void;
+  }
+) => {
+  if (!props.currentMessage?.image) return null;
+
   return (
     <>
       <Pressable
@@ -527,7 +539,25 @@ const MessageImage = (props: MessageImageProps<IMessage>) => {
       </Pressable>
       <View style={styles.mediaContainer}>
         {/* Doesn't work if I put it in renderItem 🤷 */}
-        <Lightbox>
+        <Lightbox
+          renderHeader={(close) => (
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: WINDOW_WIDTH,
+                backgroundColor: "transparent",
+              }}
+            >
+              <SafeAreaView>
+                <TouchableOpacity onPress={close}>
+                  <Ionicons name="chevron-back" size={30} color={Colors.primary} />
+                </TouchableOpacity>
+              </SafeAreaView>
+            </Animated.View>
+          )}
+        >
           <Image
             allowDownscaling
             alt="image"

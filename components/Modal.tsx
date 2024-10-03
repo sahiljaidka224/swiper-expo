@@ -6,17 +6,20 @@ interface ModalProps {
   children: React.ReactNode;
   isVisible: boolean;
   onClose: () => void;
+  hideHeader?: boolean;
 }
 
-export default function Modal({ children, isVisible, onClose }: ModalProps) {
+export default function Modal({ children, isVisible, onClose, hideHeader = false }: ModalProps) {
   return (
-    <RNModal animationType="slide" transparent={true} visible={isVisible}>
+    <RNModal animationType="fade" transparent={true} visible={isVisible}>
       <View style={styles.modalContent}>
-        <View style={styles.headerContainer}>
-          <Pressable onPress={onClose}>
-            <MaterialIcons name="close" color={Colors.primary} size={30} />
-          </Pressable>
-        </View>
+        {!hideHeader && (
+          <View style={styles.headerContainer}>
+            <Pressable onPress={onClose}>
+              <MaterialIcons name="close" color={Colors.primary} size={30} />
+            </Pressable>
+          </View>
+        )}
         {children}
       </View>
     </RNModal>
@@ -25,7 +28,7 @@ export default function Modal({ children, isVisible, onClose }: ModalProps) {
 
 const styles = StyleSheet.create({
   modalContent: {
-    height: "95%",
+    height: "100%",
     width: "100%",
     opacity: 1,
     borderTopRightRadius: 18,
