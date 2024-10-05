@@ -27,6 +27,7 @@ import { cometChatInit } from "@/hooks/cometchat";
 import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
 import { showToast } from "./Toast";
+import * as MediaLibrary from "expo-media-library";
 
 type FormData = {
   firstName: string;
@@ -174,10 +175,15 @@ export default function ProfileComponent({ context }: ProfileProps) {
         cameraType: ImagePicker.CameraType.front,
       });
       if (!result.canceled) {
-        if (result.assets.length > 0) {
+        if (result.assets.length > 0 && result.assets[0].uri) {
           const base64 = await FileSystem.readAsStringAsync(result.assets[0].uri, {
             encoding: "base64",
           });
+
+          MediaLibrary.saveToLibraryAsync(result.assets[0].uri)
+            .then()
+            .catch(() => showToast("Error", "Please allow Swiper to save images.", "error"));
+
           if (!base64 || !token || !user?.id) return;
           updateUserAvatar({ token, avatar: base64, userId: user?.id });
         }
@@ -198,7 +204,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
       });
 
       if (!result.canceled) {
-        if (result.assets.length > 0) {
+        if (result.assets.length > 0 && result.assets[0].uri) {
           const base64 = await FileSystem.readAsStringAsync(result.assets[0].uri, {
             encoding: "base64",
           });

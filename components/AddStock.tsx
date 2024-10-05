@@ -7,6 +7,7 @@ import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native"
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { showToast } from "./Toast";
+import * as MediaLibrary from "expo-media-library";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
@@ -71,7 +72,10 @@ export default function AddStock({
     }
   };
 
-  const triggerImageSelection = (result: ImagePicker.ImagePickerSuccessResult) => {
+  const triggerImageSelection = (
+    result: ImagePicker.ImagePickerSuccessResult,
+    source: "gallery" | "camera" = "gallery"
+  ) => {
     const files = [];
     for (let [index, file] of result.assets.entries()) {
       const uri = file.uri;
@@ -84,6 +88,12 @@ export default function AddStock({
       } else {
         type = file.type;
         name = `Camera_0${index}.jpeg`;
+      }
+
+      if (source === "camera") {
+        MediaLibrary.saveToLibraryAsync(uri)
+          .then()
+          .catch(() => showToast("Error", "Please allow Swiper to save images.", "error"));
       }
 
       let tempFile = {
@@ -110,7 +120,7 @@ export default function AddStock({
       });
       if (!result.canceled) {
         if (result.assets.length > 0) {
-          triggerImageSelection(result);
+          triggerImageSelection(result, "camera");
         }
       }
     } catch (error) {

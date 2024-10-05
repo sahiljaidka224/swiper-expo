@@ -55,6 +55,7 @@ import Avatar from "./Avatar";
 import { showToast } from "./Toast";
 import { useGetGroupMembers } from "@/hooks/cometchat/groups";
 import Gallery from "./Gallery";
+import * as MediaLibrary from "expo-media-library";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const options = ["Gallery", "Camera", "Cancel"];
@@ -104,11 +105,13 @@ export default function ChatComponent({
   } = useSendMessage();
   const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
-
   const { markAsRead } = useMarkMessageAsRead();
   const { groupMembers } = useGetGroupMembers(context === "group" ? userId : null);
 
-  const triggerSendMediaMessage = (result: ImagePicker.ImagePickerSuccessResult) => {
+  const triggerSendMediaMessage = (
+    result: ImagePicker.ImagePickerSuccessResult,
+    source: "camera" | "gallery" = "gallery"
+  ) => {
     let files = [];
     for (let [index, file] of result.assets.entries()) {
       const uri = file.uri;
@@ -127,7 +130,12 @@ export default function ChatComponent({
         type = "video/quicktime";
         name = `Camera_0${index}.mov`;
       }
-      // TODO: handle video
+
+      if (source === "camera") {
+        MediaLibrary.saveToLibraryAsync(uri)
+          .then()
+          .catch(() => showToast("Error", "Please allow Swiper to save images.", "error"));
+      }
 
       let tempFile = {
         name: name,
@@ -190,7 +198,7 @@ export default function ChatComponent({
       });
       if (!result.canceled) {
         if (result.assets.length > 0) {
-          triggerSendMediaMessage(result);
+          triggerSendMediaMessage(result, "camera");
         }
       }
     } catch (error) {
