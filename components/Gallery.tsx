@@ -58,11 +58,13 @@ export default function Gallery({
             },
           ]}
         >
-          <View style={styles.textContainer}>
-            <Text style={styles.headerText}>
-              {selectedIndex + 1} of {images.length}
-            </Text>
-          </View>
+          {images && images.length > 1 && (
+            <View style={styles.textContainer}>
+              <Text style={styles.headerText}>
+                {selectedIndex + 1} of {images.length}
+              </Text>
+            </View>
+          )}
           <Animated.View
             style={{
               position: "absolute",
@@ -101,7 +103,7 @@ export default function Gallery({
         }}
         onSwipeToClose={onClose}
       />
-      {infoVisible && (
+      {infoVisible && images && images.length > 1 && (
         <Animated.View
           entering={mounted ? FadeInDown.duration(250) : undefined}
           exiting={FadeOutDown.duration(250)}

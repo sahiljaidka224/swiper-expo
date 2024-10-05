@@ -7,7 +7,6 @@ import {
   FlatList,
   ListRenderItem,
   Dimensions,
-  SafeAreaView,
   TouchableOpacity,
 } from "react-native";
 import React, { useCallback, useState } from "react";
@@ -29,7 +28,6 @@ import {
 } from "react-native-gifted-chat";
 import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
 import { Image } from "expo-image";
-import Lightbox from "react-native-lightbox-v2";
 import dayjs from "dayjs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
@@ -56,7 +54,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { showToast } from "./Toast";
 import { useGetGroupMembers } from "@/hooks/cometchat/groups";
-import Animated from "react-native-reanimated";
+import Gallery from "./Gallery";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const options = ["Gallery", "Camera", "Cancel"];
@@ -94,6 +92,8 @@ export default function ChatComponent({
   const insets = useSafeAreaInsets();
   const [assets] = useAssets([backroundPattern]);
   const [text, setText] = useState<string>("");
+  const [isGalleryVisible, setGalleryVisible] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { startTyping, endTyping } = useTypingIndicator();
   const { showActionSheetWithOptions } = useActionSheet();
   const {
@@ -282,6 +282,16 @@ export default function ChatComponent({
     [carGroups]
   );
 
+  const onGalleryOpen = (url: string) => {
+    setSelectedImage(url);
+    setGalleryVisible(true);
+  };
+
+  const onGalleryClose = () => {
+    setGalleryVisible(false);
+    setSelectedImage(null);
+  };
+
   return (
     <ImageBackground
       source={assets ? assets[0] : backroundPattern}
@@ -325,6 +335,15 @@ export default function ChatComponent({
           headerTitle: () => <Header />,
         }}
       />
+      {isGalleryVisible && selectedImage && (
+        <Gallery
+          images={[{ url: selectedImage, imageIndex: 0 }]}
+          isVisible={isGalleryVisible}
+          onClose={onGalleryClose}
+          setSelectedIndex={() => {}}
+          selectedIndex={0}
+        />
+      )}
       <GiftedChat
         isTyping={isTyping}
         messages={messages}
@@ -356,7 +375,16 @@ export default function ChatComponent({
         infiniteScroll
         loadEarlier={hasMore}
         isLoadingEarlier={loadingMore}
-        renderMessageImage={MessageImage}
+        renderMessageImage={(props) => (
+          <MessageImage
+            {...props}
+            isVisible={isGalleryVisible}
+            onOpen={() => {
+              if (props.currentMessage?.image) onGalleryOpen(props.currentMessage?.image);
+            }}
+            onClose={onGalleryClose}
+          />
+        )}
         renderMessageVideo={MessageVideo}
         onLoadEarlier={() => {
           fetchMessages();
@@ -537,36 +565,22 @@ const MessageImage = (
       >
         <FontAwesome name="mail-forward" size={14} color={Colors.background} />
       </Pressable>
-      <View style={styles.mediaContainer}>
-        {/* Doesn't work if I put it in renderItem 🤷 */}
-        <Lightbox
-          renderHeader={(close) => (
-            <Animated.View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: WINDOW_WIDTH,
-                backgroundColor: "transparent",
-              }}
-            >
-              <SafeAreaView>
-                <TouchableOpacity onPress={close}>
-                  <Ionicons name="chevron-back" size={30} color={Colors.primary} />
-                </TouchableOpacity>
-              </SafeAreaView>
-            </Animated.View>
-          )}
-        >
-          <Image
-            allowDownscaling
-            alt="image"
-            contentFit="cover"
-            source={{ uri: props?.currentMessage?.image }}
-            style={[props.imageStyle, styles.image]}
-          />
-        </Lightbox>
-      </View>
+      <TouchableOpacity
+        style={styles.mediaContainer}
+        onPress={() => {
+          props.onOpen();
+        }}
+      >
+        <Image
+          allowDownscaling
+          recyclingKey={props.currentMessage?.image}
+          alt="image"
+          contentFit="cover"
+          source={{ uri: props?.currentMessage?.image }}
+          style={[props.imageStyle, styles.image]}
+          priority="high"
+        />
+      </TouchableOpacity>
     </>
   );
 };
