@@ -370,7 +370,7 @@ export default function ChatComponent({
         }}
         bottomOffset={insets.bottom}
         renderAvatar={null}
-        minInputToolbarHeight={50}
+        minInputToolbarHeight={45}
         maxComposerHeight={100}
         infiniteScroll
         loadEarlier={hasMore}
@@ -404,11 +404,9 @@ export default function ChatComponent({
               </Send>
             )}
             {text.length === 0 && (
-              <>
-                <Pressable onPress={onShowActionSheet}>
-                  <Ionicons name="camera-outline" color={Colors.primary} size={28} />
-                </Pressable>
-              </>
+              <Pressable onPress={onShowActionSheet}>
+                <Ionicons name="camera-outline" color={Colors.primary} size={28} />
+              </Pressable>
             )}
           </View>
         )}
@@ -426,18 +424,9 @@ export default function ChatComponent({
                 {...props}
                 textInputProps={{
                   ...props,
-                  maxFontSizeMultiplier: 2,
+                  maxFontSizeMultiplier: 1.3,
                 }}
-                textInputStyle={{
-                  borderRadius: 15,
-                  borderWidth: 1,
-                  borderColor: Colors.lightGray,
-                  paddingHorizontal: 10,
-                  fontSize: 16,
-                  marginVertical: 10,
-                  paddingTop: 8,
-                  fontFamily: "SF_Pro_Display_Regular",
-                }}
+                textInputStyle={styles.inputStyle}
               />
             )}
           />
@@ -671,4 +660,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   image: { width: "100%", height: "97%", borderRadius: 15 },
+  inputStyle: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    marginVertical: 10,
+    paddingTop: 8,
+    fontFamily: "SF_Pro_Display_Regular",
+  },
 });
