@@ -222,6 +222,7 @@ export default function UsersListPage() {
       {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
       <SectionList
+        keyboardShouldPersistTaps="handled"
         sections={sections}
         keyExtractor={keyExtractor}
         renderItem={renderItem}

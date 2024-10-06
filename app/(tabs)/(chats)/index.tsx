@@ -30,19 +30,31 @@ import NoConversations from "@/components/NoConversations";
 
 const transition = CurvedTransition.delay(100);
 
-function useNotificationObserver(fetchConversations: () => void) {
+function useNotificationObserver(
+  fetchConversations: () => void,
+  fetchGroupConversations: () => void
+) {
   useEffect(() => {
     let isMounted = true;
+
+    async function handleNotification() {
+      await Notifications.setBadgeCountAsync(0);
+      await Notifications.dismissAllNotificationsAsync();
+    }
 
     Notifications.getLastNotificationResponseAsync().then((response) => {
       if (!isMounted || !response?.notification) {
         return;
       }
       fetchConversations();
+      handleNotification();
+      fetchGroupConversations();
     });
 
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       fetchConversations();
+      handleNotification();
+      fetchGroupConversations();
     });
 
     return () => {
@@ -63,7 +75,7 @@ export default function Chats() {
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   const [searchText, setSearchText] = useState<string | null>(null);
-  useNotificationObserver(fetchConversations);
+  useNotificationObserver(fetchConversations, fetchGroupConversations);
 
   const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();

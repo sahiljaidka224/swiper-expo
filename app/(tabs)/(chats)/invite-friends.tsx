@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   TextInput,
   SectionList,
-  Alert,
 } from "react-native";
 import * as Contacts from "expo-contacts";
 import Avatar from "@/components/Avatar";
@@ -29,6 +28,7 @@ export default function InviteFriendsPage() {
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
+      console.log("status", status);
       if (status === "granted") {
         const { data } = await Contacts.getContactsAsync({
           fields: [Contacts.Fields.PhoneNumbers],
@@ -44,6 +44,9 @@ export default function InviteFriendsPage() {
   }, []);
 
   const filteredPhoneContacts = phoneContacts.filter((contact) => {
+    if (!contact.name) {
+      return false;
+    }
     const [firstName, lastName] = contact.name.toLowerCase().split(" ");
     return (
       firstName?.startsWith(searchText.toLowerCase()) ||
@@ -52,6 +55,9 @@ export default function InviteFriendsPage() {
   });
 
   const groupPhoneContacts = filteredPhoneContacts.reduce((acc, contact) => {
+    if (!contact.name) {
+      return acc;
+    }
     const firstLetter = contact.name.charAt(0).toUpperCase();
     if (!acc[firstLetter]) {
       acc[firstLetter] = [];
@@ -74,16 +80,16 @@ export default function InviteFriendsPage() {
   const renderItem = ({ item }: { item: Contacts.Contact }) => {
     const onPress = async () => {
       let message =
-        "Let’s Chat on Swiper. It’s my main app for all car messaging. Lots of cool features and FREE PPSR searches, download Swiper for Apple: https://apps.apple.com/au/app/swiper/id1505454640";
+        "Let’s Chat on Swiper. It’s my main app for all car messaging. Lots of cool features and FREE PPSR searches, download Swiper for Apple: https://testflight.apple.com/join/gsP284QH";
 
       const isAvailable = await SMS.isAvailableAsync();
 
       if (isAvailable && item.phoneNumbers && item.phoneNumbers[0].number) {
         const { result } = await SMS.sendSMSAsync([item.phoneNumbers[0].number], message);
         if (result === "sent") {
-          Alert.alert("SMS sent successfully");
+          showToast("Success", "SMS sent successfully ✅", "success");
         } else {
-          Alert.alert("SMS failed to send");
+          showToast("Error", "SMS failed to send ❌", "error");
         }
       } else {
         showToast("Error", "SMS is not available on this device ❌", "error");

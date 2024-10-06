@@ -52,6 +52,11 @@ export default function TabsRootLayout() {
             title: "",
             headerShown: false,
             tabBarIcon: ({ color }) => <SwiperIcon color={color} />,
+            tabBarStyle: {
+              paddingTop: 20,
+              backgroundColor: Colors.background,
+              display: segments.includes("new-chat") && segments[3] === "[id]" ? "none" : "flex",
+            },
           }}
         />
         <Tabs.Screen
@@ -60,6 +65,11 @@ export default function TabsRootLayout() {
             title: "",
             headerShown: false,
             tabBarIcon: ({ color }) => <WatchListIcon color={color} />,
+            tabBarStyle: {
+              paddingTop: 20,
+              backgroundColor: Colors.background,
+              display: segments.includes("new-chat") && segments[3] === "[id]" ? "none" : "flex",
+            },
           }}
         />
         <Tabs.Screen
@@ -113,6 +123,11 @@ export default function TabsRootLayout() {
             title: "",
             headerShown: false,
             tabBarIcon: ({ color }) => <StockIcon color={color} />,
+            tabBarStyle: {
+              paddingTop: 20,
+              backgroundColor: Colors.background,
+              display: segments.includes("new-chat") && segments[3] === "[id]" ? "none" : "flex",
+            },
           }}
         />
         <Tabs.Screen
@@ -121,6 +136,11 @@ export default function TabsRootLayout() {
             title: "",
             headerShown: false,
             tabBarIcon: ({ color }) => <PushCarIcon color={color} />,
+            tabBarStyle: {
+              paddingTop: 20,
+              backgroundColor: Colors.background,
+              display: segments.includes("new-chat") && segments[3] === "[id]" ? "none" : "flex",
+            },
           }}
         />
       </Tabs>

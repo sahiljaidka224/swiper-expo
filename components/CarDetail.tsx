@@ -1,7 +1,15 @@
 import Colors from "@/constants/Colors";
 import { formatNumberWithCommas } from "@/utils";
-import React, { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  ListRenderItem,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import ContactCard from "./ContactCard";
 import StockButtonContainer from "./StockButtonContainer";
@@ -17,6 +25,9 @@ import {
 } from "@/api/hooks/watchlist";
 import { AntDesign } from "@expo/vector-icons";
 import { showToast } from "./Toast";
+import { useGetGroupConversationsWithTags } from "@/hooks/cometchat/conversations";
+import Avatar from "./Avatar";
+import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 
 interface CarDetailProps {
   car: any;
@@ -39,6 +50,11 @@ function CarDetail({ car, context }: CarDetailProps) {
     error: mutationError,
     newCars: removedCars,
   } = useRemoveCarFromWatchlist();
+  const { markAsRead } = useMarkMessageAsRead();
+
+  const { groupConversations, groupsError, isGroupsLoading } = useGetGroupConversationsWithTags([
+    car?.carId,
+  ]);
 
   useEffect(() => {
     if (group && !loading) {
@@ -121,6 +137,50 @@ function CarDetail({ car, context }: CarDetailProps) {
     !context?.includes("(chats)") &&
     !context?.includes("(swiper)");
 
+  const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
+    ({ item }: { item: CometChat.Conversation }) => {
+      const conversationWith = item.getConversationWith();
+      const icon =
+        conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
+      const name = conversationWith.getName();
+      const groupUID =
+        conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
+      const unreadCount = item.getUnreadMessageCount();
+      // const members = conversationWith.m;
+
+      return (
+        <Pressable
+          style={{ maxWidth: 70, alignItems: "center", marginRight: 15 }}
+          onPress={() => {
+            const lastMessage = item.getLastMessage();
+            markAsRead(lastMessage);
+            router.push(`/(tabs)/(stock)/new-chat/${groupUID}`);
+          }}
+        >
+          <View
+            style={{
+              height: 54,
+              width: 54,
+              borderWidth: unreadCount > 0 ? 2 : 0,
+              borderColor: unreadCount > 0 ? Colors.primary : undefined,
+              borderRadius: 27,
+              padding: 2,
+            }}
+          >
+            <Avatar source={icon} isCar={Boolean(conversationWith instanceof CometChat.Group)} />
+          </View>
+          <Text
+            numberOfLines={3}
+            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 13 }}
+          >
+            {name}
+          </Text>
+        </Pressable>
+      );
+    },
+    [groupConversations]
+  );
+
   return (
     <View style={styles.detailsContainer}>
       <TouchableOpacity
@@ -178,6 +238,39 @@ function CarDetail({ car, context }: CarDetailProps) {
             carId={car?.carId}
             isPrimaryButtonLoading={loading}
           />
+        </>
+      ) : null}
+
+      {context &&
+      context?.includes("(stock)") &&
+      groupConversations &&
+      groupConversations.length > 0 ? (
+        <>
+          <Text
+            style={{
+              paddingVertical: 10,
+              fontFamily: "SF_Pro_Display_Medium",
+              fontSize: 20,
+              color: Colors.textDark,
+            }}
+          >
+            Active conversations:
+          </Text>
+          {groupConversations && groupConversations.length > 0 ? (
+            <View style={styles.carGroupWrapper}>
+              <FlatList<CometChat.Conversation>
+                data={groupConversations}
+                style={{ paddingHorizontal: 10, paddingVertical: 5 }}
+                keyExtractor={(item: unknown) => {
+                  const conversation = item as CometChat.Conversation;
+                  return conversation.getConversationId();
+                }}
+                renderItem={horizontalRenderItem}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              />
+            </View>
+          ) : null}
         </>
       ) : null}
     </View>
@@ -245,5 +338,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
     overflow: "hidden",
     maxWidth: 250,
+  },
+  carGroupWrapper: {
+    backgroundColor: "white",
+    width: "100%",
+    alignSelf: "center",
   },
 });
