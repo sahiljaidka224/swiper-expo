@@ -1,0 +1,82 @@
+diff --git a/node_modules/rn-swiper-list/src/SwiperCard/OverlayLabel.tsx b/node_modules/rn-swiper-list/src/SwiperCard/OverlayLabel.tsx
+index 1c68c93..0c6ad68 100644
+--- a/node_modules/rn-swiper-list/src/SwiperCard/OverlayLabel.tsx
++++ b/node_modules/rn-swiper-list/src/SwiperCard/OverlayLabel.tsx
+@@ -1,5 +1,5 @@
+ import React, { type PropsWithChildren } from 'react';
+-import { StyleSheet } from 'react-native';
++import { StyleSheet, useWindowDimensions } from 'react-native';
+ import Animated, {
+   interpolate,
+   useAnimatedStyle,
+@@ -11,6 +11,7 @@ type Props = PropsWithChildren<{
+   outputRange?: number[];
+   Component: () => JSX.Element;
+   opacityValue: SharedValue<number>;
++  direction?: 'right' | 'left' ;
+ }>;
+ 
+ const OverlayLabel = ({
+@@ -18,7 +19,9 @@ const OverlayLabel = ({
+   outputRange,
+   Component,
+   opacityValue,
++  direction = 'right',
+ }: Props) => {
++  const width = useWindowDimensions().width;
+   const animatedStyle = useAnimatedStyle(() => {
+     return {
+       opacity: interpolate(
+@@ -27,6 +30,32 @@ const OverlayLabel = ({
+         outputRange ?? [],
+         'clamp'
+       ),
++      transform: [
++        {
++          translateX: interpolate(
++            opacityValue.value,
++            inputRange ?? [],
++            [direction === 'right' ? width / 2.5 : -width / 2.5, direction === "right" ? -50 : 50],
++            'clamp'
++          ),
++        },
++        {
++          translateY: interpolate(
++            opacityValue.value,
++            inputRange ?? [],
++            [-width / 2, -width / 2],
++            'clamp'
++          ),
++        },
++        {
++          scale: interpolate(
++            opacityValue.value,
++            inputRange ?? [],
++            [0.3, 1],
++            'clamp'
++          ),
++        },
++      ],
+       zIndex: 2,
+     };
+   });
+diff --git a/node_modules/rn-swiper-list/src/SwiperCard/index.tsx b/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
+index dc78a41..ce5143c 100644
+--- a/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
++++ b/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
+@@ -220,6 +220,7 @@ const SwipeableCard = forwardRef<
+               outputRange={outputOverlayLabelLeftOpacityRange}
+               Component={OverlayLabelLeft}
+               opacityValue={translateX}
++              direction='left'
+             />
+           )}
+           {OverlayLabelRight && (
+@@ -228,6 +229,7 @@ const SwipeableCard = forwardRef<
+               outputRange={outputOverlayLabelRightOpacityRange}
+               Component={OverlayLabelRight}
+               opacityValue={translateX}
++              direction='right'
+             />
+           )}
+           {OverlayLabelTop && (

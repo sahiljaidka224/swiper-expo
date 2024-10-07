@@ -75,16 +75,14 @@ const WatchOrPass = ({ type }: { type: "Watch" | "Pass" }) => {
           width: 120,
           height: 120,
           borderRadius: 60,
-          backgroundColor: "white",
-          borderWidth: 5,
-          borderColor: type === "Watch" ? Colors.primary : Colors.borderGray,
+          backgroundColor: type === "Watch" ? Colors.primary : Colors.borderGray,
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <Text
           style={{
-            color: type === "Watch" ? Colors.primary : Colors.borderGray,
+            color: type === "Watch" ? Colors.textPrimary : Colors.textDark,
             fontSize: 22,
             fontFamily: "SF_Pro_Display_Bold",
           }}

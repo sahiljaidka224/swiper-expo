@@ -1,0 +1,15 @@
+diff --git a/node_modules/rn-swiper-list/src/SwiperCard/index.tsx b/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
+index 251942e..dc78a41 100644
+--- a/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
++++ b/node_modules/rn-swiper-list/src/SwiperCard/index.tsx
+@@ -206,9 +206,7 @@ const SwipeableCard = forwardRef<
+           {
+             translateX: translateX.value,
+           },
+-          {
+-            translateY: translateY.value,
+-          },
++          
+         ],
+       };
+     });

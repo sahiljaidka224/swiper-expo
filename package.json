@@ -8,7 +8,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "push": "eas secret:push --scope project --env-file .env.local"
+    "push": "eas secret:push --scope project --env-file .env.local",
+    "postinstall": "patch-package"
   },
   "jest": {
     "preset": "jest-expo"
@@ -45,6 +46,7 @@
     "expo-image": "~1.12.15",
     "expo-image-picker": "~15.0.7",
     "expo-linking": "~6.3.1",
+    "expo-media-library": "~16.0.5",
     "expo-notifications": "~0.28.17",
     "expo-router": "~3.5.23",
     "expo-secure-store": "~13.0.2",
@@ -53,6 +55,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
+    "patch-package": "^8.0.0",
     "react": "18.2.0",
     "react-content-loader": "^7.0.2",
     "react-dom": "18.2.0",
@@ -75,8 +78,7 @@
     "react-native-xml2js": "^1.0.3",
     "rn-swiper-list": "^2.0.2",
     "swr": "^2.2.5",
-    "xml2js": "^0.6.2",
-    "expo-media-library": "~16.0.5"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
