@@ -80,7 +80,7 @@ export default function InviteFriendsPage() {
   const renderItem = ({ item }: { item: Contacts.Contact }) => {
     const onPress = async () => {
       let message =
-        "Let’s Chat on Swiper. It’s my main app for all car messaging. Lots of cool features and FREE PPSR searches, download Swiper for Apple: https://testflight.apple.com/join/gsP284QH";
+        "Let’s Chat on Swiper. It’s my main app for all car messaging. Lots of cool features and FREE PPSR searches, download Swiper for Apple: https://apps.apple.com/au/app/swiper/id6648779114";
 
       const isAvailable = await SMS.isAvailableAsync();
 

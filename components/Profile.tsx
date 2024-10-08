@@ -370,7 +370,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
               }}
             >
               <Button
-                title="Invite Friends"
+                title="Invite Phone Contacts"
                 onPress={() => router.push("/(tabs)/(chats)/invite-friends")}
                 isLoading={isUpdateCometChatUserLoading}
               />

@@ -6,10 +6,9 @@ import {
   Platform,
   FlatList,
   ListRenderItem,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Bubble,
   Composer,
@@ -56,8 +55,11 @@ import { showToast } from "./Toast";
 import { useGetGroupMembers } from "@/hooks/cometchat/groups";
 import Gallery from "./Gallery";
 import * as MediaLibrary from "expo-media-library";
+import { Audio } from "expo-av";
+import { Sound } from "expo-av/build/Audio";
 
 const backroundPattern = require("@/assets/images/pattern.png");
+const audioAsset = require("@/assets/audio/pop-alert.mp3");
 const options = ["Gallery", "Camera", "Cancel"];
 
 interface ChatComponentProps {
@@ -75,7 +77,6 @@ interface ChatComponentProps {
   group?: CometChat.Group | null;
 }
 
-const { width: WINDOW_WIDTH } = Dimensions.get("window");
 export default function ChatComponent({
   userId,
   messages,
@@ -107,6 +108,26 @@ export default function ChatComponent({
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const { markAsRead } = useMarkMessageAsRead();
   const { groupMembers } = useGetGroupMembers(context === "group" ? userId : null);
+  const [sound, setSound] = useState<Sound>();
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  async function playSound() {
+    try {
+      const { sound } = await Audio.Sound.createAsync(audioAsset);
+      setSound(sound);
+
+      await sound.playAsync();
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
 
   const triggerSendMediaMessage = (
     result: ImagePicker.ImagePickerSuccessResult,
@@ -163,6 +184,7 @@ export default function ChatComponent({
         ],
         ""
       );
+      playSound();
     }
     if (context === "group") sendGroupMediaMessage(userId, files);
     else sendMediaMessage(userId, files, user?.org?.name ?? undefined, userOrgName ?? undefined);
@@ -358,7 +380,10 @@ export default function ChatComponent({
         alignTop
         scrollToBottom
         scrollToBottomComponent={() => <Text>V</Text>}
-        onSend={(messages: IMessage[]) => onSend(messages, text)}
+        onSend={(messages: IMessage[]) => {
+          onSend(messages, text);
+          playSound();
+        }}
         user={{ _id: 1, name: user?.name }}
         onInputTextChanged={(text) => {
           setText(text);

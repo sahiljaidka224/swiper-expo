@@ -12,7 +12,10 @@ import Text from "@/components/Text";
 import { formatNumberWithCommas } from "@/utils";
 import { useAddCarToWatchlist, useMarkCarAsSeen } from "@/api/hooks/watchlist";
 import { useAuth } from "@/context/AuthContext";
+import { Audio } from "expo-av";
+import { Sound } from "expo-av/build/Audio";
 
+const audioAsset = require("@/assets/audio/swish.mp3");
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
@@ -103,6 +106,16 @@ export default function SwiperPage() {
   const { trigger: addCarToWatchlist } = useAddCarToWatchlist();
   const { trigger: markCarAsSeen } = useMarkCarAsSeen();
 
+  const [sound, setSound] = useState<Sound>();
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
   useEffect(() => {
     if (!isLoading && cars?.cars) {
       setWatchlistData((prevData) => (page === 1 ? cars.cars : [...prevData, ...cars.cars]));
@@ -120,10 +133,22 @@ export default function SwiperPage() {
     await analytics().logEvent(action, { userId: user?.id });
   };
 
+  async function playSound() {
+    try {
+      const { sound } = await Audio.Sound.createAsync(audioAsset);
+      setSound(sound);
+
+      await sound.playAsync();
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
   const handleRightSwipe = (cardIndex: number) => {
     if (!token) return;
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
+    playSound();
 
     addCarToWatchlist({ carId, token, userId: undefined });
     markCarAsSeen({ carId, token });
@@ -140,6 +165,7 @@ export default function SwiperPage() {
 
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
+    playSound();
 
     markCarAsSeen({ carId, token });
 
