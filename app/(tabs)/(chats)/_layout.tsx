@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 
 export default function ChatsLayout() {
   const { user: currentUser, logout, updateUser } = useAuth();
@@ -41,7 +41,8 @@ export default function ChatsLayout() {
             title: "Chats",
             headerLargeTitle: false,
             headerBlurEffect: "regular",
-            headerTransparent: true,
+            headerTitleAlign: "center",
+            headerTransparent: Platform.OS === "ios",
           }}
         />
 

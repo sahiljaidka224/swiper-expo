@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
 import { Stack } from "expo-router";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, SafeAreaView } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { CarsList } from "@/components/CarsList";
@@ -47,7 +47,7 @@ export default function WatchlistPage() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Stack.Screen
         options={{
           headerRight: () => (
@@ -57,12 +57,13 @@ export default function WatchlistPage() {
           ),
         }}
       />
+      {/* <View style={{ height: 200 }} /> */}
       <CarsList
         context="followed"
         orderBy={orderState.orderBy}
         orderDirection={orderState.orderDirection}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -1,5 +1,6 @@
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 
 export default function WatchlistLayout() {
   return (
@@ -12,7 +13,7 @@ export default function WatchlistLayout() {
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
-            headerTransparent: true,
+            headerTransparent: Platform.OS === "ios",
           }}
         />
         <Stack.Screen

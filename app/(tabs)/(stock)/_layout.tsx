@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { router, Stack } from "expo-router";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import Text from "@/components/Text";
 
 export default function MyStockLayout() {
@@ -15,7 +15,7 @@ export default function MyStockLayout() {
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
-            headerTransparent: true,
+            headerTransparent: Platform.OS === "ios",
           }}
         />
         <Stack.Screen
