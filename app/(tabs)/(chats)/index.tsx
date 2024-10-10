@@ -5,6 +5,7 @@ import {
   ListRenderItem,
   FlatList,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
@@ -22,11 +23,15 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
-
+import * as Contacts from "expo-contacts";
+import * as Linking from "expo-linking";
 import * as Notifications from "expo-notifications";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { User } from "../(chats,swiper,followed,stock,add-stock)/users-list";
 import NoConversations from "@/components/NoConversations";
+import { showToast } from "@/components/Toast";
+import * as SMS from "expo-sms";
+import React from "react";
 
 const transition = CurvedTransition.delay(100);
 
@@ -64,6 +69,9 @@ function useNotificationObserver(
   }, []);
 }
 export default function Chats() {
+  const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
+  const [searchText, setSearchText] = useState<string | null>(null);
+
   const { users } = useGetCometChatUsers();
   const {
     conversationList: userConversations,
@@ -74,7 +82,6 @@ export default function Chats() {
   const { conversationList: groupConversationList, fetchConversations: fetchGroupConversations } =
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
-  const [searchText, setSearchText] = useState<string | null>(null);
   useNotificationObserver(fetchConversations, fetchGroupConversations);
 
   const groups = groupConversationList.filter((c) => {
@@ -90,6 +97,36 @@ export default function Chats() {
       return () => {};
     }, [])
   );
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Contacts.requestPermissionsAsync();
+      console.log("status", status);
+      if (status === "granted") {
+        const { data } = await Contacts.getContactsAsync({
+          fields: [Contacts.Fields.PhoneNumbers],
+        });
+
+        if (data.length > 0) {
+          setPhoneContacts(data);
+        }
+      } else if (status === Contacts.PermissionStatus.DENIED) {
+        await Linking.openSettings();
+      }
+    })();
+  }, []);
+
+  const filteredPhoneContacts = phoneContacts.filter((contact) => {
+    if (!searchText) return false;
+    if (!contact.name) {
+      return false;
+    }
+    const [firstName, lastName] = contact.name.toLowerCase().split(" ");
+    return (
+      firstName?.startsWith(searchText.toLowerCase()) ||
+      lastName?.startsWith(searchText.toLowerCase())
+    );
+  });
 
   const filteredUserConversations = userConversations.filter((c) => {
     const conversationWith = c.getConversationWith();
@@ -173,6 +210,45 @@ export default function Chats() {
       );
     },
     [filteredUsers]
+  );
+
+  const renderPhoneItem: ListRenderItem<Contacts.Contact> = useCallback(
+    ({ item }) => {
+      const onPress = async () => {
+        let message =
+          "Let’s Chat on Swiper. It’s my main app for all car messaging. Lots of cool features and FREE PPSR searches, download Swiper for Apple: https://apps.apple.com/au/app/swiper/id6648779114";
+
+        const isAvailable = await SMS.isAvailableAsync();
+
+        if (isAvailable && item.phoneNumbers && item.phoneNumbers[0].number) {
+          const { result } = await SMS.sendSMSAsync([item.phoneNumbers[0].number], message);
+          if (result === "sent") {
+            showToast("Success", "SMS sent successfully ✅", "success");
+          } else {
+            showToast("Error", "SMS failed to send ❌", "error");
+          }
+        } else {
+          showToast("Error", "SMS is not available on this device ❌", "error");
+        }
+      };
+
+      return (
+        <Pressable style={styles.userContainer} onPress={onPress}>
+          <View style={styles.leftContainer}>
+            <View style={styles.avatarContainer}>
+              <Avatar userId={""} />
+            </View>
+            <View>
+              <Text style={styles.name}>{item.name}</Text>
+              {item.phoneNumbers && (
+                <Text style={styles.orgName}>{item?.phoneNumbers[0]?.number}</Text>
+              )}
+            </View>
+          </View>
+        </Pressable>
+      );
+    },
+    [filteredPhoneContacts]
   );
 
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
@@ -340,6 +416,36 @@ export default function Chats() {
           ItemSeparatorComponent={ItemSeparator}
           renderItem={renderUserItem}
         />
+        <Animated.FlatList
+          contentInsetAdjustmentBehavior="automatic"
+          skipEnteringExitingAnimations
+          scrollEnabled={false}
+          data={filteredPhoneContacts}
+          ListHeaderComponent={
+            filteredPhoneContacts.length > 0 && searchText ? (
+              <View>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "SF_Pro_Display_Bold",
+                    fontSize: 20,
+                    color: Colors.textDark,
+                  }}
+                >
+                  Invite Phone Contacts
+                </Text>
+              </View>
+            ) : null
+          }
+          refreshing={loading}
+          itemLayoutAnimation={transition}
+          keyExtractor={(_: Contacts.Contact, index: number) => {
+            return String(index);
+          }}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={renderPhoneItem}
+        />
       </Animated.View>
     </ScrollView>
   );
@@ -348,3 +454,29 @@ export default function Chats() {
 function ItemSeparator() {
   return <View style={[defaultStyles.separator, { marginLeft: 90 }]} />;
 }
+
+const styles = StyleSheet.create({
+  leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
+  avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },
+  userContainer: {
+    flexDirection: "row",
+    gap: 10,
+    backgroundColor: Colors.background,
+    alignItems: "center",
+    marginHorizontal: 5,
+    padding: 5,
+    justifyContent: "space-between",
+  },
+  name: {
+    color: Colors.textDark,
+    fontSize: 16,
+    fontFamily: "SF_Pro_Display_Medium",
+    textTransform: "capitalize",
+  },
+  orgName: {
+    color: Colors.textDark,
+    fontSize: 14,
+    fontFamily: "SF_Pro_Display_Light",
+    marginTop: 2,
+  },
+});

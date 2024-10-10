@@ -126,7 +126,7 @@ const fetchRSSFeed = async (
 const AutomotiveRSSFeed: React.FC = () => {
   const [feedData, setFeedData] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [mode, setMode] = useState<string>("Videos");
+  const [mode, setMode] = useState<string>("Clips");
 
   useEffect(() => {
     setFeedData([]);
@@ -147,7 +147,7 @@ const AutomotiveRSSFeed: React.FC = () => {
             options={{
               headerTitle: () => (
                 <SegmentedControl
-                  options={["Videos", "News"]}
+                  options={["Clips", "News"]}
                   selectedOption={mode}
                   onOptionPress={setMode}
                 />
@@ -188,7 +188,21 @@ const AutomotiveRSSFeed: React.FC = () => {
               )}
             </ScrollView>
           ) : (
-            <FeedVideos />
+            <>
+              <View style={{ zIndex: 3, padding: 10, position: "absolute" }}>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 26,
+                    fontFamily: "SF_Pro_Display_Bold",
+                  }}
+                  maxFontSizeMultiplier={1}
+                >
+                  Clips
+                </Text>
+              </View>
+              <FeedVideos />
+            </>
           )}
         </>
       </SafeAreaView>
