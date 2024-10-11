@@ -1,5 +1,5 @@
 import { useSaveToStock, useUploadFilesToStock } from "@/api/hooks/add-car";
-import AddStockImages from "@/components/AddStock";
+import AddStockImages, { SelectedImage } from "@/components/AddStock";
 import Button from "@/components/Button";
 import CarDetail from "@/components/CarDetail";
 import ManualForm from "@/components/ManualModeForm";
@@ -9,15 +9,9 @@ import { showToast } from "@/components/Toast";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
+import React from "react";
 import { useEffect, useState } from "react";
 import { ScrollView, View, StyleSheet, KeyboardAvoidingView, Platform, Alert } from "react-native";
-
-interface SelectedImage {
-  name: string | null;
-  type: string | undefined;
-  uri: string;
-  size: number | undefined;
-}
 
 const options = ["Rego Lookup", "Manual Mode"];
 
@@ -55,6 +49,10 @@ export default function AddStockPage() {
 
           for (let index = 0; index < selectedImages.length; index++) {
             const file = selectedImages[index];
+
+            if (!file.uri) {
+              continue;
+            }
 
             formData.append(`file${index}`, {
               name: `image${index}.jpg`,

@@ -1,25 +1,46 @@
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
+import * as MediaLibrary from "expo-media-library";
 
+import {
+  RenderItemParams,
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
 import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { showToast } from "./Toast";
-import * as MediaLibrary from "expo-media-library";
+import { useState } from "react";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
 const options = ["Gallery", "Camera", "Cancel"];
 
-interface SelectedImage {
+export interface SelectedImage {
   name: string | null;
   type: string | undefined;
-  uri: string;
+  uri: string | undefined;
   size: number | undefined;
+  index: number | undefined;
+  isPlaceholder?: boolean;
 }
 
+const NUM_IMAGES = 10;
+
+function updatePlaceholderImages(selectedImagesCount: number): SelectedImage[] {
+  return Array.from({ length: NUM_IMAGES - selectedImagesCount }, (_, i) => ({
+    index: i + 100,
+    isPlaceholder: true,
+    uri: undefined,
+    name: null,
+    size: undefined,
+    type: undefined,
+  }));
+}
 export default function AddStock({
   selectedImages,
   setSelectedImages,
@@ -27,6 +48,9 @@ export default function AddStock({
   selectedImages: SelectedImage[];
   setSelectedImages: (selImage: SelectedImage[]) => void;
 }) {
+  const [placeholderImages, setPlaceholderImages] = useState<SelectedImage[]>(
+    updatePlaceholderImages(selectedImages.length)
+  );
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const { showActionSheetWithOptions } = useActionSheet();
 
@@ -77,7 +101,8 @@ export default function AddStock({
     source: "gallery" | "camera" = "gallery"
   ) => {
     const files = [];
-    for (let [index, file] of result.assets.entries()) {
+    let index = selectedImages.length;
+    for (let [, file] of result.assets.entries()) {
       const uri = file.uri;
       let name: string | null = "";
       let type: string | undefined = "";
@@ -101,9 +126,15 @@ export default function AddStock({
         type: Platform.OS === "android" ? file.type : type,
         uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
         size: file.fileSize,
+        index,
+        isPlaceholder: false,
       };
       files.push(tempFile);
+      index++;
     }
+
+    setPlaceholderImages(updatePlaceholderImages(selectedImages.length + files.length));
+
     setSelectedImages([...selectedImages, ...files]);
   };
 
@@ -153,11 +184,67 @@ export default function AddStock({
   const onRemove = (index: number) => {
     const newSelection = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(newSelection);
+
+    setPlaceholderImages(updatePlaceholderImages(newSelection.length));
+  };
+
+  const renderItem = ({ item, drag, isActive, getIndex }: RenderItemParams<SelectedImage>) => {
+    const index = getIndex();
+    if (index === undefined) return;
+
+    if (!item.isPlaceholder && !item.uri) return null;
+
+    return (
+      <ScaleDecorator>
+        <Pressable
+          key={index}
+          onLongPress={item.isPlaceholder ? null : drag}
+          disabled={isActive}
+          style={{
+            width: 95,
+            height: 95,
+            marginRight: 10,
+          }}
+          onPress={onShowActionSheet}
+        >
+          {item.isPlaceholder ? (
+            <Image
+              style={styles.smallImage}
+              placeholder={addCarSmallPlaceholder}
+              contentFit="cover"
+              recyclingKey={`${index}-${selectedImages[index]?.name}`}
+            />
+          ) : (
+            <Image
+              style={styles.smallImage}
+              placeholder={addCarSmallPlaceholder}
+              contentFit="cover"
+              source={{
+                uri: selectedImages.length >= index ? selectedImages[index]?.uri : undefined,
+              }}
+              recyclingKey={`${index}-${selectedImages[index]?.name}`}
+            />
+          )}
+
+          {selectedImages[index] && !item.isPlaceholder && (
+            <Pressable
+              style={{ position: "absolute", right: 10, top: 5 }}
+              onPress={() => onRemove(index)}
+            >
+              <AntDesign name="closecircle" size={24} color={Colors.background} />
+            </Pressable>
+          )}
+        </Pressable>
+      </ScaleDecorator>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.bannerImageContainer} onPress={onShowActionSheet}>
+      <Pressable
+        style={[styles.bannerImageContainer, { padding: selectedImages.length === 0 ? 5 : 0 }]}
+        onPress={onShowActionSheet}
+      >
         <Image
           style={
             selectedImages.length > 0 ? styles.bannerImageSelected : styles.bannerImagePlaceholder
@@ -167,44 +254,28 @@ export default function AddStock({
           contentFit={selectedImages.length > 0 ? "cover" : "contain"}
           recyclingKey={selectedImages.length > 0 ? selectedImages[0].name : undefined}
         />
+        {selectedImages.length > 0 && (
+          <Pressable
+            style={{ position: "absolute", right: 10, top: 5 }}
+            onPress={() => onRemove(0)}
+          >
+            <AntDesign name="closecircle" size={24} color={Colors.background} />
+          </Pressable>
+        )}
       </Pressable>
-      <View style={styles.smallImagesContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {Array(10)
-            .fill(1)
-            .map((_, index) => {
-              return (
-                <Pressable
-                  key={index}
-                  style={{
-                    width: 95,
-                    height: 95,
-                    marginRight: 10,
-                  }}
-                  onPress={onShowActionSheet}
-                >
-                  <Image
-                    style={styles.smallImage}
-                    placeholder={addCarSmallPlaceholder}
-                    contentFit="cover"
-                    source={{
-                      uri: selectedImages.length >= index ? selectedImages[index]?.uri : undefined,
-                    }}
-                    recyclingKey={`${index}-${selectedImages[index]?.name}`}
-                  />
-                  {selectedImages[index] && (
-                    <Pressable
-                      style={{ position: "absolute", right: 10, top: 5 }}
-                      onPress={() => onRemove(index)}
-                    >
-                      <AntDesign name="closecircle" size={24} color={Colors.background} />
-                    </Pressable>
-                  )}
-                </Pressable>
-              );
-            })}
-        </ScrollView>
-      </View>
+      <NestableScrollContainer>
+        <View style={styles.smallImagesContainer}>
+          <NestableDraggableFlatList
+            data={[...selectedImages, ...placeholderImages]}
+            onDragEnd={({ data }) => setSelectedImages(data.filter((d) => !d.isPlaceholder))}
+            keyExtractor={(item) => item.index?.toString() || ""}
+            renderItem={renderItem}
+            horizontal
+            scrollEnabled
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      </NestableScrollContainer>
     </View>
   );
 }
@@ -212,7 +283,6 @@ export default function AddStock({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   bannerImageContainer: {
-    padding: 5,
     width: "100%",
     height: 200,
     alignItems: "center",
