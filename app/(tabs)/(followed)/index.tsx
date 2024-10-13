@@ -57,7 +57,6 @@ export default function WatchlistPage() {
           ),
         }}
       />
-      {/* <View style={{ height: 200 }} /> */}
       <CarsList
         context="followed"
         orderBy={orderState.orderBy}

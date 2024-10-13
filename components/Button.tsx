@@ -5,7 +5,7 @@ import Text from "./Text";
 type ButtonProps = {
   title: string;
   onPress: () => void;
-  type?: "primary" | "secondary" | "disabled";
+  type?: "primary" | "secondary" | "disabled" | "border";
   disabled?: boolean;
   isLoading?: boolean;
 };
@@ -23,7 +23,14 @@ export default function Button({ title, onPress, type = "primary", isLoading }: 
         <Text
           style={[
             styles.text,
-            { color: type === "primary" ? Colors.textPrimary : Colors.textDark },
+            {
+              color:
+                type === "primary"
+                  ? Colors.textPrimary
+                  : type === "border"
+                  ? Colors.primary
+                  : Colors.textDark,
+            },
           ]}
         >
           {title}
@@ -48,6 +55,11 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: Colors.borderGray,
+  },
+  border: {
+    backgroundColor: Colors.background,
+    borderWidth: 2,
+    borderColor: Colors.primary,
   },
   text: {
     color: Colors.textPrimary,

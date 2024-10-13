@@ -22,6 +22,14 @@ export default function NoConversations() {
           onPress={() => router.push({ pathname: "/(chats)/users-list" })}
         />
       </View>
+      <Text style={styles.buttonSeperator}>or</Text>
+      <View style={styles.buttonContainer}>
+        <Button
+          type="border"
+          title="Invite Phone Contacts"
+          onPress={() => router.push({ pathname: "/(chats)/invite-friends" })}
+        />
+      </View>
     </View>
   );
 }
@@ -38,6 +46,7 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Bold",
     color: Colors.textDark,
     textAlign: "center",
+    letterSpacing: 0.5,
   },
   highlightHeader: {
     color: Colors.primary,
@@ -56,5 +65,14 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "80%",
     paddingHorizontal: 20,
+    justifyContent: "center",
+  },
+  buttonSeperator: {
+    paddingVertical: 15,
+    fontSize: 18,
+    fontFamily: "SF_Pro_Display_Regular",
+    color: Colors.textLight,
+    textAlign: "center",
+    letterSpacing: 0.5,
   },
 });
