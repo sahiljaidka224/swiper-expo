@@ -7,7 +7,7 @@ import {
   StyleSheet,
   I18nManager,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { Component, PropsWithChildren, useEffect } from "react";
 
 import { RectButton } from "react-native-gesture-handler";
@@ -148,10 +148,10 @@ function MessageText({
   let messageText = "";
   switch (lastMessageType) {
     case "image":
-      messageText = "Image";
+      messageText = "Photo";
       return (
         <>
-          <Ionicons name="image-outline" size={18} color="black" />
+          <FontAwesome name="camera" size={16} color={Colors.gray} style={{ marginRight: 2 }} />
           <Text style={styles.msgText}>{messageText}</Text>
         </>
       );
@@ -159,7 +159,12 @@ function MessageText({
       messageText = "Video";
       return (
         <>
-          <Ionicons name="videocam-outline" size={18} color="black" />
+          <FontAwesome
+            name="video-camera"
+            size={18}
+            color={Colors.gray}
+            style={{ marginRight: 2 }}
+          />
           <Text style={styles.msgText}>{messageText}</Text>
         </>
       );

@@ -327,6 +327,11 @@ export default function ChatComponent({
       source={assets ? assets[0] : backroundPattern}
       style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
     >
+      <Stack.Screen
+        options={{
+          headerTitle: () => <Header />,
+        }}
+      />
       {carGroups && carGroups.length > 0 ? (
         <View style={styles.carGroupWrapper}>
           <FlatList<CometChat.Conversation>
@@ -360,11 +365,6 @@ export default function ChatComponent({
           })}
         </View>
       ) : null}
-      <Stack.Screen
-        options={{
-          headerTitle: () => <Header />,
-        }}
-      />
       {isGalleryVisible && selectedImage && (
         <Gallery
           images={[{ url: selectedImage, imageIndex: 0 }]}

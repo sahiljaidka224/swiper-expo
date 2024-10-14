@@ -3,13 +3,21 @@ import Avatar from "@/components/Avatar";
 import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import OrganisationCard from "@/components/OrganisationContactCard";
 import Colors from "@/constants/Colors";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Text from "@/components/Text";
 
 export default function UserProfile() {
   const { id } = useLocalSearchParams();
   const { user, isLoading, error } = useGetUserDetails(id as string);
+  const segments = useSegments();
+
+  const onMessagePress = () => {
+    const userId = id as string;
+    if (userId && userId.trimEnd() !== "") {
+      router.push(`/(tabs)/${segments[1]}/${userId}`);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -24,7 +32,7 @@ export default function UserProfile() {
           carId=""
           phoneNumber={user?.phoneNumber}
           buttonsType="secondary"
-          userId={id as string}
+          onMessage={onMessagePress}
         />
       </View>
       {user?.organisations?.map((org: any) => {
