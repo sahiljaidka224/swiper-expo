@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import messaging from "@react-native-firebase/messaging";
+import * as TaskManager from "expo-task-manager";
+
 export interface CurrentUser {
   name: string;
   id: string;
@@ -61,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await SecureStore.deleteItemAsync("authToken");
     await SecureStore.deleteItemAsync("user");
     await CometChat.logout().catch((e) => console.log("Error while logging out", e));
+    await TaskManager.unregisterAllTasksAsync();
   };
 
   const updateUser = async (user: CurrentUser) => {

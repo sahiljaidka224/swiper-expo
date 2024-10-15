@@ -3,9 +3,10 @@ import * as Notifications from "expo-notifications";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { Platform } from "react-native";
 import messaging from "@react-native-firebase/messaging";
+import { showToast } from "@/components/Toast";
 
 function handleRegistrationError(errorMessage: string) {
-  throw new Error(errorMessage);
+  showToast("Error", errorMessage, "error");
 }
 
 async function registerForPushNotificationsAsync() {

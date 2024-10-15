@@ -2,7 +2,7 @@
   "expo": {
     "name": "Swiper",
     "slug": "swiper",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
-        "NSMicrophoneUsageDescription": "Test"
+        "NSMicrophoneUsageDescription": "This app uses microphone for sending audio messages.",
+        "UIBackgroundModes": ["fetch", "remote-notification", "processing"]
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -49,6 +50,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-notification-service-extension-plugin",
+        {
+          "mode": "development",
+          "iosNSEFilePath": "./assets/NotificationService.m"
+        }
+      ],
       "expo-router",
       "expo-secure-store",
       [
