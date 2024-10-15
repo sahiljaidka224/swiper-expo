@@ -6,13 +6,13 @@ import { useGetUnreadMessages } from "@/hooks/cometchat/messages";
 import { Image } from "expo-image";
 import { Tabs, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { AppState, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import analytics from "@react-native-firebase/analytics";
 
 export default function TabsRootLayout() {
   const segments = useSegments();
-  useGetUnreadMessages();
+  const { getUnreadMessages } = useGetUnreadMessages();
   const { unreadCount } = useMessageContext();
 
   useEffect(() => {
@@ -28,6 +28,18 @@ export default function TabsRootLayout() {
       } catch (error) {}
     })();
   }, [segments]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        getUnreadMessages();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

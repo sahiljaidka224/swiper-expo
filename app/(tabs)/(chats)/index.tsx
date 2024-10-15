@@ -6,13 +6,15 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
+  Platform,
+  AppState,
 } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
 import ChatRowLoader from "@/components/SkeletonLoaders/ChatRowLoader";
 import ErrorView from "@/components/Error";
 import { router, Stack, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Colors from "@/constants/Colors";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
@@ -32,6 +34,7 @@ import NoConversations from "@/components/NoConversations";
 import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
+import { useLastNotificationResponse } from "expo-notifications";
 
 const transition = CurvedTransition.delay(100);
 
@@ -43,6 +46,8 @@ function useNotificationObserver(
     let isMounted = true;
 
     async function handleNotification() {
+      fetchConversations();
+      fetchGroupConversations();
       await Notifications.setBadgeCountAsync(0);
       await Notifications.dismissAllNotificationsAsync();
     }
@@ -51,15 +56,11 @@ function useNotificationObserver(
       if (!isMounted || !response?.notification) {
         return;
       }
-      fetchConversations();
       handleNotification();
-      fetchGroupConversations();
     });
 
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      fetchConversations();
       handleNotification();
-      fetchGroupConversations();
     });
 
     return () => {
@@ -72,6 +73,9 @@ export default function Chats() {
   const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
   const [searchText, setSearchText] = useState<string | null>(null);
 
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
   const { users } = useGetCometChatUsers();
   const {
     conversationList: userConversations,
@@ -83,6 +87,8 @@ export default function Chats() {
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   useNotificationObserver(fetchConversations, fetchGroupConversations);
+
+  const lastNotification = useLastNotificationResponse();
 
   const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();
@@ -101,7 +107,6 @@ export default function Chats() {
   useEffect(() => {
     (async () => {
       const { status } = await Contacts.requestPermissionsAsync();
-      console.log("status", status);
       if (status === "granted") {
         const { data } = await Contacts.getContactsAsync({
           fields: [Contacts.Fields.PhoneNumbers],
@@ -114,6 +119,42 @@ export default function Chats() {
         await Linking.openSettings();
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      fetchConversations();
+      fetchGroupConversations();
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      fetchConversations();
+      fetchGroupConversations();
+    });
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        console.log("App has come to the foreground!");
+        // Reset the badge count when the app is in the foreground
+        Notifications.setBadgeCountAsync(0);
+        fetchConversations();
+        fetchGroupConversations();
+        Notifications.dismissAllNotificationsAsync();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   const filteredPhoneContacts = phoneContacts.filter((contact) => {
