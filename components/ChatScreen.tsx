@@ -376,7 +376,20 @@ export default function ChatComponent({
       )}
       <GiftedChat
         isTyping={isTyping}
-        messages={messages}
+        messages={
+          messages
+            ? [
+                ...messages,
+                {
+                  _id: "1",
+                  text: "Messages are end-to-end encrypted. No one outside of this chat, not even Swiper, can read or listen to them.",
+                  createdAt: 0,
+                  user: { _id: 1, name: "User" },
+                  system: true,
+                },
+              ]
+            : []
+        }
         alignTop
         scrollToBottom
         scrollToBottomComponent={() => <Text>V</Text>}
@@ -532,7 +545,15 @@ const SystemMessageText = (props: SystemMessageProps<IMessage>) => {
   return (
     <Text
       {...props}
-      style={{ textAlign: "center", color: Colors.gray, fontSize: 10, paddingVertical: 12 }}
+      style={{
+        textAlign: "center",
+        color: Colors.muted,
+        fontSize: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 18,
+        letterSpacing: 0.1,
+      }}
+      maxFontSizeMultiplier={1}
     >
       {props.currentMessage?.text}
     </Text>
