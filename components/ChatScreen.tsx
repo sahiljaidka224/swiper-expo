@@ -553,7 +553,7 @@ const SystemMessageText = (props: SystemMessageProps<IMessage>) => {
         paddingHorizontal: 18,
         letterSpacing: 0.1,
       }}
-      maxFontSizeMultiplier={1}
+      maxFontSizeMultiplier={1.2}
     >
       {props.currentMessage?.text}
     </Text>
