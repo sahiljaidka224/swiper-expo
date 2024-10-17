@@ -2,7 +2,7 @@ import Colors from "@/constants/Colors";
 import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import Text from "./Text";
 
-type ButtonProps = {
+export type ButtonProps = {
   title: string;
   onPress: () => void;
   type?: "primary" | "secondary" | "disabled" | "border";

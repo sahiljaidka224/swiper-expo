@@ -3,6 +3,7 @@ import Text from "./Text";
 import Colors from "@/constants/Colors";
 import Button from "./Button";
 import { router } from "expo-router";
+import PulseButton from "./PulseButton";
 
 export default function NoConversations() {
   return (
@@ -16,12 +17,10 @@ export default function NoConversations() {
         <Text style={styles.subHeaderHighlight}>Australian car dealers</Text> for you to {"\n"} find
         and connect with.
       </Text>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Find other dealers NOW!"
-          onPress={() => router.push({ pathname: "/(chats)/users-list" })}
-        />
-      </View>
+      <PulseButton
+        title="Find other dealers NOW!"
+        onPress={() => router.push({ pathname: "/(chats)/users-list" })}
+      />
       <Text style={styles.buttonSeperator}>or</Text>
       <View style={styles.buttonContainer}>
         <Button
