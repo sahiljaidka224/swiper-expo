@@ -8,7 +8,6 @@ import {
   Platform,
   Pressable,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";

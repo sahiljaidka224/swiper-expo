@@ -20,7 +20,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
         "NSMicrophoneUsageDescription": "This app uses microphone for sending audio messages.",
-        "UIBackgroundModes": ["fetch", "remote-notification", "processing"]
+        "UIBackgroundModes": ["fetch", "remote-notification"]
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -53,7 +53,7 @@
       [
         "expo-notification-service-extension-plugin",
         {
-          "mode": "development",
+          "mode": "production",
           "iosNSEFilePath": "./assets/NotificationService.m"
         }
       ],

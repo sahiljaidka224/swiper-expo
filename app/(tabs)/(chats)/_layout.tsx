@@ -87,14 +87,8 @@ export default function ChatsLayout() {
           options={{
             title: "Swiper Users",
             headerBackTitle: "",
-            // presentation: "modal",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
-            // headerRight: () => (
-            //   <Pressable onPress={() => router.back()}>
-            //     <AntDesign name="closecircleo" size={24} color="black" />
-            //   </Pressable>
-            // ),
           }}
         />
         <Stack.Screen
