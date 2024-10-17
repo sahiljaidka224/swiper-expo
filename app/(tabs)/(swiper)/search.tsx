@@ -400,11 +400,7 @@ export default function SearchPage() {
             <Button
               title="Show Results"
               onPress={showSearchResults}
-              type={
-                !getValues("make") || carsCount.length === 0 || carsCount[0].num === 0
-                  ? "disabled"
-                  : "primary"
-              }
+              type={carsCount.length === 0 || carsCount[0].num === 0 ? "disabled" : "primary"}
             />
             <Button
               title="Clear Search"

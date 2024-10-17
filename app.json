@@ -13,6 +13,7 @@
       "backgroundColor": "#1063FD"
     },
     "ios": {
+      "deploymentTarget": "12.0",
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
       "buildNumber": "1",
