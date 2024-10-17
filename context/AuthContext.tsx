@@ -57,13 +57,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    setToken(null);
-    setUserInfo(null);
-    await messaging().deleteToken();
-    await SecureStore.deleteItemAsync("authToken");
-    await SecureStore.deleteItemAsync("user");
-    await CometChat.logout().catch((e) => console.log("Error while logging out", e));
-    await TaskManager.unregisterAllTasksAsync();
+    try {
+      setToken(null);
+      setUserInfo(null);
+      await messaging().deleteToken();
+      await SecureStore.deleteItemAsync("authToken");
+      await SecureStore.deleteItemAsync("user");
+      await CometChat.logout().catch((e) => console.log("Error while logging out", e));
+      await TaskManager.unregisterAllTasksAsync();
+    } catch (error) {
+      console.log("Error while logging out", error);
+    }
   };
 
   const updateUser = async (user: CurrentUser) => {

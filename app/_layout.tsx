@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Stack, useSegments, router } from "expo-router";
+import { Stack, useSegments, router, useNavigation } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -14,6 +14,7 @@ import { MessageContextProvider } from "@/context/MessageContext";
 import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import UserDefaults from "@alevy97/react-native-userdefaults/src/ReactNativeUserDefaults.ios";
+import { showToast } from "@/components/Toast";
 
 const groupDefaults = new UserDefaults("com.galaxies.swiper");
 export { ErrorBoundary } from "expo-router";
@@ -39,6 +40,7 @@ export const unstable_settings = {
 function BaseLayout() {
   const segments = useSegments();
   const { isAuthLoading, user, token } = useAuth();
+  const navigation = useNavigation();
 
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -92,7 +94,18 @@ function BaseLayout() {
         }
       })();
     } else if (!token && inTabsGroup) {
-      router.replace("/");
+      try {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        navigation.reset({
+          index: 0,
+          routes: [{ key: "index", name: "index" as string, path: "/index" }],
+        });
+      } catch (error) {
+        console.error(error);
+        showToast("Error", "Please close the app and open again!", "error");
+      }
     }
   }, [token, isAuthLoading]);
 
