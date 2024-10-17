@@ -7,6 +7,7 @@ import {
   FlatList,
   ListRenderItem,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -325,7 +326,7 @@ export default function ChatComponent({
   return (
     <ImageBackground
       source={assets ? assets[0] : backroundPattern}
-      style={{ flex: 1, marginBottom: insets.bottom, backgroundColor: Colors.background }}
+      style={{ flex: 1, backgroundColor: Colors.background }}
     >
       <Stack.Screen
         options={{
@@ -401,7 +402,7 @@ export default function ChatComponent({
               ? 60
               : 0,
         }}
-        bottomOffset={insets.bottom}
+        bottomOffset={0}
         renderAvatar={null}
         minInputToolbarHeight={45}
         maxComposerHeight={100}
@@ -473,6 +474,7 @@ export default function ChatComponent({
         ]}
         renderFooter={() => <TypingIndicator isTyping={isTyping} />}
       />
+      {Platform.OS === "android" && <KeyboardAvoidingView behavior="padding" />}
     </ImageBackground>
   );
 }

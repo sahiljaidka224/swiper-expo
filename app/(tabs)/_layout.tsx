@@ -56,6 +56,7 @@ export default function TabsRootLayout() {
             backgroundColor: Colors.background,
           },
           headerShadowVisible: false,
+          tabBarHideOnKeyboard: true,
         }}
       >
         <Tabs.Screen
@@ -67,10 +68,10 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display:
-                (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
-                  ? "none"
-                  : "flex",
+              // display:
+              //   (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
+              //     ? "none"
+              //     : "flex",
             },
           }}
         />
@@ -83,10 +84,10 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display:
-                (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
-                  ? "none"
-                  : "flex",
+              // display:
+              //   (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
+              //     ? "none"
+              //     : "flex",
             },
           }}
         />
@@ -131,7 +132,7 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display: segments[2] === "[id]" || segments[3] === "[id]" ? "none" : "flex",
+              // display: segments[2] === "[id]" || segments[3] === "[id]" ? "none" : "flex",
             },
           }}
         />
@@ -144,10 +145,10 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display:
-                (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
-                  ? "none"
-                  : "flex",
+              // display:
+              //   (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
+              //     ? "none"
+              //     : "flex",
             },
           }}
         />
@@ -160,10 +161,10 @@ export default function TabsRootLayout() {
             tabBarStyle: {
               paddingTop: 20,
               backgroundColor: Colors.background,
-              display:
-                (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
-                  ? "none"
-                  : "flex",
+              // display:
+              //   (segments.includes("new-chat") && segments[3] === "[id]") || segments[2] === "[id]"
+              //     ? "none"
+              //     : "flex",
             },
           }}
         />
