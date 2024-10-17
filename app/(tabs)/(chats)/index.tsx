@@ -6,8 +6,8 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  Platform,
   AppState,
+  Platform,
 } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
@@ -35,7 +35,9 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useLastNotificationResponse } from "expo-notifications";
+import UserDefaults from "@alevy97/react-native-userdefaults/src/ReactNativeUserDefaults.ios";
 
+const groupDefaults = new UserDefaults("com.galaxies.swiper");
 const transition = CurvedTransition.delay(100);
 
 function useNotificationObserver(
@@ -48,8 +50,16 @@ function useNotificationObserver(
     async function handleNotification() {
       fetchConversations();
       fetchGroupConversations();
-      await Notifications.setBadgeCountAsync(0);
-      await Notifications.dismissAllNotificationsAsync();
+      try {
+        Notifications.setBadgeCountAsync(0);
+        Notifications.dismissAllNotificationsAsync();
+        if (Platform.OS === "ios") {
+          await groupDefaults.set("count", 0);
+          await groupDefaults.remove("count");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     Notifications.getLastNotificationResponseAsync().then((response) => {
@@ -143,12 +153,35 @@ export default function Chats() {
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
-        console.log("App has come to the foreground!");
-        // Reset the badge count when the app is in the foreground
-        Notifications.setBadgeCountAsync(0);
-        fetchConversations();
-        fetchGroupConversations();
-        Notifications.dismissAllNotificationsAsync();
+        try {
+          fetchConversations();
+          fetchGroupConversations();
+          Notifications.setBadgeCountAsync(0);
+          Notifications.dismissAllNotificationsAsync();
+          if (Platform.OS === "ios") {
+            groupDefaults.getAll().then((res) => console.log("groupDefaults", res));
+
+            // groupDefaults
+            //   .remove("count")
+            //   .then(() => {
+            //     console.warn("success removing with user defaults");
+            //   })
+            //   .catch((e) => {
+            //     console.error("error with user defaulkts", e);
+            //   });
+
+            groupDefaults
+              .set("count", 0)
+              .then(() => {
+                console.warn("success with user defaults");
+              })
+              .catch((e) => {
+                console.error("error with user defaulkts", e);
+              });
+          }
+        } catch (error) {
+          console.error(error);
+        }
       }
     });
 
