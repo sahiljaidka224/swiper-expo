@@ -279,7 +279,6 @@ export const useManualSearch = (initialPage: number = 1, limit: number = 10) => 
   let fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/search`;
 
   const { trigger, data, error, isMutating } = useSWRMutation(fetchUrl, getManualSearch);
-  console.log({ data });
   return {
     triggerManualSearch: trigger,
     isMutating,

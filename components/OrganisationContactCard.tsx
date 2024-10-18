@@ -12,9 +12,15 @@ interface OrganisationCardProps {
     lng: string | null;
   };
   orgId: string;
+  phoneNumber?: string | null;
 }
 
-export default function OrganisationCard({ name, address, orgId }: OrganisationCardProps) {
+export default function OrganisationCard({
+  name,
+  address,
+  orgId,
+  phoneNumber,
+}: OrganisationCardProps) {
   const segments = useSegments();
   const onShowStock = () => {
     router.navigate({ pathname: `/(tabs)/${segments[1]}/org/[listing]`, params: { orgId } });
@@ -39,6 +45,15 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
     }
   };
 
+  const onCallPress = async () => {
+    if (!phoneNumber) return;
+    try {
+      await Linking.openURL(`tel:${phoneNumber}`);
+    } catch (error) {
+      console.warn(`Unable to initiate call ${error}`);
+    }
+  };
+
   return (
     <Pressable style={styles.contactCardContainer} onPress={() => {}}>
       <View style={styles.container}>
@@ -51,6 +66,11 @@ export default function OrganisationCard({ name, address, orgId }: OrganisationC
         {address.lat && address.lng ? <Button title="Locate" onPress={onLocate} /> : null}
         <Button title="Show Stock" onPress={onShowStock} />
       </View>
+      {phoneNumber ? (
+        <View style={styles.itemButtonsContainer}>
+          <Button title="Call" onPress={onCallPress} />
+        </View>
+      ) : null}
     </Pressable>
   );
 }

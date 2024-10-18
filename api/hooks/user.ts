@@ -119,8 +119,9 @@ const loginWithPhone = async (
 export function useGetUserDetails(userId: string) {
   const { token } = useAuth();
   const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/${userId}`;
-  const { data, error, isLoading } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
-    getUserDetails(url, { arg: { token } })
+  const { data, error, isLoading } = useSWR(
+    token && userId !== "0" ? [fetchUrl, token] : null,
+    ([url, token]) => getUserDetails(url, { arg: { token } })
   );
 
   return {

@@ -6,10 +6,12 @@ import Colors from "@/constants/Colors";
 import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Text from "@/components/Text";
+import { useGetOrgDetails } from "@/api/hooks/organisation";
 
 export default function UserProfile() {
-  const { id } = useLocalSearchParams();
+  const { id, orgId } = useLocalSearchParams();
   const { user, isLoading, error } = useGetUserDetails(id as string);
+  const { org, isLoading: isOrgLoading, error: orgError } = useGetOrgDetails(orgId as string);
   const segments = useSegments();
 
   const onMessagePress = () => {
@@ -19,23 +21,29 @@ export default function UserProfile() {
     }
   };
 
+  const organisations = user?.organisations ? user?.organisations : org ? [org] : [];
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerTitle: "" }} />
-      <View style={styles.userContainer}>
-        {isLoading ? <ActivityIndicator size="large" color={Colors.primary} /> : null}
-        <View style={styles.avatarContainer}>
-          <Avatar userId={id as string} />
+      {user && (
+        <View style={styles.userContainer}>
+          {isLoading || isOrgLoading ? (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          ) : null}
+          <View style={styles.avatarContainer}>
+            <Avatar userId={id as string} />
+          </View>
+          <Text style={styles.nameText}>{user?.displayName}</Text>
+          <WatchlistButtonsContainer
+            carId=""
+            phoneNumber={user?.phoneNumber}
+            buttonsType="secondary"
+            onMessage={onMessagePress}
+          />
         </View>
-        <Text style={styles.nameText}>{user?.displayName}</Text>
-        <WatchlistButtonsContainer
-          carId=""
-          phoneNumber={user?.phoneNumber}
-          buttonsType="secondary"
-          onMessage={onMessagePress}
-        />
-      </View>
-      {user?.organisations?.map((org: any) => {
+      )}
+      {(organisations ?? []).map((org: any) => {
         return (
           <OrganisationCard
             key={org?.organisationId}
@@ -46,6 +54,7 @@ export default function UserProfile() {
               lng: org?.longitude ?? null,
             }}
             name={org?.name}
+            phoneNumber={org?.phoneNumber}
           />
         );
       })}

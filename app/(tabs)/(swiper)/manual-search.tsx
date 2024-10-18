@@ -19,10 +19,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import Text from "@/components/Text";
 import { router } from "expo-router";
-import StockButtonContainer from "@/components/StockButtonContainer";
-import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
+import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
+import EvilIcons from "@expo/vector-icons/build/EvilIcons";
 
 const debounce = (func: (...args: any[]) => void, delay: number): ((...args: any[]) => void) => {
   let timeoutId: NodeJS.Timeout;
@@ -174,17 +174,27 @@ export default function ManualSearch() {
           <Pressable
             style={styles.userContainer}
             onPress={() => {
-              router.push({ pathname: "/(tabs)/user/[user]", params: { id: item.ownerUserId } });
+              router.push({
+                pathname: `/(tabs)/user/[user]`,
+                params: { id: item.ownerUserId, orgId: item.organisationId },
+              });
             }}
           >
             <View style={styles.leftContainer}>
               <View style={styles.avatarContainer}>
-                <Avatar userId={""} />
+                <Avatar userId={""} isCar />
               </View>
               <View>
                 <Text style={styles.name}>{item.name}</Text>
+                {item.address && (
+                  <View style={styles.addressContainer}>
+                    <FontAwesome5 name="map-marker-alt" size={16} color={Colors.red} />
+                    <Text style={styles.addressText}>{item?.address}</Text>
+                  </View>
+                )}
               </View>
             </View>
+            <EvilIcons name="chevron-right" size={24} color={Colors.iconGray} />
           </Pressable>
         </Animated.View>
       );
@@ -316,13 +326,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     alignItems: "center",
     marginHorizontal: 5,
-    padding: 5,
     justifyContent: "space-between",
   },
   name: {
     color: Colors.textDark,
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: "SF_Pro_Display_Medium",
     textTransform: "capitalize",
+  },
+  addressContainer: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+  },
+  addressText: {
+    color: Colors.textLight,
+    fontSize: 16,
+    fontFamily: "SF_Pro_Display_Regular",
   },
 });
