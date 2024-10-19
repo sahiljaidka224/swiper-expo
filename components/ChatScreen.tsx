@@ -357,7 +357,7 @@ export default function ChatComponent({
             return (
               <Pressable style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
                 <View style={{ width: 40, height: 40 }}>
-                  <Avatar userId={member.getUid()} />
+                  <Avatar userId={member.getUid()} showOnlineIndicator />
                 </View>
                 <Text style={{ marginLeft: 10 }}>{member.getName()}</Text>
               </Pressable>

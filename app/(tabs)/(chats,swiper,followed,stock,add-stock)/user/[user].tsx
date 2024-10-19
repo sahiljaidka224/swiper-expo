@@ -32,7 +32,7 @@ export default function UserProfile() {
             <ActivityIndicator size="large" color={Colors.primary} />
           ) : null}
           <View style={styles.avatarContainer}>
-            <Avatar userId={id as string} />
+            <Avatar userId={id as string} showOnlineIndicator />
           </View>
           <Text style={styles.nameText}>{user?.displayName}</Text>
           <WatchlistButtonsContainer

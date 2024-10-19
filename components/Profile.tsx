@@ -285,7 +285,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
 
           {user && context === "update" ? (
             <Pressable style={{ height: 125, width: 125 }} onPress={onShowActionSheet}>
-              <Avatar userId={user?.id} />
+              <Avatar userId={user?.id} showOnlineIndicator />
             </Pressable>
           ) : (
             <View style={styles.headingWrapper}>

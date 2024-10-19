@@ -10,14 +10,12 @@ import Text from "@/components/Text";
 import ChatComponent from "@/components/ChatScreen";
 import { useAuth } from "@/context/AuthContext";
 import { useGetGroupConversationsWithTags } from "@/hooks/cometchat/conversations";
-import { useGetCometChatUser } from "@/hooks/cometchat/users";
 import Colors from "@/constants/Colors";
 
 export default function ChatDetailsPage() {
   const { id } = useLocalSearchParams();
   const { user: currentUser } = useAuth();
   const { groupConversations, getGroups } = useGetGroupConversationsWithTags([id as string]);
-  const { user: cometChatUser } = useGetCometChatUser(id as string);
   const { user, isLoading: isUserLoading } = useGetUserDetails(id as string);
 
   const {
@@ -71,12 +69,7 @@ export default function ChatDetailsPage() {
       loadingMore={loading}
       userId={id as string}
       Header={() => (
-        <Header
-          userId={id as string}
-          isLoading={isUserLoading}
-          name={user?.displayName}
-          onlineStatus={cometChatUser?.getStatus() ?? undefined}
-        />
+        <Header userId={id as string} isLoading={isUserLoading} name={user?.displayName} />
       )}
       isTyping={isTyping}
       context="user"
@@ -94,12 +87,10 @@ const Header = ({
   userId,
   isLoading,
   name,
-  onlineStatus,
 }: {
   isLoading: boolean;
   userId: string;
   name: string;
-  onlineStatus?: string;
 }) => {
   if (isLoading) return;
 
@@ -113,8 +104,7 @@ const Header = ({
   return (
     <Pressable style={styles.headerContainer} onPress={onPress}>
       <View style={styles.avatarContainer}>
-        {onlineStatus && onlineStatus === "online" ? <View style={styles.onlineIndicator} /> : null}
-        <Avatar userId={userId} />
+        <Avatar userId={userId} showOnlineIndicator />
       </View>
       <Text style={styles.name} allowFontScaling={false}>
         {name}

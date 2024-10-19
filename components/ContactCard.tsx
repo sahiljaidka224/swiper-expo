@@ -26,7 +26,7 @@ function ContactCard({
   return (
     <Pressable style={styles.contactCardContainer} onPress={onPress}>
       <View style={styles.avatarContainer}>
-        <Avatar userId={userId} />
+        <Avatar userId={userId} showOnlineIndicator />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.contactName}>{name}</Text>

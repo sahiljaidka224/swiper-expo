@@ -37,10 +37,10 @@ export const useGetCometChatUser = (uid: string) => {
       listenerID,
       new CometChat.UserListener({
         onUserOnline: (onlineUser: CometChat.User) => {
-          setUser(onlineUser);
+          if (onlineUser.getUid() === uid) setUser(onlineUser);
         },
         onUserOffline: (offlineUser: CometChat.User) => {
-          setUser(offlineUser);
+          if (offlineUser.getUid() === uid) setUser(offlineUser);
         },
       })
     );
@@ -51,6 +51,7 @@ export const useGetCometChatUser = (uid: string) => {
   }, []);
 
   const fetchUser = async () => {
+    if (!uid || uid === "") return;
     try {
       const user = await CometChat.getUser(uid);
       setUser(user);

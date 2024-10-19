@@ -96,7 +96,12 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
           <TouchableHighlight activeOpacity={0.25} underlayColor={Colors.lightGrayBackground}>
             <View style={styles.container}>
               <View style={styles.avatarContainer}>
-                <Avatar userId={userUID} source={icon} borderRadius={userUID ? 99999 : 12} />
+                <Avatar
+                  userId={userUID}
+                  source={icon}
+                  borderRadius={userUID ? 99999 : 12}
+                  showOnlineIndicator
+                />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.nameText}>{userName}</Text>
