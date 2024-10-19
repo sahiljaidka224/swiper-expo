@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaskInput from "react-native-mask-input";
@@ -16,6 +17,7 @@ import { useLoginWithPhone } from "@/api/hooks/user";
 import ErrorView from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 import Text from "@/components/Text";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
 
 const phoneNumberMask = [
   // "(",
@@ -23,12 +25,8 @@ const phoneNumberMask = [
   // "6",
   // "1",
   // ")",
-  "(",
   "0",
   /\d/,
-  ")",
-  " ",
-  /\d/,
   /\d/,
   /\d/,
   " ",
@@ -36,6 +34,7 @@ const phoneNumberMask = [
   /\d/,
   /\d/,
   " ",
+  /\d/,
   /\d/,
   /\d/,
 ];
@@ -48,6 +47,7 @@ export default function OTPPage() {
     masked: "",
     unmasked: "",
   });
+  const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
   const [password, setPassword] = useState<string>("");
   const keyboardVerticalOffset = Platform.OS === "ios" ? 90 : 0;
   const { bottom } = useSafeAreaInsets();
@@ -55,7 +55,10 @@ export default function OTPPage() {
   useEffect(() => {
     if (!isMutating && userInfo) {
       if (userInfo && !userInfo.isAccountApproved) {
-        Alert.alert("Account not approved", "Your account is not approved yet. Please try again later.");
+        Alert.alert(
+          "Account not approved",
+          "Your account is not approved yet. Please try again later."
+        );
         return;
       }
       if (userInfo && userInfo?.token) {
@@ -90,12 +93,6 @@ export default function OTPPage() {
       behavior="padding"
     >
       <View style={styles.container}>
-        {/* {loading && (
-          <View style={[StyleSheet.absoluteFill, styles.loading]}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={{ padding: 10, fontSize: 18 }}>Sending code...</Text>
-          </View>
-        )} */}
         {error && <ErrorView />}
         <Text style={styles.description}>
           Swiper will need to verify your account. Carrier charges may apply.
@@ -107,12 +104,15 @@ export default function OTPPage() {
           <View style={styles.seperator} />
 
           <MaskInput
-            style={styles.input}
+            style={[
+              styles.input,
+              { color: phoneNumber.unmasked.length === 10 ? Colors.primary : Colors.textDark },
+            ]}
             value={phoneNumber.masked}
             keyboardType="numeric"
             autoFocus
             placeholder="04 131 313 13"
-            placeholderTextColor={Colors.textLight}
+            placeholderTextColor={Colors.gray}
             onChangeText={(masked, unmasked) => {
               setPhoneNumber({ masked, unmasked: `0${unmasked.replaceAll(" ", "")}` });
             }}
@@ -120,15 +120,29 @@ export default function OTPPage() {
             maxFontSizeMultiplier={1.3}
           />
           <View style={styles.seperator} />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={setPassword}
-            placeholderTextColor={Colors.textLight}
-            maxFontSizeMultiplier={1.3}
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                { color: password.length >= 6 ? Colors.primary : Colors.textDark },
+              ]}
+              placeholder="Enter Password"
+              secureTextEntry={secureTextEntry}
+              onChangeText={setPassword}
+              placeholderTextColor={Colors.gray}
+              maxFontSizeMultiplier={1.3}
+            />
+            <Pressable
+              onPress={() => setSecureTextEntry(!secureTextEntry)}
+              style={{ paddingRight: 20, paddingVertical: 10 }}
+            >
+              <Ionicons
+                name={secureTextEntry ? "eye-off" : "eye"}
+                size={20}
+                color={Colors.iconGray}
+              />
+            </Pressable>
+          </View>
         </View>
         <Text style={styles.legal}>
           You must be{" "}
@@ -175,7 +189,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   list: {
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     width: "100%",
     borderRadius: 10,
     padding: 10,
@@ -204,7 +218,7 @@ const styles = StyleSheet.create({
   legal: {
     fontSize: 12,
     textAlign: "center",
-    color: "#000",
+    color: Colors.textDark,
     fontFamily: "SF_Pro_Display_Regular",
   },
   button: {
@@ -216,7 +230,7 @@ const styles = StyleSheet.create({
   },
   enabled: {
     backgroundColor: Colors.primary,
-    color: "#fff",
+    color: Colors.background,
   },
   buttonText: {
     color: Colors.gray,
@@ -224,9 +238,9 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Medium",
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     width: "100%",
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "SF_Pro_Display_Regular",
     padding: 6,
     marginTop: 10,
@@ -236,8 +250,14 @@ const styles = StyleSheet.create({
   loading: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 10,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     justifyContent: "center",
     alignItems: "center",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginRight: 20,
   },
 });
