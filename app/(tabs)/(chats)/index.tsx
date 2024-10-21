@@ -35,9 +35,7 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useLastNotificationResponse } from "expo-notifications";
-import UserDefaults from "@alevy97/react-native-userdefaults/src/ReactNativeUserDefaults.ios";
 
-const groupDefaults = new UserDefaults("com.galaxies.swiper");
 const transition = CurvedTransition.delay(100);
 
 function useNotificationObserver(
@@ -53,10 +51,6 @@ function useNotificationObserver(
       try {
         Notifications.setBadgeCountAsync(0);
         Notifications.dismissAllNotificationsAsync();
-        if (Platform.OS === "ios") {
-          await groupDefaults.set("count", 0);
-          await groupDefaults.remove("count");
-        }
       } catch (error) {
         console.error(error);
       }
@@ -158,27 +152,6 @@ export default function Chats() {
           fetchGroupConversations();
           Notifications.setBadgeCountAsync(0);
           Notifications.dismissAllNotificationsAsync();
-          if (Platform.OS === "ios") {
-            groupDefaults.getAll().then((res) => console.log("groupDefaults", res));
-
-            // groupDefaults
-            //   .remove("count")
-            //   .then(() => {
-            //     console.warn("success removing with user defaults");
-            //   })
-            //   .catch((e) => {
-            //     console.error("error with user defaulkts", e);
-            //   });
-
-            groupDefaults
-              .set("count", 0)
-              .then(() => {
-                console.warn("success with user defaults");
-              })
-              .catch((e) => {
-                console.error("error with user defaulkts", e);
-              });
-          }
         } catch (error) {
           console.error(error);
         }

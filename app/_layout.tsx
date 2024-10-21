@@ -5,7 +5,7 @@ import { Stack, useSegments, router, useNavigation } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { SWRConfig } from "swr";
 import { fetcher } from "@/utils/fetcher";
 import { cometChatInit } from "@/hooks/cometchat";
@@ -13,10 +13,8 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { MessageContextProvider } from "@/context/MessageContext";
 import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import UserDefaults from "@alevy97/react-native-userdefaults/src/ReactNativeUserDefaults.ios";
 import { showToast } from "@/components/Toast";
 
-const groupDefaults = new UserDefaults("com.galaxies.swiper");
 export { ErrorBoundary } from "expo-router";
 
 Notifications.setNotificationHandler({
@@ -63,10 +61,6 @@ function BaseLayout() {
   useEffect(() => {
     async function handleNotification() {
       try {
-        if (Platform.OS === "ios") {
-          await groupDefaults.set("count", 0);
-          await groupDefaults.remove("count");
-        }
         await Notifications.setBadgeCountAsync(0);
         await Notifications.dismissAllNotificationsAsync();
       } catch (error) {

@@ -131,6 +131,7 @@ export default function OTPPage() {
               onChangeText={setPassword}
               placeholderTextColor={Colors.gray}
               maxFontSizeMultiplier={1.3}
+              value={password}
             />
             <Pressable
               onPress={() => setSecureTextEntry(!secureTextEntry)}
