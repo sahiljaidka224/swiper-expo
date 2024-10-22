@@ -12,7 +12,7 @@ import { useGetCometChatUsers } from "@/hooks/cometchat/users";
 import { formatTimestamp } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { router, useLocalSearchParams, useSegments } from "expo-router";
+import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import {
@@ -210,6 +210,7 @@ export default function UsersListPage() {
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior="padding"
     >
+      <Stack.Screen  options={{ title: `Swiper Users${users && users.length > 0 ? `: ${users.length}` : ""}` }} />
       <TextInput
         style={styles.searchInput}
         placeholder="Search Swiper users..."

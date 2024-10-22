@@ -36,7 +36,7 @@ export default function MyStockLayout() {
           options={{
             title: "Recipients",
             headerBackTitle: "",
-            presentation: "modal",
+            presentation: "fullScreenModal",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
             headerLeft: () => (

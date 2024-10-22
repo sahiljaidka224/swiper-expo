@@ -206,3 +206,18 @@ export function useUpdateUserAvatar() {
     error,
   };
 }
+
+export function useUsersCount() {
+  const { token } = useAuth();
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/totalUsers`;
+  const { data, error, isLoading } = useSWR(
+    token ? [fetchUrl, token] : null,
+    ([url, token]) => getUserDetails(url, { arg: { token } })
+  );
+
+  return {
+    totalUsers: data?.data ?? null,
+    error,
+    isLoading,
+  };
+}
