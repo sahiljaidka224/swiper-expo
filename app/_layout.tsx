@@ -1,11 +1,10 @@
 import * as Notifications from "expo-notifications";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Stack, useSegments, router, useNavigation } from "expo-router";
+import { Stack, useSegments, router, useNavigation, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { View } from "react-native";
 import { SWRConfig } from "swr";
 import { fetcher } from "@/utils/fetcher";
 import { cometChatInit } from "@/hooks/cometchat";
@@ -73,38 +72,42 @@ function BaseLayout() {
 
   useEffect(() => {
     if (isAuthLoading) return;
+    try {
+      const inTabsGroup = segments[0] === "(tabs)";
 
-    const inTabsGroup = segments[0] === "(tabs)";
-
-    if (token && !inTabsGroup && user) {
-      (async () => {
-        if (user?.profileComplete) {
-          const isSuccess = await cometChatInit(user?.id, user?.name);
-          if (isSuccess) {
-            router.replace("/(tabs)/(chats)");
+      if (token && !inTabsGroup && user) {
+        (async () => {
+          if (user?.profileComplete) {
+            const isSuccess = await cometChatInit(user?.id, user?.name);
+            if (isSuccess) {
+              router.replace("/(tabs)/(chats)");
+            }
+          } else {
+            router.replace("/profile");
           }
-        } else {
-          router.replace("/profile");
+        })();
+      } else if (!token && inTabsGroup) {
+        try {
+          while (router.canGoBack()) {
+            router.back();
+          }
+          navigation.reset({
+            index: 0,
+            routes: [{ key: "index", name: "index" as string, path: "/index" }],
+          });
+        } catch (error) {
+          console.error(error);
+          showToast("Error", "Please close the app and open again!", "error");
         }
-      })();
-    } else if (!token && inTabsGroup) {
-      try {
-        while (router.canGoBack()) {
-          router.back();
-        }
-        navigation.reset({
-          index: 0,
-          routes: [{ key: "index", name: "index" as string, path: "/index" }],
-        });
-      } catch (error) {
-        console.error(error);
-        showToast("Error", "Please close the app and open again!", "error");
       }
+    } catch (error) {
+    } finally {
+      SplashScreen.hideAsync();
     }
   }, [token, isAuthLoading]);
 
   if (!loaded || isAuthLoading) {
-    return <View />;
+    return <Slot />;
   }
 
   return (
