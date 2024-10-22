@@ -115,8 +115,8 @@ export const useGetGroupConversationsWithTags = (tags: string[]) => {
       const conversations = await conversationsRequest.fetchNext();
 
       const sortedConversations = conversations.sort((a, b) => {
-        const sentAtA = a.getLastMessage().getSentAt();
-        const sentAtB = b.getLastMessage().getSentAt();
+        const sentAtA = a?.getLastMessage()?.getSentAt();
+        const sentAtB = b?.getLastMessage()?.getSentAt();
         const unreadCountA = a.getUnreadMessageCount();
         const unreadCountB = b.getUnreadMessageCount();
 
