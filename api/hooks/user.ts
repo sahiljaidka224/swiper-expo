@@ -3,16 +3,36 @@ import { useEffect } from "react";
 import useSWR from "swr";
 import useSWRMutation from "swr/dist/mutation";
 
-const getUserDetails = async (url: string, { arg }: { arg: { token: string } }) => {
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-      Authorization: `Bearer ${arg.token}`,
-    },
-  });
+const getUserOrgName = async (url: string, { arg }: { arg: { token: string } }) => {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${arg.token}`,
+      },
+    });
 
-  return response.json();
+    return response.json();
+  } catch (error) {
+    return "";
+  }
+};
+
+const getUserDetails = async (url: string, { arg }: { arg: { token: string } }) => {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${arg.token}`,
+      },
+    });
+
+    return response.json();
+  } catch (error) {
+    return [];
+  }
 };
 
 const getUserOrgDetails = async (url: string, { arg }: { arg: { token: string } }) => {
@@ -210,13 +230,27 @@ export function useUpdateUserAvatar() {
 export function useUsersCount() {
   const { token } = useAuth();
   const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/totalUsers`;
-  const { data, error, isLoading } = useSWR(
-    token ? [fetchUrl, token] : null,
-    ([url, token]) => getUserDetails(url, { arg: { token } })
+  const { data, error, isLoading } = useSWR(token ? [fetchUrl, token] : null, ([url, token]) =>
+    getUserDetails(url, { arg: { token } })
   );
 
   return {
     totalUsers: data?.data ?? null,
+    error,
+    isLoading,
+  };
+}
+
+export function useUserOrgName(userId: string) {
+  const { token } = useAuth();
+  const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/user/${userId}/organisation`;
+  const { data, error, isLoading } = useSWR(
+    token && userId !== "0" ? [fetchUrl, token] : null,
+    ([url, token]) => getUserOrgName(url, { arg: { token } })
+  );
+
+  return {
+    orgName: data?.data ?? null,
     error,
     isLoading,
   };

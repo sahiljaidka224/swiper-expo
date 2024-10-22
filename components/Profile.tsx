@@ -335,7 +335,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                placeholder="Dealership Name"
+                placeholder="Dealership Name (Optional)"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}

@@ -1,4 +1,5 @@
 import { useGetCarDetails } from "@/api/hooks/car-detail";
+import { useUserOrgName } from "@/api/hooks/user";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import ErrorView from "@/components/Error";
@@ -210,7 +211,9 @@ export default function UsersListPage() {
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior="padding"
     >
-      <Stack.Screen  options={{ title: `Swiper Users${users && users.length > 0 ? `: ${users.length}` : ""}` }} />
+      <Stack.Screen
+        options={{ title: `Swiper Users${users && users.length > 0 ? `: ${users.length}` : ""}` }}
+      />
       <TextInput
         style={styles.searchInput}
         placeholder="Search Swiper users..."
@@ -305,6 +308,7 @@ export const User = React.memo(
     const userUID = user.getUid();
     const userName = user.getName();
     const lastSeen = user.getLastActiveAt();
+    const { orgName } = useUserOrgName(userUID);
 
     return (
       <Pressable style={styles.userContainer} onPress={onPress}>
@@ -312,9 +316,10 @@ export const User = React.memo(
           <View style={styles.avatarContainer}>
             <Avatar userId={userUID} />
           </View>
-          <View>
+          <View style={{ gap: 1 }}>
             <Text style={styles.name}>{userName}</Text>
-            <Text style={styles.orgName}>{`Last seen: ${formatTimestamp(lastSeen, true)}`}</Text>
+            {orgName ? <Text style={styles.orgName}>{orgName}</Text> : null}
+            <Text style={styles.timestamp}>{`Last seen: ${formatTimestamp(lastSeen, true)}`}</Text>
           </View>
         </View>
         {multipleSelectionAllowed ? (
@@ -334,7 +339,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
-  avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },
+  avatarContainer: { width: 50, height: 50, borderRadius: 25 },
   userContainer: {
     flexDirection: "row",
     gap: 10,
@@ -343,6 +348,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     padding: 5,
     justifyContent: "space-between",
+    marginBottom: 5,
   },
   name: {
     color: Colors.textDark,
@@ -350,11 +356,17 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Medium",
     textTransform: "capitalize",
   },
+  timestamp: {
+    color: Colors.textDark,
+    fontSize: 12,
+    fontFamily: "SF_Pro_Display_Light",
+    marginTop: 2,
+  },
   orgName: {
     color: Colors.textDark,
     fontSize: 14,
-    fontFamily: "SF_Pro_Display_Light",
-    marginTop: 2,
+    fontFamily: "SF_Pro_Display_Regular",
+    textTransform: "capitalize",
   },
   searchInput: {
     backgroundColor: Colors.background,
