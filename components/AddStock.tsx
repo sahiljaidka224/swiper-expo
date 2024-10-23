@@ -29,7 +29,7 @@ export interface SelectedImage {
   isPlaceholder?: boolean;
 }
 
-const NUM_IMAGES = 10;
+const NUM_IMAGES = 20;
 
 function updatePlaceholderImages(selectedImagesCount: number): SelectedImage[] {
   return Array.from({ length: NUM_IMAGES - selectedImagesCount }, (_, i) => ({
@@ -167,7 +167,7 @@ export default function AddStock({
         aspect: [4, 3],
         quality: 0.8,
         allowsMultipleSelection: true,
-        selectionLimit: 10 - selectedImages.length,
+        selectionLimit: NUM_IMAGES - selectedImages.length,
         orderedSelection: true,
       });
 
