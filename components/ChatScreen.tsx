@@ -160,7 +160,7 @@ export default function ChatComponent({
 
       let tempFile = {
         name: name,
-        type: Platform.OS === "android" ? file.type : type,
+        type: Platform.OS === "android" && type !== "video" ? `image/${file.type}` : type,
         uri: Platform.OS === "android" ? file.uri : file.uri.replace("file://", ""),
         size: file.fileSize,
       };

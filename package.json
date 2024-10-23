@@ -15,7 +15,6 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^1.2.1",
     "@cometchat/chat-sdk-react-native": "^4.0.9",
     "@cometchat/chat-uikit-react-native": "^4.3.13",
     "@expo/react-native-action-sheet": "^4.1.0",
@@ -48,7 +47,7 @@
     "expo-linking": "~6.3.1",
     "expo-media-library": "~16.0.5",
     "expo-notification-service-extension-plugin": "^1.0.1",
-    "expo-notifications": "~0.28.18",
+    "expo-notifications": "~0.28.19",
     "expo-router": "~3.5.23",
     "expo-secure-store": "~13.0.2",
     "expo-sms": "~12.0.1",

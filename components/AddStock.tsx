@@ -123,7 +123,7 @@ export default function AddStock({
 
       let tempFile = {
         name: name,
-        type: Platform.OS === "android" ? file.type : type,
+        type: Platform.OS === "android" && type !== "video" ? `image/${file.type}` : type,
         uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
         size: file.fileSize,
         index,
