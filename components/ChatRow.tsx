@@ -113,7 +113,7 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
                 <View style={styles.msgContainer}>
                   {isSent && isOutgoingMsg && (
                     <Ionicons
-                      name={isRead || isSent ? "checkmark-done-outline" : "checkmark-outline"}
+                      name={isRead || isSent ? "checkmark-done-sharp" : "checkmark-sharp"}
                       size={18}
                       color={isRead ? Colors.primary : Colors.iconGray}
                     />

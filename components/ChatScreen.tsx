@@ -511,14 +511,14 @@ const RenderTicks = (props: any) => {
   if (props.sent)
     return (
       <View style={{ margin: 4, justifyContent: "center" }}>
-        <Ionicons name="checkmark-done" size={18} color="#fff" />
+        <Ionicons name="checkmark-done-sharp" size={18} color={Colors.background} />
       </View>
     );
 
   if (props.received)
     return (
       <View style={{ margin: 4 }}>
-        <Ionicons name="checkmark" size={18} color="#fff" />
+        <Ionicons name="checkmark-sharp" size={18} color={Colors.background} />
       </View>
     );
 
