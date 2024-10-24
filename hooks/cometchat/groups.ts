@@ -90,7 +90,7 @@ export const useCreateGroup = () => {
     }
   };
 
-  return { createGroup, loading, error, group, createMultipleGroups };
+  return { createGroup, loading, error, group, createMultipleGroups, setGroupLoading: setLoading };
 };
 
 export const useGetGroup = (guid: string) => {

@@ -92,17 +92,15 @@ function CarDetail({ car, context }: CarDetailProps) {
     router.push({ pathname: `/(tabs)/${context}/users-list?carId=${car?.carId}` });
   };
 
-  const onMessagePress = () => {
-    if (!user?.id || !car?.organisation?.ownerUserId) return;
+  const onMessagePress = (selectedUserId?: string) => {
+    const userId = selectedUserId ?? car?.organisation?.ownerUserId;
+    if (!user?.id || !userId) return;
 
-    const GUID = String(`${user?.id}_${car?.carId}_${car?.organisation?.ownerUserId}`).slice(
-      0,
-      100
-    );
+    const GUID = String(`${user?.id}_${car?.carId}_${userId}`).slice(0, 100);
     const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? undefined;
     const owner = user?.id;
-    const members = [owner, car?.organisation?.ownerUserId];
+    const members = [owner, userId];
     const metadata = {
       carId: car?.carId,
       make: car?.make,
@@ -113,7 +111,7 @@ function CarDetail({ car, context }: CarDetailProps) {
       icon,
     };
 
-    const tags = [owner, car?.organisation?.ownerUserId, car?.carId];
+    const tags = [owner, userId, car?.carId];
 
     const group = new CometChat.Group(
       GUID,
@@ -237,6 +235,7 @@ function CarDetail({ car, context }: CarDetailProps) {
             phoneNumber={car?.primaryContact?.phoneNumber}
             carId={car?.carId}
             isPrimaryButtonLoading={loading}
+            orgId={car?.organisationId}
           />
         </>
       ) : null}

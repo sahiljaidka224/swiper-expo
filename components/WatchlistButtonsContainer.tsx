@@ -6,16 +6,19 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Button from "./Button";
 import Colors from "@/constants/Colors";
 import { router } from "expo-router";
+import { useGetOrgDetails } from "@/api/hooks/organisation";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
-  onMessage?: () => void;
+  onMessage?: (userId?: string) => void;
   phoneNumber: string | null;
   carId: string;
   buttonsType?: "primary" | "secondary";
   userId?: string | null;
   isPrimaryButtonLoading?: boolean;
   isSecondaryButtonLoading?: boolean;
+  orgId?: string;
 }
 
 function WatchlistButtonsContainer({
@@ -27,7 +30,10 @@ function WatchlistButtonsContainer({
   buttonsType,
   isPrimaryButtonLoading = false,
   isSecondaryButtonLoading = false,
+  orgId,
 }: ButtonsContainerProps) {
+  const { showActionSheetWithOptions } = useActionSheet();
+  const { org, isLoading, error } = useGetOrgDetails(orgId ?? null);
   const onDeletePress = () => {
     if (onDelete && carId && carId.trim() !== "") {
       onDelete(carId);
@@ -45,7 +51,19 @@ function WatchlistButtonsContainer({
 
   const onMessagePress = () => {
     if (!userId && onMessage) {
-      onMessage();
+      if (org && org.contacts.length > 1) {
+        const contacts = org.contacts.map((c: { displayName: string }) => c.displayName);
+        showActionSheetWithOptions(
+          { options: [...contacts, "Cancel"], cancelButtonIndex: contacts.length },
+          (index) => {
+            if (typeof index === "number" && index < contacts.length) {
+              onMessage(org.contacts[index]?.userId ?? "");
+            }
+          }
+        );
+      } else {
+        onMessage();
+      }
     }
     if (userId && userId.trimEnd() !== "") {
       router.push(`/(tabs)/(chats)/${userId}`);
@@ -71,8 +89,8 @@ function WatchlistButtonsContainer({
         title="Message"
         onPress={onMessagePress}
         type={buttonsType}
-        isLoading={isPrimaryButtonLoading}
-        disabled={isPrimaryButtonLoading}
+        isLoading={isPrimaryButtonLoading || isLoading}
+        disabled={isPrimaryButtonLoading || isLoading}
       />
     </View>
   );

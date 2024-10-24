@@ -54,7 +54,7 @@ export function CarsList({
     isMutating: isStockDelMutating,
     newCars: stockCars,
   } = useRemoveCarFromStock();
-  const { createGroup, group, loading: isGroupLoading } = useCreateGroup();
+  const { createGroup, group, loading: isGroupLoading, setGroupLoading } = useCreateGroup();
   const [watchListData, setWatchlistData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
@@ -136,17 +136,15 @@ export function CarsList({
         router.push({ pathname: `/(tabs)/(stock)/users-list?carId=${item?.carId}` });
       };
 
-      const onMessagePress = () => {
-        if (!user?.id || !item?.organisation?.ownerUserId) return;
+      const onMessagePress = (selectedUserId?: string) => {
+        const userId = selectedUserId ?? item?.organisation?.ownerUserId;
+        if (!user?.id || !userId) return;
 
-        const GUID = String(`${user?.id}_${item?.carId}_${item?.organisation?.ownerUserId}`).slice(
-          0,
-          100
-        );
+        const GUID = String(`${user?.id}_${item?.carId}_${userId}`).slice(0, 100);
         const chatName = String(`${item?.year} ${item?.model}`).toUpperCase();
         const icon = item?.images[0]?.url ?? undefined;
         const owner = user?.id;
-        const members = [owner, item?.organisation?.ownerUserId];
+        const members = [owner, userId];
         const metadata = {
           carId: item?.carId,
           make: item?.make,
@@ -156,7 +154,7 @@ export function CarsList({
           odometer: item?.odometer,
           icon,
         };
-        const tags = [owner, item?.organisation?.ownerUserId, item?.carId];
+        const tags = [owner, userId, item?.carId];
 
         const group = new CometChat.Group(
           GUID,
@@ -192,6 +190,7 @@ export function CarsList({
               }
               onDelete={onDeleteFromWatchlistPress}
               isPrimaryButtonLoading={isGroupLoading}
+              orgId={item?.organisationId}
             />
           ) : (
             <StockButtonContainer
@@ -203,7 +202,7 @@ export function CarsList({
         </Animated.View>
       );
     },
-    [onDeleteFromWatchlistPress, watchListData, onDeleteFromStockPress]
+    [onDeleteFromWatchlistPress, watchListData, onDeleteFromStockPress, isGroupLoading, createGroup]
   );
 
   return (
