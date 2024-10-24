@@ -7,13 +7,14 @@ import { View, StyleSheet, ActivityIndicator, Pressable, StatusBar } from "react
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Swiper, type SwiperCardRefType } from "rn-swiper-list";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import Text from "@/components/Text";
 import { formatNumberWithCommas } from "@/utils";
 import { useAddCarToWatchlist, useMarkCarAsSeen } from "@/api/hooks/watchlist";
 import { useAuth } from "@/context/AuthContext";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
+import { getCanPlaySwiperSound } from "@/context/settings";
 
 const audioAsset = require("@/assets/audio/swish.mp3");
 const blurhash =
@@ -98,6 +99,8 @@ const WatchOrPass = ({ type }: { type: "Watch" | "Pass" }) => {
 };
 
 export default function SwiperPage() {
+  const [isSwipeSoundEnabled, setSwipeSoundEnabled] = useState(false);
+
   const { token, user } = useAuth();
   const { cars, isLoading, fetchMore, error, isValidating } = useGetSwiperCars();
   const ref = useRef<SwiperCardRefType>();
@@ -115,6 +118,16 @@ export default function SwiperPage() {
         }
       : undefined;
   }, [sound]);
+
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const canPlay = await getCanPlaySwiperSound();
+        setSwipeSoundEnabled(canPlay);
+      })();
+      return () => {};
+    }, [])
+  );
 
   useEffect(() => {
     if (!isLoading && cars?.cars) {
@@ -134,6 +147,7 @@ export default function SwiperPage() {
   };
 
   async function playSound() {
+    if (!isSwipeSoundEnabled) return;
     try {
       const { sound } = await Audio.Sound.createAsync(audioAsset);
       setSound(sound);

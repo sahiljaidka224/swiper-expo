@@ -10,13 +10,14 @@ import {
   Platform,
   Pressable,
   Alert,
+  Switch,
 } from "react-native";
 import Text from "@/components/Text";
 import * as Application from "expo-application";
 import { Controller, useForm } from "react-hook-form";
 import Button from "@/components/Button";
 import { useUpdateUserAvatar, useUpdateUserDetails } from "@/api/hooks/user";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -28,6 +29,10 @@ import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
 import { showToast } from "./Toast";
 import * as MediaLibrary from "expo-media-library";
+import { defaultStyles } from "@/constants/Styles";
+import BoxedIcon from "./BoxedIcon";
+import { Ionicons } from "@expo/vector-icons";
+import { getCanPlaySwiperSound, setSwiperSound } from "@/context/settings";
 
 type FormData = {
   firstName: string;
@@ -42,6 +47,7 @@ interface ProfileProps {
 }
 
 export default function ProfileComponent({ context }: ProfileProps) {
+  const [isSwipeSoundEnabled, setSwipeSoundEnabled] = useState(false);
   const { showActionSheetWithOptions } = useActionSheet();
   const { logout, user, token, updateUser } = useAuth();
   const { updateUserDetails, updatedUserDetails, isMutating, error } = useUpdateUserDetails();
@@ -76,6 +82,13 @@ export default function ProfileComponent({ context }: ProfileProps) {
       dealershipName: user?.org?.name ?? "",
     },
   });
+
+  useEffect(() => {
+    (async () => {
+      const canPlay = await getCanPlaySwiperSound();
+      setSwipeSoundEnabled(canPlay);
+    })();
+  }, []);
 
   useEffect(() => {
     if (avatarUpdateData && !avatarError && !isUserAvatarMutating) {
@@ -353,6 +366,22 @@ export default function ProfileComponent({ context }: ProfileProps) {
             maxFontSizeMultiplier={1.3}
             readOnly
           />
+          <View style={defaultStyles.item}>
+            <BoxedIcon name={"megaphone"} backgroundColor={Colors.green} />
+            <Text style={{ fontSize: 18, flex: 1, fontFamily: "SF_Pro_Display_Regular" }}>
+              Swipe sound
+            </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: Colors.primary }}
+              thumbColor={isSwipeSoundEnabled ? Colors.background : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                setSwipeSoundEnabled(!isSwipeSoundEnabled);
+                setSwiperSound(!isSwipeSoundEnabled);
+              }}
+              value={isSwipeSoundEnabled}
+            />
+          </View>
         </View>
 
         <View style={{ paddingHorizontal: 20, gap: 15 }}>
