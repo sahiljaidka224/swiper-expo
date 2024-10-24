@@ -5,14 +5,16 @@ import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/mess
 import { router, useLocalSearchParams, useSegments } from "expo-router";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
-import { useGetGroup, useLeaveGroup } from "@/hooks/cometchat/groups";
+import { useGetGroup, useGetGroupMembers, useLeaveGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
 import ChatComponent from "@/components/ChatScreen";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { useAuth } from "@/context/AuthContext";
 
 export default function NewGroupChatPage() {
+  const { user } = useAuth();
   const { id } = useLocalSearchParams();
   const { group, isGroupLoading } = useGetGroup(id as string);
   const {
@@ -25,15 +27,22 @@ export default function NewGroupChatPage() {
     isTyping,
   } = useGetGroupMessages(id as string);
   const { sendMessage } = useSendGroupMessage();
+  const { groupMembers } = useGetGroupMembers(id as string);
 
-  const onSend = useCallback((messages: IMessage[], text: string) => {
-    const updatedMessages = messages.map((m) => {
-      return { ...m, received: true, from: 1 };
-    });
+  const filteredGroupMembers = groupMembers?.filter((member) => member.getUid() !== user?.id);
 
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, updatedMessages));
-    if (text.trimEnd().length > 0) sendMessage(id as string, text);
-  }, []);
+  const onSend = useCallback(
+    (messages: IMessage[], text: string) => {
+      const updatedMessages = messages.map((m) => {
+        return { ...m, received: true, from: 1 };
+      });
+
+      setMessages((previousMessages) => GiftedChat.append(previousMessages, updatedMessages));
+      if (text.trimEnd().length > 0)
+        sendMessage(id as string, text, undefined, undefined, filteredGroupMembers[0]);
+    },
+    [filteredGroupMembers]
+  );
 
   return (
     <ChatComponent
@@ -49,6 +58,7 @@ export default function NewGroupChatPage() {
       isTyping={isTyping}
       context="group"
       group={group}
+      groupMembers={filteredGroupMembers}
     />
   );
 }

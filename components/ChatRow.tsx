@@ -174,6 +174,12 @@ function MessageText({
         </>
       );
     default:
+      if (lastMessage instanceof CometChat.CustomMessage) {
+        const customData = lastMessage.getCustomData() as { text: string };
+        if (customData && customData.hasOwnProperty("text")) {
+          messageText = customData.text ?? "";
+        }
+      }
       if (lastMessage instanceof CometChat.TextMessage) {
         messageText = lastMessage.getText();
       }

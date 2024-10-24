@@ -75,6 +75,7 @@ interface ChatComponentProps {
   userOrgName?: string;
   carGroups?: CometChat.Conversation[] | null;
   group?: CometChat.Group | null;
+  groupMembers?: CometChat.User[] | null;
 }
 
 export default function ChatComponent({
@@ -89,6 +90,7 @@ export default function ChatComponent({
   context,
   userOrgName,
   carGroups,
+  groupMembers,
 }: ChatComponentProps) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -107,7 +109,6 @@ export default function ChatComponent({
   const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const { markAsRead } = useMarkMessageAsRead();
-  const { groupMembers } = useGetGroupMembers(context === "group" ? userId : null);
   const [sound, setSound] = useState<Sound>();
 
   useEffect(() => {
@@ -186,7 +187,14 @@ export default function ChatComponent({
       );
       playSound();
     }
-    if (context === "group") sendGroupMediaMessage(userId, files);
+    if (context === "group")
+      sendGroupMediaMessage(
+        userId,
+        files,
+        undefined,
+        undefined,
+        groupMembers ? groupMembers[0] : null
+      );
     else sendMediaMessage(userId, files, user?.org?.name ?? undefined, userOrgName ?? undefined);
   };
 

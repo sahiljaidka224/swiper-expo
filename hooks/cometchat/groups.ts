@@ -5,7 +5,7 @@ import { useAddCarToWatchlist } from "@/api/hooks/watchlist";
 import { useAuth } from "@/context/AuthContext";
 
 export const useCreateGroup = () => {
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<CometChat.CometChatException | null>(null);
   const [group, setGroup] = useState<CometChat.Group | null>(null);
@@ -36,6 +36,17 @@ export const useCreateGroup = () => {
       console.log("Group creation failed with error:", error);
     } finally {
       setLoading(false);
+      try {
+        const user: CometChat.User = groupMembers.filter(
+          (member) => member.getUid() !== currentUser?.id
+        )[0];
+        if (user) {
+          const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
+            text: "You have a new car message",
+          });
+          CometChat.sendCustomMessage(customMsg);
+        }
+      } catch (error) {}
     }
   };
 
@@ -82,6 +93,17 @@ export const useCreateGroup = () => {
           }
         } finally {
           setLoading(false);
+          try {
+            const user: CometChat.User = groupMembers.filter(
+              (member) => member.getUid() !== currentUser?.id
+            )[0];
+            if (user) {
+              const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
+                text: "You have a new car message",
+              });
+              CometChat.sendCustomMessage(customMsg);
+            }
+          } catch (error) {}
         }
       }
     } catch (error) {

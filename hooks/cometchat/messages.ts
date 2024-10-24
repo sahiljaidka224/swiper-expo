@@ -399,7 +399,8 @@ export const useSendGroupMessage = () => {
     receiverID: string,
     messageText: string,
     organisationFrom?: string,
-    organisationTo?: string
+    organisationTo?: string,
+    groupMember?: CometChat.User | null
   ) => {
     setLoading(true);
     setError(null);
@@ -419,6 +420,14 @@ export const useSendGroupMessage = () => {
       console.log("Message sending failed with error:", error);
     } finally {
       setLoading(false);
+      try {
+        if (groupMember) {
+          const customMsg = new CometChat.CustomMessage(groupMember?.getUid(), "user", "custom", {
+            text: "You have a new car message",
+          });
+          CometChat.sendCustomMessage(customMsg);
+        }
+      } catch (error) {}
     }
   };
 
@@ -431,7 +440,8 @@ export const useSendGroupMessage = () => {
       size: number | undefined;
     }[],
     organisationFrom?: string,
-    organisationTo?: string
+    organisationTo?: string,
+    groupMember?: CometChat.User | null
   ) => {
     setLoading(true);
     setError(null);
@@ -451,6 +461,14 @@ export const useSendGroupMessage = () => {
       console.log("Media message sending failed with error", error);
     } finally {
       setLoading(false);
+      try {
+        if (groupMember) {
+          const customMsg = new CometChat.CustomMessage(groupMember?.getUid(), "user", "custom", {
+            text: "You have a new car message",
+          });
+          CometChat.sendCustomMessage(customMsg);
+        }
+      } catch (error) {}
     }
   };
 
