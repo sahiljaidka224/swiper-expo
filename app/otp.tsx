@@ -111,7 +111,7 @@ export default function OTPPage() {
             value={phoneNumber.masked}
             keyboardType="numeric"
             autoFocus
-            placeholder="04 131 313 13"
+            placeholder="Enter Mobile Number"
             placeholderTextColor={Colors.gray}
             onChangeText={(masked, unmasked) => {
               setPhoneNumber({ masked, unmasked: `0${unmasked.replaceAll(" ", "")}` });
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: Colors.background,
-    gap: 20,
+    gap: 5,
   },
   description: {
     fontSize: 14,
@@ -193,14 +193,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     width: "100%",
     borderRadius: 10,
-    padding: 10,
+    padding: 5,
   },
   listItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 6,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   listItemText: {
     fontSize: 18,

@@ -216,7 +216,7 @@ export default function UsersListPage() {
       />
       <TextInput
         style={styles.searchInput}
-        placeholder="Search Swiper users..."
+        placeholder="Search all Swiper users..."
         value={searchText}
         onChangeText={setSearchText}
         clearButtonMode="while-editing"
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   selectedContainer: {
     backgroundColor: Colors.background,
     borderWidth: 1,
-    borderColor: Colors.borderGray,
+    borderColor: Colors.primary,
     borderRadius: 9999,
     width: 25,
     height: 25,

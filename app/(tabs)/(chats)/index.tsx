@@ -21,7 +21,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Animated, { CurvedTransition } from "react-native-reanimated";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
@@ -365,12 +365,12 @@ export default function Chats() {
             },
           },
           headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: 15, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
                 <AntDesign name="user" size={24} color={Colors.primary} />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFeedPress}>
-                <FontAwesome name="newspaper-o" size={24} color={Colors.primary} />
+                <MaterialIcons name="ondemand-video" size={24} color={Colors.primary} />
               </TouchableOpacity>
             </View>
           ),
@@ -379,7 +379,7 @@ export default function Chats() {
               onPress={() => router.push("/(tabs)/(chats)/users-list")}
               style={{ flexDirection: "row" }}
             >
-              <FontAwesome5 name="user-friends" size={24} color={Colors.primary} />
+              <FontAwesome5 name="users" size={24} color={Colors.primary} />
             </TouchableOpacity>
           ),
         }}

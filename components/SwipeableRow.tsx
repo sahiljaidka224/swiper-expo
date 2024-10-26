@@ -72,7 +72,7 @@ export default class SwipeableRow extends Component<
       <Swipeable
         ref={this.updateRef}
         enableTrackpadTwoFingerGesture
-        friction={1.4}
+        friction={2}
         overshootRight={false}
         rightThreshold={140}
         renderRightActions={this.renderRightActions}
