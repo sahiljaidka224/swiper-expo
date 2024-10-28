@@ -653,7 +653,7 @@ const Day = ({
     <View style={[styles.container, containerStyle]}>
       <View style={wrapperStyle}>
         <Text style={[styles.text, textStyle]}>
-          {dayjs(currentMessage.createdAt).locale(getLocale()).format(dateFormat)}
+          {dayjs(currentMessage.createdAt).locale(getLocale()).format("D MMM, YYYY")}
         </Text>
       </View>
     </View>
