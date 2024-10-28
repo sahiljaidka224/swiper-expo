@@ -1,9 +1,9 @@
 import { View, Pressable, Alert, StyleSheet } from "react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { memo, useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 
 import { useGetMessages, useSendMessage } from "@/hooks/cometchat/messages";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { useGetUserDetails } from "@/api/hooks/user";
 import Text from "@/components/Text";
@@ -61,58 +61,58 @@ export default function ChatDetailsPage() {
   }, []);
 
   return (
-    <ChatComponent
-      fetchMessages={fetchMessages}
-      messages={chatMessages}
-      onSend={onSend}
-      hasMore={hasMore}
-      loadingMore={loading}
-      userId={id as string}
-      Header={() => (
-        <Header userId={id as string} isLoading={isUserLoading} name={user?.displayName} />
-      )}
-      isTyping={isTyping}
-      context="user"
-      userOrgName={
-        user?.organisations && user?.organisations.length > 0
-          ? user?.organisations[0]?.name
-          : undefined
-      }
-      carGroups={groupConversations}
-      groupMembers={[]}
-    />
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: () => (
+            <Header userId={id as string} isLoading={isUserLoading} name={user?.displayName} />
+          ),
+        }}
+      />
+      <ChatComponent
+        fetchMessages={fetchMessages}
+        messages={chatMessages}
+        onSend={onSend}
+        hasMore={hasMore}
+        loadingMore={loading}
+        userId={id as string}
+        isTyping={isTyping}
+        context="user"
+        userOrgName={
+          user?.organisations && user?.organisations.length > 0
+            ? user?.organisations[0]?.name
+            : undefined
+        }
+        carGroups={groupConversations}
+        groupMembers={[]}
+      />
+    </>
   );
 }
 
-const Header = ({
-  userId,
-  isLoading,
-  name,
-}: {
-  isLoading: boolean;
-  userId: string;
-  name: string;
-}) => {
-  if (isLoading) return;
+const Header = memo(
+  ({ userId, isLoading, name }: { isLoading: boolean; userId: string; name: string }) => {
+    if (isLoading) return null;
 
-  const onPress = () => {
-    router.push({
-      pathname: `/(tabs)/(chats)/user/${userId}`,
-      params: { id: userId },
-    });
-  };
+    const onPress = useCallback(() => {
+      router.push({
+        pathname: `/(tabs)/(chats)/user/${userId}`,
+        params: { id: userId },
+      });
+    }, [userId]);
 
-  return (
-    <Pressable style={styles.headerContainer} onPress={onPress}>
-      <View style={styles.avatarContainer}>
-        <Avatar userId={userId} showOnlineIndicator />
-      </View>
-      <Text style={styles.name} allowFontScaling={false}>
-        {name}
-      </Text>
-    </Pressable>
-  );
-};
+    return (
+      <Pressable style={styles.headerContainer} onPress={onPress}>
+        <View style={styles.avatarContainer}>
+          <Avatar userId={userId} showOnlineIndicator />
+        </View>
+        <Text style={styles.name} allowFontScaling={false}>
+          {name}
+        </Text>
+      </Pressable>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   headerContainer: {

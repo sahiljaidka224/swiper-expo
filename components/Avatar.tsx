@@ -37,7 +37,11 @@ function Avatar({
           uri: userId ? `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` : source,
         }}
       />
-      {!isCar && isOnline && <View style={styles.onlineIndicator} />}
+      {!isCar && isOnline && (
+        <View style={styles.indicatorWrapper}>
+          <View style={styles.onlineIndicator} />
+        </View>
+      )}
     </View>
   );
 }
@@ -49,15 +53,20 @@ const styles = StyleSheet.create({
   avatarContainer: {
     flex: 1,
   },
-  onlineIndicator: {
+  indicatorWrapper: {
+    padding: 3,
+    backgroundColor: Colors.background,
     position: "absolute",
     bottom: 4,
-    right: -2,
+    right: -5,
+    borderRadius: 999999,
+    zIndex: 1,
+  },
+  onlineIndicator: {
     width: 10,
     height: 10,
     borderRadius: 5,
     backgroundColor: Colors.green,
-    zIndex: 1,
   },
 });
 

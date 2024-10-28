@@ -69,7 +69,7 @@ interface ChatComponentProps {
   hasMore: boolean;
   loadingMore: boolean;
   fetchMessages: () => void;
-  Header: () => React.ReactNode;
+  Header?: () => React.ReactNode;
   isTyping: boolean;
   context: "user" | "group";
   userOrgName?: string;
@@ -335,11 +335,13 @@ export default function ChatComponent({
       source={assets ? assets[0] : backroundPattern}
       style={{ flex: 1, backgroundColor: Colors.background }}
     >
-      <Stack.Screen
-        options={{
-          headerTitle: () => <Header />,
-        }}
-      />
+      {Header ? (
+        <Stack.Screen
+          options={{
+            headerTitle: () => <Header />,
+          }}
+        />
+      ) : null}
       {carGroups && carGroups.length > 0 ? (
         <View style={styles.carGroupWrapper}>
           <FlatList<CometChat.Conversation>
@@ -383,6 +385,7 @@ export default function ChatComponent({
         />
       )}
       <GiftedChat
+        isKeyboardInternallyHandled
         isTyping={isTyping}
         messages={
           messages

@@ -5,7 +5,7 @@ export default {
   background: "#fff",
   gray: "#6E6E73",
   lightGray: "#DCDCE2",
-  green: "#4FEE57",
+  green: "#0ac914",
   lightGreen: "#DBFFCB",
   red: "#EF0827",
   yellow: "#FCC70B",
