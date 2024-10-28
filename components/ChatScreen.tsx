@@ -53,7 +53,6 @@ import * as ImagePicker from "expo-image-picker";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Avatar from "./Avatar";
 import { showToast } from "./Toast";
-import { useGetGroupMembers } from "@/hooks/cometchat/groups";
 import Gallery from "./Gallery";
 import * as MediaLibrary from "expo-media-library";
 import { Audio } from "expo-av";
