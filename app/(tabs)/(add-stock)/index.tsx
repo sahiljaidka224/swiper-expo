@@ -11,7 +11,8 @@ import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 import React from "react";
 import { useEffect, useState } from "react";
-import { ScrollView, View, StyleSheet, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { View, StyleSheet, Platform, SafeAreaView } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const options = ["Rego Lookup", "Manual Mode"];
 
@@ -121,16 +122,8 @@ export default function AddStockPage() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ paddingBottom: 40 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
+    <SafeAreaView style={styles.container}>
+      <KeyboardAwareScrollView style={[styles.container, { marginTop: 0 }]} bottomOffset={50}>
         <AddStockImages selectedImages={selectedImages} setSelectedImages={setSelectedImages} />
 
         <View style={{ flex: 1, padding: 12 }}>
@@ -199,11 +192,11 @@ export default function AddStockPage() {
             <ManualForm setCarDetails={setCarDetails} />
           ) : null}
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { backgroundColor: Colors.background, flex: 1 },
 });

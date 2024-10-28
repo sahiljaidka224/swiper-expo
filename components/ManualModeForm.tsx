@@ -6,6 +6,7 @@ import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useMakeList } from "@/api/hooks/car-search";
 import Text from "./Text";
+import { useRef } from "react";
 
 const transmission = ["Automatic", "Manual"];
 
@@ -22,6 +23,9 @@ export default function ManualModeForm({
 }: {
   setCarDetails: (details: any) => void;
 }) {
+  const odometerRef = useRef<TextInput | null>(null);
+  const yearRef = useRef<TextInput | null>(null);
+
   const { showActionSheetWithOptions } = useActionSheet();
   const { makeList, error, loading: makeListLoading } = useMakeList();
   const {
@@ -104,6 +108,9 @@ export default function ManualModeForm({
               value={value}
               maxFontSizeMultiplier={1.3}
               style={[styles.textInput, { flex: 1 }]}
+              returnKeyType="next"
+              returnKeyLabel="next"
+              onSubmitEditing={() => odometerRef.current?.focus()}
             />
           )}
           name="model"
@@ -117,6 +124,7 @@ export default function ManualModeForm({
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
+            ref={odometerRef}
             placeholder="Odometer"
             onBlur={onBlur}
             onChangeText={onChange}
@@ -124,6 +132,9 @@ export default function ManualModeForm({
             maxFontSizeMultiplier={1.3}
             style={[styles.textInput]}
             keyboardType="number-pad"
+            returnKeyType="next"
+            returnKeyLabel="next"
+            onSubmitEditing={() => yearRef.current?.focus()}
           />
         )}
         name="odometer"
@@ -135,6 +146,7 @@ export default function ManualModeForm({
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
+            ref={yearRef}
             placeholder="Year"
             onBlur={onBlur}
             onChangeText={onChange}

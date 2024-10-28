@@ -390,7 +390,7 @@ export default function ChatComponent({
                 ...messages,
                 {
                   _id: "1",
-                  text: "Messages are end-to-end encrypted. No one outside of this chat, not even Swiper, can read or listen to them.",
+                  text: "Swiper provides end-to-end encryption for all messages sent and received.",
                   createdAt: 0,
                   user: { _id: 1, name: "User" },
                   system: true,

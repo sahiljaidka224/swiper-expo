@@ -5,7 +5,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import Button from "./Button";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useCarDetailsFromNedVis } from "@/api/hooks/car-detail";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Text from "./Text";
 
 const states = ["ACT", "NSW", "NT", "QLD", "SA", "VIC", "WA", "TAS"];
@@ -19,6 +19,7 @@ type FormData = {
 };
 
 export default function RegoForm({ setCarDetails }: { setCarDetails: (details: any) => void }) {
+  const odometerRef = useRef<TextInput | null>(null);
   const { showActionSheetWithOptions } = useActionSheet();
   const { carData, error, fetchCarDetails, loading } = useCarDetailsFromNedVis();
   const {
@@ -103,6 +104,11 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
               style={[styles.textInput, { flex: 1 }]}
               autoCapitalize="characters"
               maxFontSizeMultiplier={1.3}
+              numberOfLines={1}
+              maxLength={10}
+              returnKeyType="next"
+              returnKeyLabel="next"
+              onSubmitEditing={() => odometerRef.current?.focus()}
             />
           )}
           name="rego"
@@ -112,6 +118,7 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
         control={control}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
+            ref={odometerRef}
             placeholder="Odometer"
             onBlur={onBlur}
             onChangeText={onChange}

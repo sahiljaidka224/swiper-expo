@@ -13,6 +13,7 @@ import { MessageContextProvider } from "@/context/MessageContext";
 import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { showToast } from "@/components/Toast";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -128,13 +129,15 @@ export default function RootLayoutNav() {
   const { top } = useSafeAreaInsets();
 
   return (
-    <AuthProvider>
-      <MessageContextProvider>
-        <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
-          <BaseLayout />
-          <Toast topOffset={top} />
-        </SWRConfig>
-      </MessageContextProvider>
-    </AuthProvider>
+    <KeyboardProvider>
+      <AuthProvider>
+        <MessageContextProvider>
+          <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
+            <BaseLayout />
+            <Toast topOffset={top} />
+          </SWRConfig>
+        </MessageContextProvider>
+      </AuthProvider>
+    </KeyboardProvider>
   );
 }
