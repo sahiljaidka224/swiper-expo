@@ -6,7 +6,7 @@ import { useGetUnreadMessages } from "@/hooks/cometchat/messages";
 import { Image } from "expo-image";
 import { Tabs, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { AppState, View } from "react-native";
+import { AppState, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import analytics from "@react-native-firebase/analytics";
 
@@ -56,7 +56,7 @@ export default function TabsRootLayout() {
             backgroundColor: Colors.background,
           },
           headerShadowVisible: false,
-          tabBarHideOnKeyboard: true,
+          tabBarHideOnKeyboard: Platform.OS === "ios",
         }}
       >
         <Tabs.Screen

@@ -497,7 +497,9 @@ export default function ChatComponent({
         ]}
         renderFooter={() => <TypingIndicator isTyping={isTyping} />}
       />
-      {Platform.OS === "android" && <KeyboardAvoidingView behavior="padding" />}
+      {Platform.OS === "android" && (
+        <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={80} />
+      )}
     </ImageBackground>
   );
 }
