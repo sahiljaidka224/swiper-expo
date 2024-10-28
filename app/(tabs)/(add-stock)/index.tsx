@@ -57,7 +57,7 @@ export default function AddStockPage() {
 
             formData.append(`file${index}`, {
               name: `image${index}.jpg`,
-              fileName: `image`,
+              fileName: Platform.OS === "ios" ? `image` : `image${index}.jpg`,
               type: "image/jpg",
               uri: Platform.OS === "ios" ? file.uri.replace("file://", "") : file.uri,
             } as any);

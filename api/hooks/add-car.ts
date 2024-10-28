@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { RawAxiosRequestHeaders } from "axios";
+import { Platform } from "react-native";
 import useSWRMutation from "swr/dist/mutation";
 
 const saveToStock = async (
@@ -26,10 +27,19 @@ const uploadFilesToStock = async (
   { arg: { formData, token } }: { arg: { formData: FormData; token: string } }
 ) => {
   try {
+    let headers: RawAxiosRequestHeaders = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (Platform.OS === "android") {
+      headers = {
+        ...headers,
+        "Content-Type": "multipart/form-data",
+      };
+    }
+
     const response = await axios.post(url, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers,
     });
 
     return response.data; // Axios automatically parses JSON responses
