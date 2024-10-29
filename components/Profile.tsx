@@ -23,7 +23,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
 import * as FileSystem from "expo-file-system";
 import ErrorView from "@/components/Error";
-import { router, Stack } from "expo-router";
+import { router, Stack, useNavigation } from "expo-router";
 import { cometChatInit } from "@/hooks/cometchat";
 import { useUpdateCometChatUser } from "@/hooks/cometchat/users";
 import SimpleLineIcons from "@expo/vector-icons/build/SimpleLineIcons";
@@ -69,6 +69,8 @@ export default function ProfileComponent({ context }: ProfileProps) {
   const name = user?.name.split(" ");
   const firstName = name?.[0] ?? "";
   const lastName = name?.[1] ?? "";
+
+  const navigation = useNavigation();
 
   const {
     control,
@@ -265,6 +267,8 @@ export default function ProfileComponent({ context }: ProfileProps) {
   };
 
   const onLogout = async () => {
+    console.log(navigation.getState());
+    // router.push("/asdasdasd/sadasd/asdadasdar");
     logout();
   };
 

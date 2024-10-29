@@ -1,7 +1,7 @@
 import * as Notifications from "expo-notifications";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Stack, useSegments, router, useNavigation, Slot } from "expo-router";
+import { Stack, useSegments, router, Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -33,12 +33,11 @@ if (__DEV__) {
 
 export const unstable_settings = {
   // Ensure any route can link back to `/`
-  initialRouteName: "index",
+  initialRouteName: "(public)/index",
 };
 function BaseLayout() {
   const segments = useSegments();
   const { isAuthLoading, user, token } = useAuth();
-  const navigation = useNavigation();
 
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -84,18 +83,12 @@ function BaseLayout() {
               router.replace("/(tabs)/(chats)");
             }
           } else {
-            router.replace("/profile");
+            router.replace("/(public)/profile");
           }
         })();
       } else if (!token && inTabsGroup) {
         try {
-          while (router.canGoBack()) {
-            router.back();
-          }
-          navigation.reset({
-            index: 0,
-            routes: [{ key: "index", name: "index" as string, path: "/index" }],
-          });
+          router.replace("/(public)/otp");
         } catch (error) {
           console.error(error);
           showToast("Error", "Please close the app and open again!", "error");
@@ -113,12 +106,15 @@ function BaseLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="(public)/index" options={{ headerShown: false }} />
       <Stack.Screen
-        name="otp"
+        name="(public)/otp"
         options={{ headerTitle: "Enter Your Phone Number", headerBackVisible: false }}
       />
-      <Stack.Screen name="profile" options={{ title: "Your Details", headerBackVisible: false }} />
+      <Stack.Screen
+        name="(public)/profile"
+        options={{ title: "Your Details", headerBackVisible: false }}
+      />
 
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>

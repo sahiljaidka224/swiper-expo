@@ -1,7 +1,6 @@
 import Colors from "@/constants/Colors";
 import { useEffect, useState } from "react";
 import {
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   View,
@@ -18,6 +17,7 @@ import ErrorView from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 import Text from "@/components/Text";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 const phoneNumberMask = [
   // "(",
@@ -88,9 +88,10 @@ export default function OTPPage() {
 
   return (
     <KeyboardAvoidingView
+      behavior={"padding"}
+      contentContainerStyle={{ flex: 1 }}
+      keyboardVerticalOffset={100}
       style={{ flex: 1 }}
-      keyboardVerticalOffset={keyboardVerticalOffset}
-      behavior="padding"
     >
       <View style={styles.container}>
         {error && <ErrorView />}

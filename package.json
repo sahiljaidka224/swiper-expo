@@ -24,7 +24,7 @@
     "@react-native-firebase/analytics": "^20.4.0",
     "@react-native-firebase/app": "^20.4.0",
     "@react-native-firebase/messaging": "^20.4.0",
-    "@react-navigation/native": "^6.0.2",
+    "@react-navigation/native": "^6.1.18",
     "@shopify/flash-list": "1.6.4",
     "axios": "^1.7.4",
     "date-fns": "^3.6.0",
