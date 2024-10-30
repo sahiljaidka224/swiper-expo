@@ -733,9 +733,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.lightGray,
     paddingHorizontal: 10,
-    fontSize: 16,
+    fontSize: 20,
     marginVertical: 10,
     paddingTop: 8,
     fontFamily: "SF_Pro_Display_Regular",
+    lineHeight: 20,
   },
 });
