@@ -35,6 +35,7 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useLastNotificationResponse } from "expo-notifications";
+import { useMessageContext } from "@/context/MessageContext";
 
 const transition = CurvedTransition.delay(100);
 
@@ -74,6 +75,7 @@ function useNotificationObserver(
   }, []);
 }
 export default function Chats() {
+  const { unreadCount } = useMessageContext();
   const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
   const [searchText, setSearchText] = useState<string | null>(null);
 
@@ -162,6 +164,11 @@ export default function Chats() {
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    fetchConversations();
+    fetchGroupConversations();
+  }, [unreadCount]);
 
   const filteredPhoneContacts = phoneContacts.filter((contact) => {
     if (!searchText) return false;
@@ -316,6 +323,8 @@ export default function Chats() {
           onPress={() => {
             const lastMessage = item.getLastMessage();
             markAsRead(lastMessage);
+            fetchConversations();
+            fetchGroupConversations();
             router.push(`/(tabs)/(chats)/new-chat/${groupUID}`);
           }}
         >
