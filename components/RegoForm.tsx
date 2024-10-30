@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Pressable } from "react-native";
+import { View, TextInput, StyleSheet, Pressable, Platform } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import Colors from "@/constants/Colors";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -7,6 +7,7 @@ import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useCarDetailsFromNedVis } from "@/api/hooks/car-detail";
 import { useEffect, useRef } from "react";
 import Text from "./Text";
+import { showToast } from "./Toast";
 
 const states = ["ACT", "NSW", "NT", "QLD", "SA", "VIC", "WA", "TAS"];
 const transmission = ["Automatic", "Manual"];
@@ -39,6 +40,12 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
 
   const rego = watch("rego");
   const state = watch("state");
+
+  useEffect(() => {
+    if (error) {
+      showToast("Error", "Unable to fetch car details, please check rego!", "error");
+    }
+  }, [error]);
 
   useEffect(() => {
     if (carData && !loading && carData.length > 0) {
@@ -94,18 +101,22 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
           control={control}
           rules={{
             required: true,
+            pattern: {
+              value: /^[a-zA-Z0-9]+$/,
+              message: "Invalid car registration. Only alphanumeric characters allowed, no spaces.",
+            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Car Registration"
+              placeholder="Car Registration*"
               onBlur={onBlur}
-              onChangeText={onChange}
+              onChangeText={(text) => onChange(text.replace(/[^a-zA-Z0-9]/g, ""))}
               value={value}
               style={[styles.textInput, { flex: 1 }]}
-              autoCapitalize="characters"
+              autoCapitalize={Platform.OS === "ios" ? "characters" : undefined}
               maxFontSizeMultiplier={1.3}
               numberOfLines={1}
-              maxLength={10}
+              maxLength={8}
               returnKeyType="next"
               returnKeyLabel="next"
               onSubmitEditing={() => odometerRef.current?.focus()}

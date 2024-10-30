@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import useSWR from "swr";
+import useSWRMutation from "swr/dist/mutation";
 
 const getCarDetails = async (url: string, { arg }: { arg: { token: string } }) => {
   const response = await fetch(`${url}`, {
@@ -18,8 +19,11 @@ const getCarDetails = async (url: string, { arg }: { arg: { token: string } }) =
   return response.json();
 };
 
-const getCarDetailsFromNedVis = async (url: string, { arg }: { arg: { token: string } }) => {
-  const response = await fetch(url, {
+const getCarDetailsFromNedVis = async (
+  url: string,
+  { arg }: { arg: { token: string; rego: string; state: string } }
+) => {
+  const response = await fetch(`${url}/${arg.rego}/${arg.state}`, {
     method: "GET",
     headers: {
       "Content-type": "application/json; charset=UTF-8",
@@ -36,10 +40,14 @@ const getCarDetailsFromNedVis = async (url: string, { arg }: { arg: { token: str
     const nestedDataString = responseData?.data;
     const nestedData = JSON.parse(nestedDataString);
     const carDetails = nestedData?.data?.nevdisPlateSearch_v2;
+    if (!carDetails && nestedData?.errors) {
+      throw new Error("Unable to fetch car details, please try again!");
+    } else if (carDetails && carDetails.length === 0) {
+      throw new Error("No car details found for the provided registration number");
+    }
     return carDetails;
   } catch (error) {
-    console.log({ error });
-    return null;
+    throw new Error("Unable to fetch car details, please try again!");
   }
 };
 
@@ -60,26 +68,28 @@ export function useGetCarDetails(carId: string) {
 
 export const useCarDetailsFromNedVis = () => {
   const { token } = useAuth();
-  const [state, setState] = useState<{ rego: string; state: string }>();
-  const fetchUrl = state
-    ? `${process.env.EXPO_PUBLIC_API_BASE_URL}/offers/cardetailsnedvis/${state.rego}/${state.state}`
-    : "";
+  const [error, setError] = useState<any>(null);
 
-  const { data, error, isLoading } = useSWR(
-    token ? [fetchUrl, token] : null,
-    ([url, token]) => getCarDetailsFromNedVis(url, { arg: { token } }),
-    {
-      revalidateOnFocus: false,
-    }
+  const {
+    trigger,
+    data,
+    isMutating: loading,
+  } = useSWRMutation(
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/offers/cardetailsnedvis`,
+    getCarDetailsFromNedVis
   );
 
   const fetchCarDetails = (rego: string, state: string) => {
-    setState({ rego, state });
+    if (!token) return;
+    setError(null);
+    trigger({ token, rego, state }).catch((error) => {
+      setError(error);
+    });
   };
 
   return {
     carData: data ?? [],
-    loading: isLoading,
+    loading,
     error,
     fetchCarDetails,
   };

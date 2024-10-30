@@ -102,7 +102,7 @@ export default function ManualModeForm({
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder="Model"
+              placeholder="Model*"
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
@@ -116,7 +116,25 @@ export default function ManualModeForm({
           name="model"
         />
       </View>
-
+      <Controller
+        control={control}
+        rules={{
+          maxLength: 100,
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            ref={yearRef}
+            placeholder="Year*"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            style={styles.textInput}
+            maxFontSizeMultiplier={1.3}
+            keyboardType="number-pad"
+          />
+        )}
+        name="year"
+      />
       <Controller
         control={control}
         rules={{
@@ -139,25 +157,7 @@ export default function ManualModeForm({
         )}
         name="odometer"
       />
-      <Controller
-        control={control}
-        rules={{
-          maxLength: 100,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput
-            ref={yearRef}
-            placeholder="Year"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            style={styles.textInput}
-            maxFontSizeMultiplier={1.3}
-            keyboardType="number-pad"
-          />
-        )}
-        name="year"
-      />
+
       <Controller
         control={control}
         name="transmission"
