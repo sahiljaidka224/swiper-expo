@@ -143,7 +143,7 @@ export default function AddStock({
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        quality: 0.8,
+        quality: 0.5,
         aspect: [4, 3],
         allowsMultipleSelection: true,
         selectionLimit: 10,
@@ -165,7 +165,7 @@ export default function AddStock({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 0.5,
         allowsMultipleSelection: true,
         selectionLimit: NUM_IMAGES - selectedImages.length,
         orderedSelection: true,

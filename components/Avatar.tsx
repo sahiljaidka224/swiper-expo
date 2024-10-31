@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import Colors from "@/constants/Colors";
@@ -21,7 +21,7 @@ function Avatar({
   showOnlineIndicator?: boolean;
 }) {
   const { user: cometChatUser } = useGetCometChatUser(userId as string);
-  const isOnline = cometChatUser?.getStatus() === "online";
+  const isOnline = useMemo(() => cometChatUser?.getStatus() === "online", [cometChatUser]);
 
   return (
     <View style={styles.avatarContainer}>
