@@ -256,6 +256,8 @@ class AppleStyleSwipeableRow extends Component<PropsWithChildren<{ onDelete: () 
   };
   render() {
     const { children } = this.props;
+
+    return <>{children}</>;
     return (
       <Swipeable
         ref={this.updateRef}

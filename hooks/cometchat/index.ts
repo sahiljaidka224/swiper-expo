@@ -118,8 +118,16 @@ export async function createCometChatUser(uid: string, name: string) {
           firstName = splitName[0];
         }
 
-        const message = `Hello ${firstName}, Welcome to Swiper messaging..\n\nFor a great experience invite your phone contacts.\n\nGet chatting, create opportunites and enjoy!!`;
-        await sendBotMessage(newUserUID, message);
+        sendCustomMessageToSwiperAdmin(name)
+          .then(() => {
+            const message = `Hello ${firstName}, Welcome to Swiper messaging..\n\nFor a great experience invite your phone contacts.\n\nGet chatting, create opportunites and enjoy!!`;
+            sendBotMessage(newUserUID, message).catch((error) => {
+              console.error("Error while sending bot message:", error);
+            });
+          })
+          .catch((error) => {
+            console.error("Error while sending custom message:", error);
+          });
 
         return true;
       }
@@ -129,6 +137,23 @@ export async function createCometChatUser(uid: string, name: string) {
   } catch (error) {
     console.log("Create user failed with error:", error);
     return false;
+  }
+}
+
+async function sendCustomMessageToSwiperAdmin(userName: string) {
+  try {
+    if (CometChat.getLoggedinUser() !== null) {
+      const textMessage = new CometChat.TextMessage(
+        process.env.EXPO_PUBLIC_ADMIN_USER_ID!,
+        `Hi, I'am new here.`,
+        "user"
+      );
+      CometChat.sendMessage(textMessage).catch((error) => {
+        console.error("Error while sending message to SWIPER ADMIN", error);
+      });
+    }
+  } catch (error) {
+    console.log("Error while trying to send message to SWIPER ADMIN", error);
   }
 }
 
