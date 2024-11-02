@@ -1,6 +1,6 @@
 import analytics from "@react-native-firebase/analytics";
 import { useGetSwiperCars } from "@/api/hooks/swiper";
-import ContactCard from "@/components/ContactCard";
+import ContactCardNew from "@/components/ContactCardNew";
 import Colors from "@/constants/Colors";
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, Pressable, StatusBar } from "react-native";
@@ -206,52 +206,89 @@ export default function SwiperPage() {
           placeholder={{ blurhash }}
           placeholderContentFit="cover"
         />
-
-        <View style={styles.absoluteCenteredView}>
-          <View
-            style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
-              overflow: "hidden",
-            }}
-          >
-            <Text style={styles.detailsText}>{`${item?.year} ${item?.make} ${item?.model}`}</Text>
-            {item?.price && item?.price > 0 ? (
-              <View
-                style={{
-                  padding: 4,
-                  paddingHorizontal: 8,
-                  borderRadius: 8,
-                  backgroundColor: Colors.primary,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: 80,
-                  maxHeight: 40,
-                }}
-              >
-                <Text style={{ color: "white", fontFamily: "SF_Pro_Display_Bold", fontSize: 20 }}>
-                  {`$${formatNumberWithCommas(item?.price)}`}
-                </Text>
+        <View style={styles.absoluteCenteredViewCopy}>
+          <View style={styles.absoluteCenteredView}>
+            <Text style={styles.detailsText}>{item?.year}</Text>
+            <Text style={styles.detailsText}>{`${item?.make} ${item?.model}`}</Text>
+            <Text
+              style={{
+                color: Colors.primary,
+                fontFamily: "SF_Pro_Display_Bold",
+                fontSize: 24,
+                marginVertical: 10,
+                textAlign: "center",
+              }}
+            >
+              {`$${formatNumberWithCommas(item?.price)}`}
+            </Text>
+            <View style={styles.carDetailsContainer}>
+              <View style={{ flex: 0.5, justifyContent: "flex-start", gap: 10 }}>
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "SF_Pro_Display_Light",
+                      marginBottom: 2,
+                      color: Colors.textLight,
+                    }}
+                  >
+                    Odometer
+                  </Text>
+                  <Text style={styles.descriptionValue}>{`${formatNumberWithCommas(
+                    item?.odometer
+                  )} km`}</Text>
+                </View>
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "SF_Pro_Display_Light",
+                      marginBottom: 2,
+                      color: Colors.textLight,
+                    }}
+                  >
+                    Fuel Type
+                  </Text>
+                  <Text style={styles.descriptionValue}>{checkNull(item?.fuelType)}</Text>
+                </View>
               </View>
-            ) : null}
-          </View>
-          <View style={{ paddingHorizontal: 10, gap: 12 }}>
-            <Text style={styles.descriptionValue}>{`${formatNumberWithCommas(
-              item?.odometer
-            )} km`}</Text>
-            <Text style={styles.descriptionValue}>{checkNull(item?.fuelType)}</Text>
-            {item?.rego && (
-              <Text style={[styles.descriptionValue, { textTransform: "uppercase" }]}>
-                {checkNull(item?.rego)}
-              </Text>
-            )}
-            {item?.transmission && (
-              <Text style={styles.descriptionValue}>{checkNull(item?.transmission)}</Text>
-            )}
-            {item?.series && <Text style={styles.descriptionValue}>{checkNull(item?.series)}</Text>}
+              <View style={{ flex: 0.5, justifyContent: "flex-start", gap: 10 }}>
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "SF_Pro_Display_Light",
+                      marginBottom: 2,
+                      color: Colors.textLight,
+                    }}
+                  >
+                    Transmission
+                  </Text>
+                  {item?.transmission && (
+                    <Text style={styles.descriptionValue}>{checkNull(item?.transmission)}</Text>
+                  )}
+                </View>
+
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "SF_Pro_Display_Light",
+                      marginBottom: 2,
+                      color: Colors.textLight,
+                    }}
+                  >
+                    Series
+                  </Text>
+                  {item?.series && (
+                    <Text style={styles.descriptionValue}>{checkNull(item?.series)}</Text>
+                  )}
+                </View>
+              </View>
+            </View>
           </View>
           <View style={styles.stickyContactCard}>
-            <ContactCard
+            <ContactCardNew
               name={item?.primaryContact?.displayName}
               organisationName={item?.organisation?.name}
               userId={item?.primaryContact?.userId}
@@ -287,7 +324,7 @@ export default function SwiperPage() {
             OverlayLabelLeft={OverlayLabelLeft}
           />
         ) : (isLoading || isValidating) && watchListData.length === 0 ? (
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={Colors.background} />
         ) : null}
       </View>
     </GestureHandlerRootView>
@@ -299,6 +336,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: Colors.primary,
   },
   cardStyle: {
     width: "100%",
@@ -307,7 +345,7 @@ const styles = StyleSheet.create({
   renderCardContainer: {
     flex: 1,
     height: "100%",
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primary,
     width: "100%",
     shadowColor: "#000",
     shadowOffset: {
@@ -320,45 +358,78 @@ const styles = StyleSheet.create({
   },
   renderCardImage: {
     width: "100%",
-
     zIndex: 1,
-    flex: 0.65,
+    flex: 0.5,
   },
   subContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    // backgroundColor: "red",
   },
   overlayLabelContainer: {
     width: "100%",
     height: "100%",
   },
+  absoluteCenteredViewCopy: {
+    position: "absolute",
+    width: "100%",
+    bottom: 10,
+    // backgroundColor: "red",
+    zIndex: 100,
+  },
   absoluteCenteredView: {
     zIndex: 100,
     justifyContent: "flex-start",
-
     paddingHorizontal: 10,
     paddingVertical: 10,
     overflow: "hidden",
     elevation: 5,
     flex: 0.65,
     backgroundColor: Colors.background,
+    display: "flex",
+    // position: "absolute",
+    width: "95%",
+    // top: "20%",
+    minHeight: "36%",
+    margin: 10,
+    borderRadius: 24,
   },
   detailsText: {
     color: Colors.textDark,
-    fontSize: 26,
-    marginVertical: 10,
+    fontSize: 28,
+    // marginVertical: 10,
     fontFamily: "SF_Pro_Display_Bold",
     textTransform: "capitalize",
-    marginLeft: 10,
-    flex: 0.9,
+    // marginLeft: 10,
+    // flex: 0.9,
+    textAlign: "center",
   },
   descriptionValue: {
     color: Colors.textDark,
     fontFamily: "SF_Pro_Display_Regular",
-    fontSize: 20,
+    fontSize: 18,
     textAlign: "left",
     textTransform: "capitalize",
   },
-  stickyContactCard: { position: "absolute", bottom: 20, flex: 1, right: 10, left: 10 },
+  stickyContactCard: { marginHorizontal: 10 },
+  carDetailsContainer: {
+    flexDirection: "row",
+    // gap: 10,
+    alignItems: "center",
+    marginTop: 15,
+    marginBottom: 10,
+    marginHorizontal: 10,
+    padding: 15,
+    borderRadius: 16,
+    backgroundColor: Colors.background,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
 });

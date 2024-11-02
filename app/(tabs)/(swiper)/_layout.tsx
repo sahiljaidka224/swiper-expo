@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { Ionicons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import { TouchableOpacity } from "react-native";
 
@@ -18,12 +18,29 @@ export default function SwiperLayout() {
             headerTransparent: true,
             headerRight: () => (
               <TouchableOpacity
+                activeOpacity={0.2}
                 onPress={() => {
                   router.push({ pathname: "/(swiper)/search" });
                 }}
-                style={{ padding: 10 }}
+                style={{
+                  height: 40,
+                  width: 40,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: Colors.background,
+                  borderRadius: 20,
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+
+                  elevation: 5,
+                }}
               >
-                <Ionicons name="search" size={24} color={Colors.background} />
+                <EvilIcons name="search" size={30} color={Colors.gray} />
               </TouchableOpacity>
             ),
           }}
