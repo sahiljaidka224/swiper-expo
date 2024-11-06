@@ -81,6 +81,10 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
     }
   }, [deletedConversation]);
 
+  const highlightUnread =
+    unreadMessageCount > 0 &&
+    (lastMessage instanceof CometChat.TextMessage || lastMessage instanceof CometChat.MediaMessage);
+
   return (
     <AppleStyleSwipeableRow
       onDelete={() => {
@@ -125,12 +129,12 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
                 <Text
                   style={[
                     styles.timestamp,
-                    { color: unreadMessageCount > 0 ? Colors.primary : Colors.gray },
+                    { color: highlightUnread ? Colors.primary : Colors.gray },
                   ]}
                 >
                   {formatTimestamp(lastMessageSentAt)}
                 </Text>
-                {unreadMessageCount > 0 ? (
+                {highlightUnread ? (
                   <View style={styles.unreadCountContainer}>
                     <Text style={styles.unreadCount}>{unreadMessageCount}</Text>
                   </View>

@@ -31,7 +31,6 @@ import NoConversations from "@/components/NoConversations";
 import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
-import { useLastNotificationResponse } from "expo-notifications";
 import { useMessageContext } from "@/context/MessageContext";
 
 const transition = CurvedTransition.delay(100);
@@ -90,8 +89,6 @@ export default function Chats() {
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   useNotificationObserver(fetchConversations, fetchGroupConversations);
-
-  const lastNotification = useLastNotificationResponse();
 
   const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();
@@ -237,7 +234,10 @@ export default function Chats() {
         <ChatRow
           conversation={item as CometChat.Conversation}
           index={index}
-          refetch={fetchConversations}
+          refetch={() => {
+            fetchConversations();
+            fetchGroupConversations();
+          }}
         />
       );
     },
