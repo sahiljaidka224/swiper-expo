@@ -83,7 +83,7 @@ export default function ChatDetailsPage() {
             ? user?.organisations[0]?.name
             : undefined
         }
-        carGroups={groupConversations}
+        carGroups={groupConversations.filter((g) => g.getUnreadMessageCount() === 0)}
         groupMembers={[]}
       />
     </>

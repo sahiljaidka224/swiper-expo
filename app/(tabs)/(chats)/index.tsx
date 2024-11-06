@@ -7,7 +7,6 @@ import {
   Pressable,
   StyleSheet,
   AppState,
-  Platform,
 } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
@@ -19,8 +18,6 @@ import Colors from "@/constants/Colors";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import Animated, { CurvedTransition } from "react-native-reanimated";
-import AntDesign from "@expo/vector-icons/build/AntDesign";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
@@ -374,9 +371,9 @@ export default function Chats() {
             },
           },
           headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 15, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
-                <AntDesign name="user" size={24} color={Colors.primary} />
+                <FontAwesome5 name="user-alt" size={24} s color={Colors.primary} />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFeedPress}>
                 <MaterialIcons name="ondemand-video" size={24} color={Colors.primary} />

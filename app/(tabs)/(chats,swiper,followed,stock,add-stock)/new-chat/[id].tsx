@@ -1,15 +1,14 @@
 import { View, Pressable, ActivityIndicator, Alert, StyleSheet } from "react-native";
-import React, { useCallback, useEffect } from "react";
+import React, { memo, useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
-import { router, useLocalSearchParams, useSegments } from "expo-router";
+import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useGetGroup, useGetGroupMembers, useLeaveGroup } from "@/hooks/cometchat/groups";
 import { formatNumberWithCommas } from "@/utils";
 import ChatComponent from "@/components/ChatScreen";
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useAuth } from "@/context/AuthContext";
 
@@ -27,7 +26,7 @@ export default function NewGroupChatPage() {
     isTyping,
   } = useGetGroupMessages(id as string);
   const { sendMessage } = useSendGroupMessage();
-  const { groupMembers } = useGetGroupMembers(id as string);
+  const { groupMembers, loading: isUserLoading } = useGetGroupMembers(id as string);
 
   const filteredGroupMembers = groupMembers?.filter((member) => member.getUid() !== user?.id);
 
@@ -44,26 +43,66 @@ export default function NewGroupChatPage() {
     [filteredGroupMembers]
   );
 
+  const memberUser =
+    filteredGroupMembers && filteredGroupMembers.length > 0 ? filteredGroupMembers[0] : null;
   return (
-    <ChatComponent
-      fetchMessages={fetchMessages}
-      messages={chatMessages}
-      onSend={onSend}
-      hasMore={hasMore}
-      loadingMore={loading}
-      userId={id as string}
-      Header={() => (
-        <Header groupUID={id as string} group={group} isGroupLoading={isGroupLoading} />
-      )}
-      isTyping={isTyping}
-      context="group"
-      group={group}
-      groupMembers={filteredGroupMembers}
-    />
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: () =>
+            memberUser ? (
+              <Header
+                userId={memberUser.getUid() as string}
+                isLoading={isUserLoading}
+                name={memberUser.getName()}
+              />
+            ) : null,
+        }}
+      />
+      <ChatComponent
+        fetchMessages={fetchMessages}
+        messages={chatMessages}
+        onSend={onSend}
+        hasMore={hasMore}
+        loadingMore={loading}
+        userId={id as string}
+        isTyping={isTyping}
+        context="group"
+        group={group}
+        groupMembers={filteredGroupMembers}
+        GroupInfo={() => (
+          <GroupInfo groupUID={id as string} group={group} isGroupLoading={isGroupLoading} />
+        )}
+      />
+    </>
   );
 }
 
-const Header = ({
+const Header = memo(
+  ({ userId, isLoading, name }: { isLoading: boolean; userId: string; name: string }) => {
+    if (isLoading) return null;
+
+    const onPress = useCallback(() => {
+      router.push({
+        pathname: `/(tabs)/(chats)/user/${userId}`,
+        params: { id: userId },
+      });
+    }, [userId]);
+
+    return (
+      <Pressable style={styles.headerContainer} onPress={onPress}>
+        <View style={styles.avatarContainer}>
+          <Avatar userId={userId} showOnlineIndicator />
+        </View>
+        <Text style={styles.name} allowFontScaling={false}>
+          {name}
+        </Text>
+      </Pressable>
+    );
+  }
+);
+
+const GroupInfo = ({
   groupUID,
   group,
   isGroupLoading,
@@ -110,7 +149,7 @@ const Header = ({
   };
 
   return (
-    <Pressable style={styles.headerContainer} onPress={onPress}>
+    <Pressable style={styles.groupInfoContainer} onPress={onPress}>
       <View style={styles.leftContainer}>
         <View style={styles.avatarContainer}>
           <Avatar source={icon} borderRadius={10} isCar />
@@ -124,9 +163,9 @@ const Header = ({
           )}KM - $${formatNumberWithCommas(metadata.price)}`}</Text>
         </View>
       </View>
-      <Pressable onPress={onLeaveGroupPress}>
+      {/* <Pressable onPress={onLeaveGroupPress}>
         <Ionicons name="exit-outline" size={24} color={Colors.primary} />
-      </Pressable>
+      </Pressable> */}
     </Pressable>
   );
 };
@@ -134,16 +173,34 @@ const Header = ({
 const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
+    gap: 10,
     paddingBottom: 4,
     alignItems: "center",
     flex: 1,
-    maxWidth: "90%",
+  },
+  groupInfoContainer: {
+    flexDirection: "row",
+    paddingBottom: 4,
+    alignItems: "center",
+    backgroundColor: Colors.background,
+    padding: 10,
+    width: "100%",
     alignSelf: "flex-start",
     justifyContent: "space-between",
   },
-  leftContainer: { flexDirection: "row", gap: 10 },
-  avatarContainer: { width: 40, height: 40, borderRadius: 20 },
-  textContainer: { flexDirection: "column" },
+  onlineIndicator: {
+    position: "absolute",
+    bottom: 4,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.green,
+    zIndex: 1,
+  },
+  avatarContainer: { width: 40, height: 40 },
   name: { fontSize: 16, fontFamily: "SF_Pro_Display_Medium" },
+  leftContainer: { flexDirection: "row", gap: 10 },
+  textContainer: { flexDirection: "column" },
   extraInfo: { fontSize: 14, fontFamily: "SF_Pro_Display_Medium" },
 });

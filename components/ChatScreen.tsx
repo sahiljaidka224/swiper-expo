@@ -70,6 +70,7 @@ interface ChatComponentProps {
   loadingMore: boolean;
   fetchMessages: () => void;
   Header?: () => React.ReactNode;
+  GroupInfo?: () => React.ReactNode;
   isTyping: boolean;
   context: "user" | "group";
   userOrgName?: string;
@@ -91,6 +92,7 @@ export default function ChatComponent({
   userOrgName,
   carGroups,
   groupMembers,
+  GroupInfo,
 }: ChatComponentProps) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -357,24 +359,7 @@ export default function ChatComponent({
           />
         </View>
       ) : null}
-      {groupMembers && groupMembers.length > 0 ? (
-        <View style={styles.carGroupWrapper}>
-          {groupMembers.map((member) => {
-            const memberUID = member.getUid();
-            if (memberUID === user?.id) {
-              return null;
-            }
-            return (
-              <Pressable style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-                <View style={{ width: 40, height: 40 }}>
-                  <Avatar userId={member.getUid()} showOnlineIndicator />
-                </View>
-                <Text style={{ marginLeft: 10 }}>{member.getName()}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      ) : null}
+      {GroupInfo ? <GroupInfo /> : null}
       {isGalleryVisible && selectedImage && (
         <Gallery
           images={[{ url: selectedImage, imageIndex: 0 }]}
@@ -418,12 +403,7 @@ export default function ChatComponent({
           }
         }}
         messagesContainerStyle={{
-          paddingTop:
-            carGroups && carGroups.length > 0
-              ? 100
-              : groupMembers && groupMembers.length > 0
-              ? 60
-              : 0,
+          paddingTop: carGroups && carGroups.length > 0 ? 100 : 0,
         }}
         bottomOffset={0}
         renderAvatar={null}
@@ -456,8 +436,18 @@ export default function ChatComponent({
         renderSend={(props) => (
           <View style={styles.sendContainer}>
             {text.length > 0 && (
-              <Send {...props} containerStyle={{ justifyContent: "center" }}>
-                <Ionicons name="send" color={Colors.primary} size={28} />
+              <Send
+                {...props}
+                containerStyle={{
+                  justifyContent: "center",
+                  backgroundColor: Colors.primary,
+                  borderRadius: 18,
+                  height: 36,
+                  width: 36,
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons name="send" color={Colors.background} size={22} />
               </Send>
             )}
             {text.length === 0 && (

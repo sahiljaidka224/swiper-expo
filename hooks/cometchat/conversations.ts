@@ -106,7 +106,7 @@ export const useGetGroupConversationsWithTags = (tags: string[]) => {
 
     try {
       const conversationsRequest = new CometChat.ConversationsRequestBuilder()
-        .setLimit(30)
+        .setLimit(50)
         .withTags(true)
         .setConversationType("group")
         .setGroupTags(tags)

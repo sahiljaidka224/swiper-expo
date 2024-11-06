@@ -21,14 +21,14 @@ export default function NoConversations() {
         title="Find other dealers NOW!"
         onPress={() => router.push({ pathname: "/(chats)/users-list" })}
       />
-      <Text style={styles.buttonSeperator}>or</Text>
+      {/* <Text style={styles.buttonSeperator}>or</Text>
       <View style={styles.buttonContainer}>
         <Button
           type="border"
           title="Invite Phone Contacts"
           onPress={() => router.push({ pathname: "/(chats)/invite-friends" })}
         />
-      </View>
+      </View> */}
     </View>
   );
 }
