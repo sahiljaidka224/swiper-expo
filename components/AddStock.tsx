@@ -10,7 +10,7 @@ import {
 } from "react-native-draggable-flatlist";
 import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
-import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { showToast } from "./Toast";
@@ -18,7 +18,7 @@ import { useState } from "react";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
-const options = ["Gallery", "Camera", "Cancel"];
+const options = ["Camera", "Gallery", "Cancel"];
 
 export interface SelectedImage {
   name: string | null;
@@ -61,15 +61,20 @@ export default function AddStock({
       {
         options,
         cancelButtonIndex,
+        icons: [
+          <AntDesign name="camera" size={24} color={Colors.primary} />,
+          <AntDesign name="picture" size={24} color={Colors.primary} />,
+          <AntDesign name="close" size={24} color={Colors.primary} />,
+        ],
       },
       (buttonIndex) => {
         if (buttonIndex !== cancelButtonIndex) {
-          if (buttonIndex === 0) {
+          if (buttonIndex === 1) {
             onPickImageFromGallery();
             return;
           }
 
-          if (buttonIndex === 1) {
+          if (buttonIndex === 0) {
             onPickImageFromCamera();
             return;
           }

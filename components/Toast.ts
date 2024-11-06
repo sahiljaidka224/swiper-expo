@@ -6,14 +6,17 @@ export function showToast(textPrimary: string, textSecondary: string, type: Toas
     type: type,
     text1: textPrimary,
     text2: textSecondary,
-    text1Style: { fontFamily: "SF_Pro_Display_Bold", fontSize: 18, color: Colors.textDark },
+    text1Style: { fontFamily: "SF_Pro_Display_Bold", fontSize: 20, color: Colors.textDark },
     text2Style: {
       fontFamily: "SF_Pro_Display_Regular",
-      fontSize: 16,
-      color: Colors.textLight,
+      fontSize: 18,
+      color: Colors.textDark,
     },
     swipeable: true,
     autoHide: true,
-    visibilityTime: 3000,
+    visibilityTime: 4000,
+    props: {
+      text2NumberOfLines: 2,
+    },
   });
 }

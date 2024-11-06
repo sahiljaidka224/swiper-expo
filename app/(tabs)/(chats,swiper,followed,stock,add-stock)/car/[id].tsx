@@ -2,10 +2,11 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from "react-na
 import { router, useLocalSearchParams, useSegments } from "expo-router";
 import { useGetCarDetails } from "@/api/hooks/car-detail";
 import Colors from "@/constants/Colors";
-
+import React from "react";
 import CarDetail from "@/components/CarDetail";
 import Carousel from "@/components/Carousel";
 import { useEffect } from "react";
+import { showToast } from "@/components/Toast";
 
 export default function CarDetailPage() {
   const segments = useSegments();
@@ -14,7 +15,7 @@ export default function CarDetailPage() {
 
   useEffect(() => {
     if (error && !isLoading) {
-      Alert.alert("Error", "Failed to fetch car details", [{ text: "OK" }]);
+      showToast("Info", "SOLD. Please contact the dealer to know more.", "info");
       router.back();
     }
   }, [error, isLoading]);
