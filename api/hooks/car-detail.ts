@@ -51,7 +51,7 @@ const getCarDetailsFromNedVis = async (
   }
 };
 
-export function useGetCarDetails(carId: string) {
+export function useGetCarDetails(carId: string | null) {
   const { token } = useAuth();
   const fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/${carId}`;
   const { data, error, isLoading } = useSWR(

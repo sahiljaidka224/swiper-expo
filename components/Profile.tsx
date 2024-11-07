@@ -40,7 +40,7 @@ type FormData = {
   dealershipName: string;
 };
 
-const options = ["Gallery", "Camera", "Cancel"];
+const options = ["Camera", "Gallery", "Cancel"];
 
 interface ProfileProps {
   context: "update" | "create";
@@ -244,7 +244,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
       (buttonIndex: any) => {
         if (buttonIndex !== cancelButtonIndex) {
           switch (buttonIndex) {
-            case 0:
+            case 1:
               onPickImageFromGallery();
               break;
 

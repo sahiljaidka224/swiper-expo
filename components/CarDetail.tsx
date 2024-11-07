@@ -132,8 +132,8 @@ function CarDetail({ car, context }: CarDetailProps) {
   const ifFollowAllowed =
     context &&
     !context?.includes("(stock)") &&
-    !context?.includes("(chats)") &&
-    !context?.includes("(swiper)");
+    !context?.includes("(swiper)") &&
+    car?.organisationId !== user?.org?.id;
 
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
     ({ item }: { item: CometChat.Conversation }) => {

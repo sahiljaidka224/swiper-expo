@@ -60,7 +60,7 @@ import { Sound } from "expo-av/build/Audio";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
-const options = ["Gallery", "Camera", "Cancel"];
+const options = ["Camera", "Gallery", "Cancel"];
 
 interface ChatComponentProps {
   userId: string;
@@ -250,7 +250,7 @@ export default function ChatComponent({
       (buttonIndex: any) => {
         if (buttonIndex !== cancelButtonIndex) {
           switch (buttonIndex) {
-            case 0:
+            case 1:
               onPickImageFromGallery();
               break;
 

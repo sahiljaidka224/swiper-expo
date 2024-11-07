@@ -11,6 +11,7 @@ import ChatComponent from "@/components/ChatScreen";
 import Colors from "@/constants/Colors";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useAuth } from "@/context/AuthContext";
+import { useGetCarDetails } from "@/api/hooks/car-detail";
 
 export default function NewGroupChatPage() {
   const { user } = useAuth();
@@ -27,6 +28,12 @@ export default function NewGroupChatPage() {
   } = useGetGroupMessages(id as string);
   const { sendMessage } = useSendGroupMessage();
   const { groupMembers, loading: isUserLoading } = useGetGroupMembers(id as string);
+
+  const metadata = group
+    ? (group.getMetadata() as { carId: string; odometer: number; price: number })
+    : null;
+
+  const { car, isLoading: isCarLoading } = useGetCarDetails(metadata?.carId ?? null);
 
   const filteredGroupMembers = groupMembers?.filter((member) => member.getUid() !== user?.id);
 
@@ -71,7 +78,12 @@ export default function NewGroupChatPage() {
         group={group}
         groupMembers={filteredGroupMembers}
         GroupInfo={() => (
-          <GroupInfo groupUID={id as string} group={group} isGroupLoading={isGroupLoading} />
+          <GroupInfo
+            groupUID={id as string}
+            group={group}
+            isGroupLoading={isGroupLoading}
+            car={car}
+          />
         )}
       />
     </>
@@ -106,10 +118,12 @@ const GroupInfo = ({
   groupUID,
   group,
   isGroupLoading,
+  car,
 }: {
   groupUID: string;
   group: CometChat.Group | null;
   isGroupLoading: boolean;
+  car: any;
 }) => {
   const segments = useSegments();
   const { leaveGroup, hasLeft, error } = useLeaveGroup();
@@ -124,9 +138,15 @@ const GroupInfo = ({
   if (!group) return null;
 
   const groupName = group.getName();
-  const icon = group.getIcon();
+  let icon = group.getIcon();
   const metadata = group.getMetadata() as { carId: string; odometer: number; price: number };
   const memberScope = group.getScope() as CometChat.GroupMemberScope;
+
+  if (!icon) {
+    if (car?.images && car?.images.length > 0) {
+      icon = car.images[0].url;
+    }
+  }
 
   const onPress = () => {
     if (!metadata?.carId) return;
