@@ -208,3 +208,17 @@ export const useGetGroupMembers = (guid: string | null) => {
 
   return { loading, error, groupMembers };
 };
+
+export const getGroupMembers = async (guid: string | null): Promise<CometChat.GroupMember[]> => {
+  if (!guid) return [];
+
+  try {
+    const groupMembersRequest = new CometChat.GroupMembersRequestBuilder(guid).setLimit(10).build();
+
+    const members = await groupMembersRequest.fetchNext();
+    return members;
+  } catch (error) {
+    console.log("Group Member list fetching failed with exception:", error);
+    throw error;
+  }
+};

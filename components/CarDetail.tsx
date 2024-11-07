@@ -17,7 +17,7 @@ import Text from "./Text";
 import { router } from "expo-router";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useAuth } from "@/context/AuthContext";
-import { useCreateGroup } from "@/hooks/cometchat/groups";
+import { getGroupMembers, useCreateGroup } from "@/hooks/cometchat/groups";
 import {
   useAddCarToWatchlist,
   useMarkCarAsSeen,
@@ -35,6 +35,7 @@ interface CarDetailProps {
 }
 
 function CarDetail({ car, context }: CarDetailProps) {
+  const [groupMembers, setGroupMembers] = React.useState<{ [key: string]: CometChat.User[] }>({});
   const [carFollowed, setCarFollowed] = React.useState<boolean>(car?.followed);
   const { user, token } = useAuth();
   const { createGroup, loading, group, error } = useCreateGroup();
@@ -55,6 +56,21 @@ function CarDetail({ car, context }: CarDetailProps) {
   const { groupConversations, groupsError, isGroupsLoading } = useGetGroupConversationsWithTags([
     car?.carId,
   ]);
+
+  useEffect(() => {
+    // Fetch group members for all group conversations
+    groupConversations.forEach((conversation) => {
+      const conversationWith = conversation.getConversationWith();
+      if (conversationWith instanceof CometChat.Group) {
+        getGroupMembers(conversationWith.getGuid()).then((members) => {
+          setGroupMembers((prev) => ({
+            ...prev,
+            [conversationWith.getGuid()]: members,
+          }));
+        });
+      }
+    });
+  }, [groupConversations]);
 
   useEffect(() => {
     if (group && !loading) {
@@ -138,14 +154,20 @@ function CarDetail({ car, context }: CarDetailProps) {
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
     ({ item }: { item: CometChat.Conversation }) => {
       const conversationWith = item.getConversationWith();
-      const icon =
-        conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
-      const name = conversationWith.getName();
-      const groupUID =
-        conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
-      const unreadCount = item.getUnreadMessageCount();
-      // const members = conversationWith.m;
+      if (conversationWith instanceof CometChat.User) return null;
 
+      const groupUID = conversationWith.getGuid();
+      let members = groupMembers[groupUID] || [];
+
+      if (members.length > 0) {
+        members = members.filter((member) => member.getUid() !== user?.id);
+      }
+      const unreadCount = item.getUnreadMessageCount();
+
+      if (members.length === 0) return null;
+
+      const userId = members[0].getUid();
+      const memberName = members[0].getName();
       return (
         <Pressable
           style={{ maxWidth: 70, alignItems: "center", marginRight: 15 }}
@@ -165,18 +187,18 @@ function CarDetail({ car, context }: CarDetailProps) {
               padding: 2,
             }}
           >
-            <Avatar source={icon} isCar={Boolean(conversationWith instanceof CometChat.Group)} />
+            <Avatar userId={userId} isCar={false} />
           </View>
           <Text
             numberOfLines={3}
             style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 13 }}
           >
-            {name}
+            {memberName}
           </Text>
         </Pressable>
       );
     },
-    [groupConversations]
+    [groupConversations, groupMembers]
   );
 
   return (

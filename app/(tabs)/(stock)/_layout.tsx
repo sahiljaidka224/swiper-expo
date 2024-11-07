@@ -46,6 +46,14 @@ export default function MyStockLayout() {
             ),
           }}
         />
+        <Stack.Screen
+          name="new-chat/[id]"
+          options={{
+            title: "",
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );
