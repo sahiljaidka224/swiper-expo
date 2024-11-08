@@ -28,15 +28,23 @@ import { showToast } from "./Toast";
 import { useGetGroupConversationsWithTags } from "@/hooks/cometchat/conversations";
 import Avatar from "./Avatar";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
+import { TextInput } from "react-native-gesture-handler";
+import Button from "./Button";
+import { useUpdateStock } from "@/api/hooks/add-car";
 
 interface CarDetailProps {
   car: any;
   context: CarsListContext | null;
+  isEditing?: boolean;
+  setIsEdit?: (isEdit: boolean) => void;
+  refetchCar?: () => void;
 }
 
-function CarDetail({ car, context }: CarDetailProps) {
+function CarDetail({ car: carDetails, context, isEditing, setIsEdit, refetchCar }: CarDetailProps) {
+  const [car, setCarDetails] = React.useState<any>(carDetails);
+  const [editedFields, setEditedFields] = React.useState<{ [key: string]: any }>({}); // Track edited values
   const [groupMembers, setGroupMembers] = React.useState<{ [key: string]: CometChat.User[] }>({});
-  const [carFollowed, setCarFollowed] = React.useState<boolean>(car?.followed);
+  const [carFollowed, setCarFollowed] = React.useState<boolean>(carDetails?.followed);
   const { user, token } = useAuth();
   const { createGroup, loading, group, error } = useCreateGroup();
   const {
@@ -52,13 +60,21 @@ function CarDetail({ car, context }: CarDetailProps) {
     newCars: removedCars,
   } = useRemoveCarFromWatchlist();
   const { markAsRead } = useMarkMessageAsRead();
-
+  const {
+    updateCar,
+    isMutating,
+    savedCar,
+    error: updateCarMutationError,
+  } = useUpdateStock(car?.carId);
   const { groupConversations, groupsError, isGroupsLoading } = useGetGroupConversationsWithTags([
     car?.carId,
   ]);
 
+  const handleFieldChange = (fieldName: string, value: string) => {
+    setEditedFields((prev) => ({ ...prev, [fieldName]: value }));
+  };
+
   useEffect(() => {
-    // Fetch group members for all group conversations
     groupConversations.forEach((conversation) => {
       const conversationWith = conversation.getConversationWith();
       if (conversationWith instanceof CometChat.Group) {
@@ -71,6 +87,19 @@ function CarDetail({ car, context }: CarDetailProps) {
       }
     });
   }, [groupConversations]);
+
+  useEffect(() => {
+    if (savedCar && !isMutating) {
+      showToast("Success", "Stock updated successfully", "success");
+      setCarDetails({ ...car, ...editedFields });
+      setIsEdit?.(false);
+      refetchCar?.();
+    }
+
+    if (!savedCar && !isMutating && updateCarMutationError) {
+      showToast("Error", "Failed to update stock", "error");
+    }
+  }, [savedCar, updateCarMutationError, isMutating]);
 
   useEffect(() => {
     if (group && !loading) {
@@ -223,12 +252,36 @@ function CarDetail({ car, context }: CarDetailProps) {
         title="Mileage"
         value={car?.odometer ? `${formatNumberWithCommas(car?.odometer)} km` : ""}
         uppercase
+        isEditing={isEditing}
+        onFieldChange={(value) => handleFieldChange("odometer", value)}
       />
-      <DescriptionView title="Transmission" value={car?.transmission} />
-      <DescriptionView title="Registration" value={car?.rego} uppercase />
+      <DescriptionView
+        title="Transmission"
+        value={car?.transmission}
+        isEditing={isEditing}
+        onFieldChange={(value) => handleFieldChange("transmission", value)}
+      />
+      <DescriptionView
+        title="Registration"
+        value={car?.rego}
+        uppercase
+        isEditing={isEditing}
+        onFieldChange={(value) => handleFieldChange("rego", value)}
+      />
       <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
-      <DescriptionView title="Registration State" value={car?.regoState} uppercase />
-      <DescriptionView title="Year of manufacture" value={car?.year} />
+      <DescriptionView
+        title="Registration State"
+        value={car?.regoState}
+        uppercase
+        isEditing={isEditing}
+        onFieldChange={(value) => handleFieldChange("regoState", value)}
+      />
+      <DescriptionView
+        title="Year of manufacture"
+        value={car?.year}
+        isEditing={isEditing}
+        onFieldChange={(value) => handleFieldChange("year", value)}
+      />
       <DescriptionView title="Compliance Date" value={car?.compliance} />
       <DescriptionView title="Colour" value={car?.colour} />
       <DescriptionView title="Body Style" value={car?.body} />
@@ -238,8 +291,17 @@ function CarDetail({ car, context }: CarDetailProps) {
       <DescriptionView title="VIN" value={car?.vin} uppercase />
       <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
 
-      {(context && context?.includes("stock")) ||
-      (car?.organisationId === user?.org?.id && !context?.includes("chats")) ? (
+      {isEditing ? (
+        <Button
+          onPress={() => {
+            if (!car || !token) return;
+            updateCar({ carModel: { ...car, ...editedFields }, token });
+          }}
+          title="Update Stock"
+          isLoading={isMutating}
+        />
+      ) : (context && context?.includes("stock")) ||
+        (car?.organisationId === user?.org?.id && !context?.includes("chats")) ? (
         <StockButtonContainer
           carId=""
           onPushToSwiperContacts={onSendToPhoneContacts}
@@ -302,20 +364,47 @@ function DescriptionView({
   title,
   value,
   uppercase = false,
+  isEditing = false,
+  onFieldChange,
 }: {
   title: string;
   value: string;
   uppercase?: boolean;
+  isEditing?: boolean;
+  onFieldChange?: (value: string) => void;
 }) {
-  if (!value) return null;
+  const [fieldValue, setFieldValue] = React.useState(value);
+
+  const handleChange = (text: string) => {
+    setFieldValue(text);
+    // if title is mileage remove commas and km from the value before sending it to the parent
+    if (title === "Mileage") {
+      onFieldChange?.(text.toLowerCase().replace(/,/g, "").replace("km", ""));
+      return;
+    }
+    onFieldChange?.(text);
+  };
+  if (!value && !isEditing) return null;
+
   return (
     <View style={styles.descriptionContainer}>
       <Text style={styles.descriptionTitle}>{title}:</Text>
-      <Text
-        style={[styles.descriptionValue, { textTransform: uppercase ? "uppercase" : "capitalize" }]}
-      >
-        {value}
-      </Text>
+      {isEditing ? (
+        <TextInput
+          style={styles.descriptionValueEditable}
+          value={fieldValue}
+          onChangeText={handleChange}
+        />
+      ) : (
+        <Text
+          style={[
+            styles.descriptionValue,
+            { textTransform: uppercase ? "uppercase" : "capitalize" },
+          ]}
+        >
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
@@ -349,6 +438,19 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     lineHeight: 22,
     textAlign: "left",
+  },
+  descriptionValueEditable: {
+    borderWidth: 1,
+    borderColor: Colors.gray,
+    borderRadius: 5,
+    padding: 5,
+    fontSize: 18,
+    color: Colors.textDark,
+    lineHeight: 22,
+    textAlign: "right",
+    overflow: "hidden",
+    maxWidth: 250,
+    fontFamily: "SF_Pro_Display_Regular",
   },
   descriptionValue: {
     fontFamily: "SF_Pro_Display_Light",

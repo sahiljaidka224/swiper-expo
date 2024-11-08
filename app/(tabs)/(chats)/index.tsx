@@ -371,12 +371,12 @@ export default function Chats() {
             },
           },
           headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: 25, alignItems: "center" }}>
               <TouchableOpacity onPress={onProfilePress}>
                 <FontAwesome5 name="user-alt" size={24} s color={Colors.primary} />
               </TouchableOpacity>
               <TouchableOpacity onPress={onFeedPress}>
-                <MaterialIcons name="ondemand-video" size={24} color={Colors.primary} />
+                <MaterialIcons name="ondemand-video" size={28} color={Colors.primary} />
               </TouchableOpacity>
             </View>
           ),

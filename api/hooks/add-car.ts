@@ -22,6 +22,32 @@ const saveToStock = async (
   return response.json();
 };
 
+const updateStock = async (
+  url: string,
+  { arg: { carModel, token } }: { arg: { carModel: any; token: string } }
+) => {
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(carModel),
+    });
+
+    if (!response.ok) {
+      console.log({ response });
+
+      throw new Error("Failed to update stock");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Failed to update stock", error);
+  }
+};
+
 const uploadFilesToStock = async (
   url: string,
   { arg: { formData, token } }: { arg: { formData: FormData; token: string } }
@@ -64,6 +90,21 @@ export function useSaveToStock() {
 
   return {
     saveCar: trigger,
+    savedCar: data?.data ?? null,
+    isMutating,
+    error,
+  };
+}
+
+export function useUpdateStock(carId: string) {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/update_stock/${carId}`,
+    // `http://localhost:9090/car/update_stock/${carId}`,
+    updateStock
+  );
+
+  return {
+    updateCar: trigger,
     savedCar: data?.data ?? null,
     isMutating,
     error,

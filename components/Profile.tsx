@@ -267,8 +267,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
   };
 
   const onLogout = async () => {
-    console.log(navigation.getState());
-    // router.push("/asdasdasd/sadasd/asdadasdar");
     logout();
   };
 
