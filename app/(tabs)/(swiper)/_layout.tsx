@@ -69,6 +69,15 @@ export default function SwiperLayout() {
             title: "",
           }}
         />
+
+        <Stack.Screen
+          name="new-chat/[id]"
+          options={{
+            title: "",
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );

@@ -292,6 +292,8 @@ export default function SwiperPage() {
               name={item?.primaryContact?.displayName}
               organisationName={item?.organisation?.name}
               userId={item?.primaryContact?.userId}
+              phoneNumber={item?.primaryContact?.phoneNumber}
+              car={item}
             />
           </View>
         </View>
@@ -418,7 +420,7 @@ const styles = StyleSheet.create({
     // gap: 10,
     alignItems: "center",
     marginTop: 15,
-    marginBottom: 10,
+    marginBottom: 20,
     marginHorizontal: 10,
     padding: 15,
     borderRadius: 16,

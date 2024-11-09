@@ -42,7 +42,7 @@ export const useCreateGroup = () => {
         )[0];
         if (user) {
           const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
-            text: "You have a new car message",
+            text: "You have a car message",
           });
           CometChat.sendCustomMessage(customMsg);
         }
@@ -99,7 +99,7 @@ export const useCreateGroup = () => {
             )[0];
             if (user) {
               const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
-                text: "You have a new car message",
+                text: "You have a car message",
               });
               CometChat.sendCustomMessage(customMsg);
             }

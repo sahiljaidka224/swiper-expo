@@ -12,6 +12,7 @@ import Colors from "@/constants/Colors";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useGetCarDetails } from "@/api/hooks/car-detail";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function NewGroupChatPage() {
   const { user } = useAuth();
@@ -183,9 +184,11 @@ const GroupInfo = ({
           )}KM - $${formatNumberWithCommas(metadata.price)}`}</Text>
         </View>
       </View>
-      {/* <Pressable onPress={onLeaveGroupPress}>
-        <Ionicons name="exit-outline" size={24} color={Colors.primary} />
-      </Pressable> */}
+      <Pressable onPress={onPress}>
+        {/* next arrow */}
+        <AntDesign name="arrowright" size={24} color={Colors.primary} />
+        {/* <Ionicons name="exit-outline" size={24} color={Colors.primary} /> */}
+      </Pressable>
     </Pressable>
   );
 };

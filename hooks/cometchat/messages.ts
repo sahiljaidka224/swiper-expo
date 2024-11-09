@@ -423,7 +423,7 @@ export const useSendGroupMessage = () => {
       try {
         if (groupMember) {
           const customMsg = new CometChat.CustomMessage(groupMember?.getUid(), "user", "custom", {
-            text: "You have a new car message",
+            text: "You have a car message",
           });
           CometChat.sendCustomMessage(customMsg);
         }
@@ -464,7 +464,7 @@ export const useSendGroupMessage = () => {
       try {
         if (groupMember) {
           const customMsg = new CometChat.CustomMessage(groupMember?.getUid(), "user", "custom", {
-            text: "You have a new car message",
+            text: "You have a car message",
           });
           CometChat.sendCustomMessage(customMsg);
         }

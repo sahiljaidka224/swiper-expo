@@ -122,7 +122,7 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
                       color={isRead ? Colors.primary : Colors.iconGray}
                     />
                   )}
-                  <MessageText lastMessage={lastMessage} />
+                  <MessageText lastMessage={lastMessage} isOutgoingMsg={isOutgoingMsg} />
                 </View>
               </View>
               <View style={styles.timeStampContainer}>
@@ -150,8 +150,10 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
 
 function MessageText({
   lastMessage,
+  isOutgoingMsg,
 }: {
   lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage;
+  isOutgoingMsg: boolean;
 }) {
   const lastMessageType = lastMessage.getType();
   let messageText = "";
@@ -181,7 +183,11 @@ function MessageText({
       if (lastMessage instanceof CometChat.CustomMessage) {
         const customData = lastMessage.getCustomData() as { text: string };
         if (customData && customData.hasOwnProperty("text")) {
-          messageText = customData.text ?? "";
+          if (isOutgoingMsg) {
+            messageText = "You sent a car message";
+          } else {
+            messageText = customData.text ?? "";
+          }
         }
       }
       if (lastMessage instanceof CometChat.TextMessage) {
