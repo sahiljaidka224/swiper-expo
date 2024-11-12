@@ -56,7 +56,7 @@ export default function TabsRootLayout() {
             backgroundColor: Colors.background,
           },
           headerShadowVisible: false,
-          tabBarHideOnKeyboard: Platform.OS === "ios",
+          tabBarHideOnKeyboard: false,
         }}
       >
         <Tabs.Screen

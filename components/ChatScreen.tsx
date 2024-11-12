@@ -7,7 +7,6 @@ import {
   FlatList,
   ListRenderItem,
   TouchableOpacity,
-  KeyboardAvoidingView,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -57,6 +56,8 @@ import Gallery from "./Gallery";
 import * as MediaLibrary from "expo-media-library";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
+import { KeyboardAvoidingView, KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
@@ -94,6 +95,7 @@ export default function ChatComponent({
   groupMembers,
   GroupInfo,
 }: ChatComponentProps) {
+  const headerHeight = useHeaderHeight();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [assets] = useAssets([backroundPattern]);
@@ -370,7 +372,7 @@ export default function ChatComponent({
         />
       )}
       <GiftedChat
-        isKeyboardInternallyHandled
+        isKeyboardInternallyHandled={false}
         isTyping={isTyping}
         messages={
           messages
@@ -487,9 +489,10 @@ export default function ChatComponent({
         ]}
         renderFooter={() => <TypingIndicator isTyping={isTyping} />}
       />
-      {Platform.OS === "android" && (
-        <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={80} />
-      )}
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === "ios" ? headerHeight : headerHeight + 20}
+      />
     </ImageBackground>
   );
 }
