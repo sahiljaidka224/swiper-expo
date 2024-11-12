@@ -1,8 +1,8 @@
-import { View, Pressable, ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { View, Pressable, ActivityIndicator, Alert, StyleSheet, Keyboard } from "react-native";
 import React, { memo, useCallback, useEffect } from "react";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useGetGroupMessages, useSendGroupMessage } from "@/hooks/cometchat/messages";
-import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
+import { router, Stack, useLocalSearchParams, useNavigation, useSegments } from "expo-router";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
 import { useGetGroup, useGetGroupMembers, useLeaveGroup } from "@/hooks/cometchat/groups";
@@ -29,12 +29,20 @@ export default function NewGroupChatPage() {
   } = useGetGroupMessages(id as string);
   const { sendMessage } = useSendGroupMessage();
   const { groupMembers, loading: isUserLoading } = useGetGroupMembers(id as string);
-
+  const navigation = useNavigation();
   const metadata = group
     ? (group.getMetadata() as { carId: string; odometer: number; price: number })
     : null;
 
   const { car, isLoading: isCarLoading } = useGetCarDetails(metadata?.carId ?? null);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("blur", () => {
+      Keyboard.dismiss();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const filteredGroupMembers = groupMembers?.filter((member) => member.getUid() !== user?.id);
 
