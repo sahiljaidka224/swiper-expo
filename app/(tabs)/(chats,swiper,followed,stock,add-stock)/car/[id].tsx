@@ -74,18 +74,19 @@ export default function CarDetailPage() {
         {isLoading && <ActivityIndicator color={Colors.primary} size="large" />}
         {car && (
           <>
-            {/* {canEdit && isEdit && images.length === 0 ? (
+            {canEdit && isEdit ? (
               <AddStock selectedImages={selectedImages} setSelectedImages={setSelectedImages} />
             ) : (
               <Carousel images={images} price={car?.price} />
-            )} */}
-            <Carousel images={images} price={car?.price} />
+            )}
+            {/* <Carousel images={images} price={car?.price} /> */}
             <CarDetail
               car={car}
               context={segments[1]}
               isEditing={isEdit}
               setIsEdit={setIsEdit}
               refetchCar={refetch}
+              selectedImages={selectedImages}
             />
           </>
         )}

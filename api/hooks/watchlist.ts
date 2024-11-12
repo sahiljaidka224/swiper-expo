@@ -34,7 +34,7 @@ const removeCarFromStock = async (
   url: string,
   { arg }: { arg: { carId: string; token: string | null } }
 ) => {
-  const response = await fetch(`${url}/delete_from_stock`, {
+  const response = await fetch(`${url}delete_from_stock`, {
     method: "POST",
     headers: {
       "Content-type": "application/json; charset=UTF-8",
