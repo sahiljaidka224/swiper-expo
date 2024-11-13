@@ -32,6 +32,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { ResizeMode, Video } from "expo-av";
 import Text from "@/components/Text";
@@ -661,6 +662,12 @@ const MessageImage = (
           priority="high"
           cachePolicy="memory-disk"
         />
+        <LinearGradient
+          colors={["transparent", "rgba(3, 3, 3, 0.4)"]} // Adjust end color for shadow intensity
+          style={styles.background}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        />
       </TouchableOpacity>
     </>
   );
@@ -762,5 +769,15 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Regular",
     lineHeight: 20,
     minHeight: 42,
+  },
+  background: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 50,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    // zIndex: 1,
   },
 });
