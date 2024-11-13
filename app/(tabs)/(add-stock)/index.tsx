@@ -75,9 +75,12 @@ export default function AddStockPage() {
                 uri: Platform.OS === "ios" ? file.uri.replace("file://", "") : file.uri,
               } as any);
             }
-
-            await uploadFilesToStock(formData, token);
             showToast("Success", "Car added to stock successfully!", "success");
+            try {
+              await uploadFilesToStock(formData, token);
+            } catch (error) {
+              showToast("Error", "Failed to upload images! Please edit stock", "error");
+            }
 
             if (pushToContacts) {
               router.push({
