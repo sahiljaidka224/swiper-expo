@@ -36,7 +36,7 @@ const debounce = (func: (...args: any[]) => void, delay: number): ((...args: any
   };
 };
 
-const options = ["Cars", "Organisations"];
+const options = ["Cars", "Dealerships"];
 export default function ManualSearch() {
   const { token, user } = useAuth();
   const { triggerManualSearch, cars, organisations, isMutating } = useManualSearch();
@@ -216,7 +216,7 @@ export default function ManualSearch() {
         <View style={styles.container}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Cars or Organisations..."
+            placeholder="Search Cars or Dealerships..."
             value={searchText}
             onChangeText={handleSearch}
             clearButtonMode="while-editing"
@@ -250,7 +250,7 @@ export default function ManualSearch() {
               ListEmptyComponent={null}
             />
           ) : null}
-          {mode === "Organisations" ? (
+          {mode === "Dealerships" ? (
             <FlashList
               contentInsetAdjustmentBehavior="automatic"
               contentContainerStyle={{ paddingBottom: 40 }}

@@ -230,7 +230,7 @@ export default function SearchPage() {
               }}
               maxFontSizeMultiplier={1.1}
             >
-              Search Cars or Organisations...
+              Search Cars or Dealerships...
             </Text>
           </TouchableOpacity>
 
