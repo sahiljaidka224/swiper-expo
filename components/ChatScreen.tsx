@@ -409,7 +409,7 @@ export default function ChatComponent({
         }}
         bottomOffset={0}
         renderAvatar={null}
-        minInputToolbarHeight={45}
+        minInputToolbarHeight={50}
         maxComposerHeight={100}
         infiniteScroll
         loadEarlier={hasMore}
@@ -467,13 +467,19 @@ export default function ChatComponent({
         renderInputToolbar={(props) => (
           <InputToolbar
             {...props}
-            containerStyle={{ backgroundColor: Colors.background }}
+            containerStyle={{
+              backgroundColor: Colors.background,
+            }}
+            primaryStyle={{
+              display: "flex",
+              alignItems: "center",
+            }}
             renderComposer={(props) => (
               <Composer
                 {...props}
                 textInputProps={{
                   ...props,
-                  maxFontSizeMultiplier: 1.3,
+                  maxFontSizeMultiplier: 1.5,
                 }}
                 textInputStyle={styles.inputStyle}
               />
@@ -726,10 +732,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.lightGray,
     paddingHorizontal: 10,
-    fontSize: 20,
+    fontSize: 22,
     marginVertical: 10,
     paddingTop: 8,
     fontFamily: "SF_Pro_Display_Regular",
-    lineHeight: 20,
+    lineHeight: 22,
+    minHeight: 42,
   },
 });
