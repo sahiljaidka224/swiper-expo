@@ -431,6 +431,30 @@ export default function ChatComponent({
         keyboardShouldPersistTaps="handled"
         renderSystemMessage={SystemMessageText}
         renderBubble={(props) => {
+          if (props.currentMessage?.image || props.currentMessage?.video) {
+            return (
+              <Bubble
+                {...props}
+                bottomContainerStyle={{
+                  left: {
+                    position: "absolute",
+                    left: 2,
+                    bottom: 2,
+                    paddingHorizontal: 5,
+                  },
+                  right: {
+                    position: "absolute",
+                    left: 2,
+                    bottom: 2,
+                    width: "100%",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    paddingHorizontal: 5,
+                  },
+                }}
+              />
+            );
+          }
           return <Bubble {...props} />;
         }}
         renderDay={(props: DayProps<IMessage>) => <Day {...props} />}
@@ -635,6 +659,7 @@ const MessageImage = (
           source={{ uri: props?.currentMessage?.image }}
           style={[props.imageStyle, styles.image]}
           priority="high"
+          cachePolicy="memory-disk"
         />
       </TouchableOpacity>
     </>
@@ -700,7 +725,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   video: { width: "100%", height: "100%", borderRadius: 5 },
-  mediaContainer: { borderRadius: 30, padding: 4, height: 225, width: 275 },
+  mediaContainer: { borderRadius: 30, height: 250, width: 280, padding: 2 },
   messageText: {
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 16,
@@ -720,23 +745,22 @@ const styles = StyleSheet.create({
   },
   forwardContainer: {
     position: "absolute",
-
     top: "50%",
     backgroundColor: Colors.iconGray,
     padding: 6,
     borderRadius: 50,
   },
-  image: { width: "100%", height: "97%", borderRadius: 15 },
+  image: { width: "100%", height: "100%", borderRadius: 15, padding: 1 },
   inputStyle: {
     borderRadius: 15,
     borderWidth: 1,
     borderColor: Colors.lightGray,
     paddingHorizontal: 10,
-    fontSize: 22,
+    fontSize: 20,
     marginVertical: 10,
     paddingTop: 8,
     fontFamily: "SF_Pro_Display_Regular",
-    lineHeight: 22,
+    lineHeight: 20,
     minHeight: 42,
   },
 });
