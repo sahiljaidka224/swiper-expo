@@ -44,6 +44,7 @@
     "expo-haptics": "~13.0.1",
     "expo-image": "~1.13.0",
     "expo-image-picker": "~15.0.7",
+    "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
     "expo-media-library": "~16.0.5",
     "expo-notification-service-extension-plugin": "^1.0.1",
@@ -62,6 +63,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.52.2",
     "react-native": "0.74.5",
+    "react-native-actions-sheet": "^0.9.7",
     "react-native-awesome-gallery": "^0.4.3",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-draggable-flatlist": "^4.0.1",
@@ -82,8 +84,7 @@
     "rn-swiper-list": "^2.0.2",
     "swr": "^2.2.5",
     "xml2js": "^0.6.2",
-    "zustand": "^5.0.1",
-    "expo-linear-gradient": "~13.0.2"
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

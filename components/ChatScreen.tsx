@@ -47,7 +47,6 @@ import {
   useTypingIndicator,
 } from "@/hooks/cometchat/messages";
 import * as Linking from "expo-linking";
-import { useActionSheet } from "@expo/react-native-action-sheet";
 
 import * as ImagePicker from "expo-image-picker";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
@@ -57,12 +56,12 @@ import Gallery from "./Gallery";
 import * as MediaLibrary from "expo-media-library";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
-import { KeyboardAvoidingView, KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { SheetManager } from "react-native-actions-sheet";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
-const options = ["Camera", "Gallery", "Cancel"];
 
 interface ChatComponentProps {
   userId: string;
@@ -104,7 +103,6 @@ export default function ChatComponent({
   const [isGalleryVisible, setGalleryVisible] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { startTyping, endTyping } = useTypingIndicator();
-  const { showActionSheetWithOptions } = useActionSheet();
   const {
     sendMediaMessage,
     loading: isSendMsgInProgress,
@@ -243,27 +241,16 @@ export default function ChatComponent({
   };
 
   const onShowActionSheet = () => {
-    const cancelButtonIndex = options.length - 1;
-
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-      },
-      (buttonIndex: any) => {
-        if (buttonIndex !== cancelButtonIndex) {
-          switch (buttonIndex) {
-            case 1:
-              onPickImageFromGallery();
-              break;
-
-            default:
-              onPickImageFromCamera();
-              break;
-          }
+    SheetManager.show("camera-sheet").then((result) => {
+      setTimeout(() => {
+        if (!result) return;
+        if (result === "camera") {
+          onPickImageFromCamera();
         }
-      }
-    );
+
+        onPickImageFromGallery();
+      }, 100);
+    });
   };
 
   const onPickImageFromGallery = async () => {

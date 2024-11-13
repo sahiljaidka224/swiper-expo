@@ -12,13 +12,12 @@ import Colors from "@/constants/Colors";
 import { Image } from "expo-image";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
-import { useActionSheet } from "@expo/react-native-action-sheet";
 import { showToast } from "./Toast";
 import { useState } from "react";
+import { SheetManager } from "react-native-actions-sheet";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
-const options = ["Camera", "Gallery", "Cancel"];
 
 export interface SelectedImage {
   name: string | null;
@@ -52,35 +51,18 @@ export default function AddStock({
     updatePlaceholderImages(selectedImages.length)
   );
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
-  const { showActionSheetWithOptions } = useActionSheet();
 
   const onShowActionSheet = () => {
-    const cancelButtonIndex = 2;
-
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        icons: [
-          <AntDesign name="camera" size={24} color={Colors.primary} />,
-          <AntDesign name="picture" size={24} color={Colors.primary} />,
-          <AntDesign name="close" size={24} color={Colors.primary} />,
-        ],
-      },
-      (buttonIndex) => {
-        if (buttonIndex !== cancelButtonIndex) {
-          if (buttonIndex === 1) {
-            onPickImageFromGallery();
-            return;
-          }
-
-          if (buttonIndex === 0) {
-            onPickImageFromCamera();
-            return;
-          }
+    SheetManager.show("camera-sheet").then((result) => {
+      setTimeout(() => {
+        if (!result) return;
+        if (result === "camera") {
+          onPickImageFromCamera();
         }
-      }
-    );
+
+        onPickImageFromGallery();
+      }, 100);
+    });
   };
 
   const onPickImageFromCamera = async () => {

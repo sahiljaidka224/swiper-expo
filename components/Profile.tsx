@@ -31,8 +31,8 @@ import { showToast } from "./Toast";
 import * as MediaLibrary from "expo-media-library";
 import { defaultStyles } from "@/constants/Styles";
 import BoxedIcon from "./BoxedIcon";
-import { Ionicons } from "@expo/vector-icons";
 import { getCanPlaySwiperSound, setSwiperSound } from "@/context/settings";
+import { SheetManager } from "react-native-actions-sheet";
 
 type FormData = {
   firstName: string;
@@ -40,15 +40,12 @@ type FormData = {
   dealershipName: string;
 };
 
-const options = ["Camera", "Gallery", "Cancel"];
-
 interface ProfileProps {
   context: "update" | "create";
 }
 
 export default function ProfileComponent({ context }: ProfileProps) {
   const [isSwipeSoundEnabled, setSwipeSoundEnabled] = useState(false);
-  const { showActionSheetWithOptions } = useActionSheet();
   const { logout, user, token, updateUser } = useAuth();
   const { updateUserDetails, updatedUserDetails, isMutating, error } = useUpdateUserDetails();
   const {
@@ -69,8 +66,6 @@ export default function ProfileComponent({ context }: ProfileProps) {
   const name = user?.name.split(" ");
   const firstName = name?.[0] ?? "";
   const lastName = name?.[1] ?? "";
-
-  const navigation = useNavigation();
 
   const {
     control,
@@ -234,27 +229,16 @@ export default function ProfileComponent({ context }: ProfileProps) {
   };
 
   const onShowActionSheet = () => {
-    const cancelButtonIndex = options.length - 1;
-
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-      },
-      (buttonIndex: any) => {
-        if (buttonIndex !== cancelButtonIndex) {
-          switch (buttonIndex) {
-            case 1:
-              onPickImageFromGallery();
-              break;
-
-            default:
-              onPickImageFromCamera();
-              break;
-          }
+    SheetManager.show("camera-sheet").then((result) => {
+      setTimeout(() => {
+        if (!result) return;
+        if (result === "camera") {
+          onPickImageFromCamera();
         }
-      }
-    );
+
+        onPickImageFromGallery();
+      }, 100);
+    });
   };
 
   // check if all the mandatory fields are filled

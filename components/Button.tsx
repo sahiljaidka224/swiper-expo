@@ -43,9 +43,15 @@ export default function Button({ title, onPress, type = "primary", isLoading }: 
 const styles = StyleSheet.create({
   container: {
     borderRadius: 30,
-    padding: 10,
     flex: 1,
     justifyContent: "center",
+    minHeight: 44,
+    elevation: 5,
+    shadowColor: "black",
+    shadowOffset: { width: 0.3 * 4, height: 0.5 * 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 0.7 * 4,
+    alignItems: "center",
   },
   primary: {
     backgroundColor: Colors.primary,
@@ -63,7 +69,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.textPrimary,
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "SF_Pro_Display_Regular",
     textAlign: "center",
   },

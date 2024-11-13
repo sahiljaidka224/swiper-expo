@@ -77,7 +77,6 @@ function WatchlistButtonsContainer({
           <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
         </TouchableOpacity>
       )}
-      {/* // TODO: after comet chat is integrated completely */}
       <Button
         title="Call"
         onPress={onCallPress}
