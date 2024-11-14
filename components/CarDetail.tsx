@@ -356,6 +356,14 @@ function CarDetail({
               />
             </>
           ) : null}
+          {context && context?.includes("(stock)") && car?.organisationId === user?.org?.id ? (
+            <View style={{ marginVertical: 15 }}>
+              <Button
+                title="Add Test Drive Logs"
+                onPress={() => router.push("/(tabs)/(stock)/test-drive")}
+              />
+            </View>
+          ) : null}
 
           {context &&
           context?.includes("(stock)") &&

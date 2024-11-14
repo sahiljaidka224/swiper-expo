@@ -58,6 +58,7 @@ export default function AddStock({
         if (!result) return;
         if (result === "camera") {
           onPickImageFromCamera();
+          return;
         }
 
         onPickImageFromGallery();

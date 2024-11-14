@@ -246,6 +246,7 @@ export default function ChatComponent({
         if (!result) return;
         if (result === "camera") {
           onPickImageFromCamera();
+          return;
         }
 
         onPickImageFromGallery();

@@ -234,6 +234,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
         if (!result) return;
         if (result === "camera") {
           onPickImageFromCamera();
+          return;
         }
 
         onPickImageFromGallery();

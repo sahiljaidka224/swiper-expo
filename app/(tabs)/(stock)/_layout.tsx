@@ -54,6 +54,15 @@ export default function MyStockLayout() {
             headerBackTitleVisible: false,
           }}
         />
+        <Stack.Screen
+          name="test-drive"
+          options={{
+            title: "Test Drive",
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
+            headerStyle: { backgroundColor: Colors.background },
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );
