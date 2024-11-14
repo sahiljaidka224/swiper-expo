@@ -134,11 +134,7 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
                 >
                   {formatTimestamp(lastMessageSentAt)}
                 </Text>
-                {highlightUnread ? (
-                  <View style={styles.unreadCountContainer}>
-                    <Text style={styles.unreadCount}>{unreadMessageCount}</Text>
-                  </View>
-                ) : null}
+                {highlightUnread ? <View style={styles.unreadCountContainer} /> : null}
               </View>
             </View>
           </TouchableHighlight>
@@ -153,7 +149,7 @@ function MessageText({
   isOutgoingMsg,
 }: {
   lastMessage: CometChat.TextMessage | CometChat.MediaMessage | CometChat.CustomMessage;
-  isOutgoingMsg: boolean;
+  isOutgoingMsg: boolean | undefined;
 }) {
   const lastMessageType = lastMessage.getType();
   let messageText = "";
@@ -346,17 +342,12 @@ const styles = StyleSheet.create({
   },
   unreadCountContainer: {
     backgroundColor: Colors.primary,
-    borderRadius: 9999,
-    padding: 5,
-    paddingHorizontal: 10,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
   },
   timestamp: {
     fontSize: 14,
     fontFamily: "SF_Pro_Display_Regular",
-  },
-  unreadCount: {
-    color: "white",
-    fontSize: 14,
-    fontFamily: "SF_Pro_Display_Bold",
   },
 });
