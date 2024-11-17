@@ -85,8 +85,12 @@ function ContactCardNew({
           <Avatar userId={userId} showOnlineIndicator />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.contactName}>{name}</Text>
-          <Text style={styles.organisationName}>{organisationName}</Text>
+          <Text maxFontSizeMultiplier={1.1} style={styles.contactName}>
+            {name}
+          </Text>
+          <Text maxFontSizeMultiplier={1.1} style={styles.organisationName}>
+            {organisationName}
+          </Text>
         </View>
       </View>
       <WatchlistButtonsContainer
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     // marginHorizontal: 10,
-    padding: 15,
+    padding: 12,
     borderRadius: 24,
     backgroundColor: Colors.background,
     shadowColor: "#000",

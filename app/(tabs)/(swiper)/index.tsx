@@ -208,14 +208,22 @@ export default function SwiperPage() {
         />
         <View style={styles.absoluteCenteredViewCopy}>
           <View style={styles.absoluteCenteredView}>
-            <Text style={styles.detailsText}>{item?.year}</Text>
-            <Text style={styles.detailsText}>{`${item?.make} ${item?.model}`}</Text>
+            <Text maxFontSizeMultiplier={1.1} style={styles.detailsText}>
+              {item?.year}
+            </Text>
             <Text
+              style={styles.detailsText}
+              maxFontSizeMultiplier={1.1}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >{`${item?.make} ${item?.model}`}</Text>
+            <Text
+              maxFontSizeMultiplier={1.1}
               style={{
                 color: Colors.primary,
                 fontFamily: "SF_Pro_Display_Bold",
                 fontSize: 24,
-                marginVertical: 10,
+                marginVertical: 5,
                 textAlign: "center",
               }}
             >
@@ -225,6 +233,7 @@ export default function SwiperPage() {
               <View style={{ flex: 0.5, justifyContent: "flex-start", gap: 10 }}>
                 <View>
                   <Text
+                    maxFontSizeMultiplier={1.1}
                     style={{
                       fontSize: 16,
                       fontFamily: "SF_Pro_Display_Light",
@@ -234,12 +243,14 @@ export default function SwiperPage() {
                   >
                     Odometer
                   </Text>
-                  <Text style={styles.descriptionValue}>{`${formatNumberWithCommas(
-                    item?.odometer
-                  )} km`}</Text>
+                  <Text
+                    maxFontSizeMultiplier={1.1}
+                    style={styles.descriptionValue}
+                  >{`${formatNumberWithCommas(item?.odometer)} km`}</Text>
                 </View>
                 <View>
                   <Text
+                    maxFontSizeMultiplier={1.1}
                     style={{
                       fontSize: 16,
                       fontFamily: "SF_Pro_Display_Light",
@@ -249,12 +260,15 @@ export default function SwiperPage() {
                   >
                     Fuel Type
                   </Text>
-                  <Text style={styles.descriptionValue}>{checkNull(item?.fuelType)}</Text>
+                  <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
+                    {checkNull(item?.fuelType)}
+                  </Text>
                 </View>
               </View>
               <View style={{ flex: 0.5, justifyContent: "flex-start", gap: 10 }}>
                 <View>
                   <Text
+                    maxFontSizeMultiplier={1.1}
                     style={{
                       fontSize: 16,
                       fontFamily: "SF_Pro_Display_Light",
@@ -265,12 +279,15 @@ export default function SwiperPage() {
                     Transmission
                   </Text>
                   {item?.transmission && (
-                    <Text style={styles.descriptionValue}>{checkNull(item?.transmission)}</Text>
+                    <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
+                      {checkNull(item?.transmission)}
+                    </Text>
                   )}
                 </View>
 
                 <View>
                   <Text
+                    maxFontSizeMultiplier={1.1}
                     style={{
                       fontSize: 16,
                       fontFamily: "SF_Pro_Display_Light",
@@ -281,7 +298,9 @@ export default function SwiperPage() {
                     Series
                   </Text>
                   {item?.series && (
-                    <Text style={styles.descriptionValue}>{checkNull(item?.series)}</Text>
+                    <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
+                      {checkNull(item?.series)}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -376,25 +395,23 @@ const styles = StyleSheet.create({
   absoluteCenteredViewCopy: {
     position: "absolute",
     width: "100%",
-    bottom: 10,
-    // backgroundColor: "red",
+    bottom: 0,
     zIndex: 100,
   },
   absoluteCenteredView: {
     zIndex: 100,
     justifyContent: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
     overflow: "hidden",
     elevation: 5,
-    flex: 0.65,
     backgroundColor: Colors.background,
     display: "flex",
-    // position: "absolute",
     width: "95%",
-    // top: "20%",
-    minHeight: "36%",
+    // flex: 0.6,
+    // minHeight: "35%",
     margin: 10,
+    maxHeight: "70%",
     borderRadius: 24,
   },
   detailsText: {
@@ -414,16 +431,16 @@ const styles = StyleSheet.create({
     textAlign: "left",
     textTransform: "capitalize",
   },
-  stickyContactCard: { marginHorizontal: 10 },
+  stickyContactCard: { marginHorizontal: 10, marginBottom: 5 },
   carDetailsContainer: {
     flexDirection: "row",
     // gap: 10,
     alignItems: "center",
-    marginTop: 15,
-    marginBottom: 20,
+    marginVertical: 10,
     marginHorizontal: 10,
-    padding: 15,
+    padding: 12,
     borderRadius: 16,
+    // backgroundColor: "red",
     backgroundColor: Colors.background,
     shadowColor: "#000",
     shadowOffset: {
