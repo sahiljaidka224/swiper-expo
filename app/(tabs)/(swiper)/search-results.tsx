@@ -6,8 +6,6 @@ import { useAuth } from "@/context/AuthContext";
 import CarOverview from "@/components/CarOverview";
 import ErrorView from "@/components/Error";
 import CarOverviewLoader from "@/components/SkeletonLoaders/CarOverviewLoader";
-import StockButtonContainer from "@/components/StockButtonContainer";
-import WatchlistButtonsContainer from "@/components/WatchlistButtonsContainer";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import Text from "@/components/Text";
@@ -256,6 +254,7 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    padding: 15,
+    paddingRight: 10,
+    paddingVertical: 15,
   },
 });

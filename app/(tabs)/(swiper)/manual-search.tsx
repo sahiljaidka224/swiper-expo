@@ -167,7 +167,7 @@ export default function ManualSearch() {
     ({ item, index }: { item: any; index: number }) => {
       return (
         <Animated.View
-          style={styles.itemWrapper}
+          style={[styles.itemWrapper, { paddingHorizontal: 10 }]}
           entering={FadeInUp.delay(index * 10)}
           exiting={FadeOutUp}
         >
@@ -231,43 +231,44 @@ export default function ManualSearch() {
               width={300}
             />
           </View>
-          {isMutating && <ActivityIndicator size="large" color={Colors.primary} />}
-
-          {mode === "Cars" ? (
-            <FlashList
-              contentInsetAdjustmentBehavior="automatic"
-              contentContainerStyle={{ paddingBottom: 40 }}
-              refreshing={isMutating && !carsData}
-              keyExtractor={(item) => item.carId}
-              scrollEnabled={true}
-              data={carsData}
-              estimatedItemSize={395}
-              ItemSeparatorComponent={ItemSeperator}
-              ListFooterComponent={() => (isMutating && carsData?.length > 0 ? <Footer /> : null)}
-              onEndReached={loadMore}
-              onEndReachedThreshold={0.5}
-              renderItem={renderItemCars}
-              ListEmptyComponent={null}
-            />
-          ) : null}
-          {mode === "Dealerships" ? (
-            <FlashList
-              contentInsetAdjustmentBehavior="automatic"
-              contentContainerStyle={{ paddingBottom: 40 }}
-              refreshing={isMutating && !orgsData}
-              keyExtractor={(item) => item.organisationId}
-              scrollEnabled={true}
-              data={orgsData}
-              estimatedItemSize={395}
-              ItemSeparatorComponent={ItemSeperator}
-              ListFooterComponent={() => (isMutating && orgsData?.length > 0 ? <Footer /> : null)}
-              onEndReached={loadMore}
-              onEndReachedThreshold={0.5}
-              renderItem={renderItemOrgs}
-              ListEmptyComponent={null}
-            />
-          ) : null}
         </View>
+
+        {isMutating && <ActivityIndicator size="large" color={Colors.primary} />}
+
+        {mode === "Cars" ? (
+          <FlashList
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={{ paddingBottom: 40 }}
+            refreshing={isMutating && !carsData}
+            keyExtractor={(item) => item.carId}
+            scrollEnabled={true}
+            data={carsData}
+            estimatedItemSize={210}
+            ItemSeparatorComponent={ItemSeperator}
+            ListFooterComponent={() => (isMutating && carsData?.length > 0 ? <Footer /> : null)}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            renderItem={renderItemCars}
+            ListEmptyComponent={null}
+          />
+        ) : null}
+        {mode === "Dealerships" ? (
+          <FlashList
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={{ paddingBottom: 40 }}
+            refreshing={isMutating && !orgsData}
+            keyExtractor={(item) => item.organisationId}
+            scrollEnabled={true}
+            data={orgsData}
+            estimatedItemSize={80}
+            ItemSeparatorComponent={ItemSeperator}
+            ListFooterComponent={() => (isMutating && orgsData?.length > 0 ? <Footer /> : null)}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            renderItem={renderItemOrgs}
+            ListEmptyComponent={null}
+          />
+        ) : null}
       </ScrollView>
     </KeyboardAvoidingView>
   );
