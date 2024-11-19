@@ -84,7 +84,8 @@
     "rn-swiper-list": "^2.0.2",
     "swr": "^2.2.5",
     "xml2js": "^0.6.2",
-    "zustand": "^5.0.1"
+    "zustand": "^5.0.1",
+    "@react-native-community/datetimepicker": "8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

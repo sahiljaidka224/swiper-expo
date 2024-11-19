@@ -8,18 +8,25 @@ export type ButtonProps = {
   type?: "primary" | "secondary" | "disabled" | "border";
   disabled?: boolean;
   isLoading?: boolean;
+  children?: React.ReactNode;
 };
 
-export default function Button({ title, onPress, type = "primary", isLoading }: ButtonProps) {
+export default function Button({
+  title,
+  onPress,
+  type = "primary",
+  isLoading,
+  children,
+}: ButtonProps) {
   return (
     <Pressable
       disabled={type === "disabled"}
-      style={[styles.container, styles[type]]}
+      style={[styles.container, styles[type], children ? { minHeight: 32, maxHeight: 32 } : {}]}
       onPress={onPress}
     >
       {isLoading ? (
         <ActivityIndicator size="small" color="#fff" />
-      ) : (
+      ) : !children ? (
         <Text
           style={[
             styles.text,
@@ -35,6 +42,8 @@ export default function Button({ title, onPress, type = "primary", isLoading }: 
         >
           {title}
         </Text>
+      ) : (
+        children
       )}
     </Pressable>
   );

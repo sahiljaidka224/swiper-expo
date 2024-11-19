@@ -8,6 +8,7 @@ import Colors from "@/constants/Colors";
 import { router } from "expo-router";
 import { useGetOrgDetails } from "@/api/hooks/organisation";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { SheetManager } from "react-native-actions-sheet";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
@@ -19,6 +20,7 @@ interface ButtonsContainerProps {
   isPrimaryButtonLoading?: boolean;
   isSecondaryButtonLoading?: boolean;
   orgId?: string;
+  icons?: boolean;
 }
 
 function WatchlistButtonsContainer({
@@ -31,6 +33,7 @@ function WatchlistButtonsContainer({
   isPrimaryButtonLoading = false,
   isSecondaryButtonLoading = false,
   orgId,
+  icons,
 }: ButtonsContainerProps) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { org, isLoading, error } = useGetOrgDetails(orgId ?? null);
@@ -69,6 +72,58 @@ function WatchlistButtonsContainer({
       router.push(`/(tabs)/(chats)/${userId}`);
     }
   };
+
+  if (icons) {
+    return (
+      <View style={[styles.itemButtonsContainer, { gap: 5 }]}>
+        {onDelete && (
+          <TouchableOpacity
+            onPress={() => {
+              SheetManager.show("watchlist-sheet", { payload: { deleteVisible: true } }).then(
+                (result) => {
+                  if (!result) return;
+                  if (result === "delete") {
+                    onDeletePress();
+                    return;
+                  }
+                }
+              );
+
+              // showActionSheetWithOptions(
+              //   { options: ["Delete", "Cancel"], cancelButtonIndex: 1 },
+              //   (index) => {
+              //     if (typeof index === "number" && index < 1) {
+              //       onDeletePress();
+              //     }
+              //   }
+              // );
+            }}
+          >
+            <Ionicons name="ellipsis-horizontal-circle" size={30} color={Colors.primary} />
+          </TouchableOpacity>
+        )}
+        <Button
+          onPress={onCallPress}
+          title=""
+          type="border"
+          isLoading={isSecondaryButtonLoading}
+          disabled={isSecondaryButtonLoading}
+        >
+          <Ionicons name="call" color={Colors.primary} size={22} />
+        </Button>
+
+        <Button
+          onPress={onMessagePress}
+          title=""
+          type="border"
+          isLoading={isPrimaryButtonLoading || isLoading}
+          disabled={isPrimaryButtonLoading || isLoading}
+        >
+          <Ionicons name="chatbubble" color={Colors.primary} size={22} />
+        </Button>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.itemButtonsContainer}>

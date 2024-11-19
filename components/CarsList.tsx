@@ -178,27 +178,34 @@ export function CarsList({
           entering={FadeInUp.delay(index * 10)}
           exiting={FadeOutUp}
         >
-          <CarOverview car={item} context={context} />
-          {context === "followed" || context === "search" ? (
-            <WatchlistButtonsContainer
-              carId={item?.carId}
-              onMessage={onMessagePress}
-              phoneNumber={
-                item?.organisation?.phoneNumber && item?.organisation?.phoneNumber !== ""
-                  ? item?.organisation?.phoneNumber
-                  : item?.primaryContact?.phoneNumber
-              }
-              onDelete={onDeleteFromWatchlistPress}
-              isPrimaryButtonLoading={isGroupLoading}
-              orgId={item?.organisationId}
-            />
-          ) : (
-            <StockButtonContainer
-              carId={item?.carId}
-              onPushToSwiperContacts={onSendToPhoneContacts}
-              onDelete={item?.importSource === "regopage" ? onDeleteFromStockPress : undefined}
-            />
-          )}
+          <CarOverview car={item} context={context}>
+            {context === "followed" || context === "search" ? (
+              <WatchlistButtonsContainer
+                carId={item?.carId}
+                onMessage={onMessagePress}
+                phoneNumber={
+                  item?.organisation?.phoneNumber && item?.organisation?.phoneNumber !== ""
+                    ? item?.organisation?.phoneNumber
+                    : item?.primaryContact?.phoneNumber
+                }
+                onDelete={onDeleteFromWatchlistPress}
+                isPrimaryButtonLoading={isGroupLoading}
+                orgId={item?.organisationId}
+                icons
+              />
+            ) : null}
+          </CarOverview>
+
+          {context !== "followed" && context !== "search" ? (
+            <View style={{ paddingLeft: 10 }}>
+              <StockButtonContainer
+                carId={item?.carId}
+                onPushToSwiperContacts={onSendToPhoneContacts}
+                showOptionSheet
+                onDelete={item?.importSource === "regopage" ? onDeleteFromStockPress : undefined}
+              />
+            </View>
+          ) : null}
         </Animated.View>
       );
     },
@@ -228,7 +235,7 @@ export function CarsList({
         keyExtractor={(item) => item.carId}
         scrollEnabled={true}
         data={watchListData}
-        estimatedItemSize={395}
+        estimatedItemSize={210}
         ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
@@ -287,7 +294,9 @@ const styles = StyleSheet.create({
   },
   itemWrapper: {
     backgroundColor: Colors.background,
-    borderRadius: 10,
-    padding: 10,
+    paddingVertical: 15,
+    paddingRight: 10,
+    // borderRadius: 10,
+    // padding: 10,
   },
 });

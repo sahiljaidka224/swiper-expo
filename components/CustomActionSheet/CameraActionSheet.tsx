@@ -10,6 +10,7 @@ export default function CameraActionSheet() {
 
   return (
     <ActionSheet
+      ref={ref}
       safeAreaInsets={insets}
       drawUnderStatusBar
       gestureEnabled

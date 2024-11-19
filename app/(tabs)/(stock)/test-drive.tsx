@@ -14,6 +14,7 @@ import { SheetManager } from "react-native-actions-sheet";
 import { showToast } from "@/components/Toast";
 import Text from "@/components/Text";
 import { router } from "expo-router";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
 
@@ -37,6 +38,9 @@ function updatePlaceholderImages(selectedImagesCount: number): SelectedImage[] {
 }
 
 export default function TestDrivePage() {
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
   const [licenseFront, setLicenseFront] = useState<SelectedImage | null>(null);
   const [licenseBack, setLicenseBack] = useState<SelectedImage | null>(null);
 
@@ -215,7 +219,7 @@ export default function TestDrivePage() {
           )}
           name="phone"
         />
-        <Controller
+        {/* <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -228,8 +232,43 @@ export default function TestDrivePage() {
             />
           )}
           name="source"
-        />
-
+        /> */}
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={styles.licenseTitle}>Start Date</Text>
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={startDate}
+            mode="datetime"
+            onChange={(event, date) => {
+              if (date) setStartDate(date);
+            }}
+          />
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={styles.licenseTitle}>End Date</Text>
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={endDate}
+            mode="datetime"
+            onChange={(event, date) => {
+              if (date) setEndDate(date);
+            }}
+          />
+        </View>
         <View style={styles.buttonContainer}>
           <Pressable onPress={() => onAddLicensePhotos("front")} style={{ alignItems: "center" }}>
             <Image

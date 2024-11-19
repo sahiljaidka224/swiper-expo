@@ -10,7 +10,15 @@ import Text from "@/components/Text";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
 
-function CarOverview({ car, context }: { car: any; context: CarsListContext }) {
+function CarOverview({
+  car,
+  context,
+  children,
+}: {
+  car: any;
+  context: CarsListContext;
+  children?: React.ReactNode;
+}) {
   const segments = useSegments();
   const onAnimatePress = (carId: string) => {
     router.push({
@@ -21,35 +29,48 @@ function CarOverview({ car, context }: { car: any; context: CarsListContext }) {
 
   return (
     <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
-      <Image
-        placeholder={placeholderImage}
-        source={{ uri: car?.images[0]?.url }}
-        style={styles.itemCarImage}
-        recyclingKey={car?.images[0]?.carImageId}
-        placeholderContentFit="fill"
-      />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
-        <DetailsText text={car.transmission} />
-        <DetailsText text={car.body} />
-        <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
-        {(car?.capacity || car?.fuelType) && (
-          <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
-        )}
+      <View style={{ width: 180, height: 180, position: "relative" }}>
+        <Image
+          placeholder={placeholderImage}
+          source={{ uri: car?.images[0]?.url }}
+          style={[
+            styles.itemCarImage,
+            !car?.images[0]?.url ? { marginLeft: -12, borderRadius: 0, borderWidth: 0 } : {},
+          ]}
+          recyclingKey={car?.images[0]?.carImageId}
+          placeholderContentFit="fill"
+        />
         <View style={styles.priceContainer}>
-          <Text style={styles.itemPriceText}>{`${
-            car?.price && car?.price > 0
-              ? `$${formatNumberWithCommas(car.price)}`
-              : context === "followed"
-              ? "Enquire"
-              : "No Price"
-          }`}</Text>
           {typeof car?.daysInStock === "number" ? (
             <View style={styles.daysInStockContainer}>
               <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
             </View>
-          ) : null}
+          ) : (
+            <View />
+          )}
+          <View style={styles.itemPriceTextContainer}>
+            <Text style={styles.itemPriceText}>{`${
+              car?.price && car?.price > 0
+                ? `$${formatNumberWithCommas(car.price)}`
+                : context === "followed"
+                ? "Enquire"
+                : "No Price"
+            }`}</Text>
+          </View>
         </View>
+      </View>
+
+      <View style={styles.detailsContainer}>
+        <View style={{ gap: 2 }}>
+          <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
+          <DetailsText text={car.transmission} />
+          <DetailsText text={car.body} />
+          <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
+          {(car?.capacity || car?.fuelType) && (
+            <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
+          )}
+        </View>
+        {children}
       </View>
     </AnimatedPressable>
   );
@@ -58,7 +79,7 @@ function CarOverview({ car, context }: { car: any; context: CarsListContext }) {
 function DetailsText({ text }: { text: string | null }) {
   if (!text || text?.trim() === "") return null;
 
-  return <Text style={styles.detailText}>{`• ${text}`}</Text>;
+  return <Text style={styles.detailText}>{text}</Text>;
 }
 
 export default React.memo(CarOverview);
@@ -66,7 +87,7 @@ export default React.memo(CarOverview);
 const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
     minHeight: 150,
   },
   itemCarTitle: {
@@ -76,22 +97,31 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: Colors.textDark,
   },
+  itemPriceTextContainer: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderBottomRightRadius: 15,
+  },
   itemPriceText: {
     fontSize: 18,
-    color: Colors.primary,
+    color: Colors.background,
     fontWeight: "600",
     fontFamily: "SF_Pro_Display_Bold",
+    borderRadius: 15,
   },
   itemCarImage: {
-    minWidth: 130,
-    width: "40%",
-    height: 130,
-    borderRadius: 15,
+    minWidth: 140,
+    // width: "45%",
+    height: 180,
+    borderTopRightRadius: 15,
+    borderBottomRightRadius: 15,
+    // borderRadius: 15,
     objectFit: "cover",
     borderWidth: 1,
     borderColor: Colors.lightGray,
   },
-  detailsContainer: { flex: 1, gap: 2, marginLeft: 5 },
+  detailsContainer: { flex: 1, marginLeft: 5, justifyContent: "space-between" },
   detailText: {
     fontSize: 16,
     textTransform: "capitalize",
@@ -100,15 +130,18 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
   },
   priceContainer: {
-    marginTop: 10,
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    left: 0,
+
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
   },
   daysInStockContainer: {
     backgroundColor: Colors.primaryLight,
     padding: 5,
-    borderRadius: 20,
   },
   daysInStockText: {
     color: Colors.primary,

@@ -6,12 +6,15 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Button from "./Button";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
+import { SheetManager } from "react-native-actions-sheet";
+import { router } from "expo-router";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
   onPushToSwiperContacts: () => void;
   carId: string;
   showSMSOption?: boolean;
+  showOptionSheet?: boolean;
 }
 
 function StockButtonContainer({
@@ -19,6 +22,7 @@ function StockButtonContainer({
   onDelete,
   carId,
   showSMSOption = false,
+  showOptionSheet = false,
 }: ButtonsContainerProps) {
   const { user } = useAuth();
   const onDeletePress = () => {
@@ -44,11 +48,34 @@ function StockButtonContainer({
 
   return (
     <View style={styles.itemButtonsContainer}>
-      {onDelete && (
+      {/* {onDelete && (
         <TouchableOpacity onPress={onDeletePress} style={styles.iconContainer}>
           <Ionicons name="trash-outline" color={Colors.iconGray} size={24} />
         </TouchableOpacity>
+      )} */}
+
+      {showOptionSheet && (
+        <TouchableOpacity
+          onPress={() => {
+            SheetManager.show("watchlist-sheet", {
+              payload: { deleteVisible: Boolean(onDelete), testDriveVisible: true },
+            }).then((result) => {
+              if (!result) return;
+              if (result === "delete") {
+                onDeletePress();
+                return;
+              }
+
+              if (result === "test-drive") {
+                router.push("/(tabs)/(stock)/test-drive");
+              }
+            });
+          }}
+        >
+          <Ionicons name="ellipsis-horizontal-circle" size={40} color={Colors.primary} />
+        </TouchableOpacity>
       )}
+
       <Button title="Push to Swiper Users" onPress={onPushToSwiperContactsPress} />
       {/* {showSMSOption && (
         <Button title="SMS Phone Contacts" onPress={onSMSToPhoneContacts} type="secondary" />
@@ -66,6 +93,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingBottom: 5,
     gap: 10,
+    alignItems: "center",
   },
   iconContainer: {
     borderRadius: 25,
