@@ -21,6 +21,7 @@ interface ButtonsContainerProps {
   isSecondaryButtonLoading?: boolean;
   orgId?: string;
   icons?: boolean;
+  circularIcons?: boolean;
 }
 
 function WatchlistButtonsContainer({
@@ -33,7 +34,8 @@ function WatchlistButtonsContainer({
   isPrimaryButtonLoading = false,
   isSecondaryButtonLoading = false,
   orgId,
-  icons,
+  icons = false,
+  circularIcons = false,
 }: ButtonsContainerProps) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { org, isLoading, error } = useGetOrgDetails(orgId ?? null);
@@ -73,6 +75,48 @@ function WatchlistButtonsContainer({
     }
   };
 
+  if (circularIcons) {
+    return (
+      <View style={[styles.itemButtonsContainer, { gap: 15, justifyContent: "flex-start" }]}>
+        {onDelete && (
+          <TouchableOpacity
+            onPress={() => {
+              SheetManager.show("watchlist-sheet", { payload: { deleteVisible: true } }).then(
+                (result) => {
+                  if (!result) return;
+                  if (result === "delete") {
+                    onDeletePress();
+                    return;
+                  }
+                }
+              );
+            }}
+          >
+            <Ionicons name="ellipsis-horizontal-circle" size={30} color={Colors.primary} />
+          </TouchableOpacity>
+        )}
+        <Button
+          onPress={onCallPress}
+          title=""
+          type="circle"
+          isLoading={isSecondaryButtonLoading}
+          disabled={isSecondaryButtonLoading}
+        >
+          <Ionicons name="call" color={Colors.background} size={22} />
+        </Button>
+        <Button
+          onPress={onMessagePress}
+          title=""
+          type="circle"
+          isLoading={isPrimaryButtonLoading || isLoading}
+          disabled={isPrimaryButtonLoading || isLoading}
+        >
+          <Ionicons name="chatbubble" color={Colors.background} size={22} />
+        </Button>
+      </View>
+    );
+  }
+
   if (icons) {
     return (
       <View style={[styles.itemButtonsContainer, { gap: 5 }]}>
@@ -88,15 +132,6 @@ function WatchlistButtonsContainer({
                   }
                 }
               );
-
-              // showActionSheetWithOptions(
-              //   { options: ["Delete", "Cancel"], cancelButtonIndex: 1 },
-              //   (index) => {
-              //     if (typeof index === "number" && index < 1) {
-              //       onDeletePress();
-              //     }
-              //   }
-              // );
             }}
           >
             <Ionicons name="ellipsis-horizontal-circle" size={30} color={Colors.primary} />

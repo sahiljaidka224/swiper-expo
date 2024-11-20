@@ -126,7 +126,12 @@ export default function UsersListPage() {
           return prev.filter((user) => user.getUid() !== userUID);
         });
       } else {
-        router.push(`/(tabs)/(chats)/${userUID}`);
+        // router.push(`/(tabs)/(chats)/${userUID}`);
+
+        router.push({
+          pathname: `/(tabs)/user/[user]`,
+          params: { id: userUID },
+        });
       }
     };
 

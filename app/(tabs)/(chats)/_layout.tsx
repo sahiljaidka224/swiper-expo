@@ -99,6 +99,14 @@ export default function ChatsLayout() {
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
+        <Stack.Screen
+          name="user/[user]"
+          options={{
+            title: "",
+            headerBackTitle: "",
+            headerBackTitleVisible: false,
+          }}
+        />
       </Stack>
     </ActionSheetProvider>
   );

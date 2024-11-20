@@ -14,10 +14,12 @@ function CarOverview({
   car,
   context,
   children,
+  showDetails = true,
 }: {
   car: any;
   context: CarsListContext;
   children?: React.ReactNode;
+  showDetails?: boolean;
 }) {
   const segments = useSegments();
   const onAnimatePress = (carId: string) => {
@@ -29,7 +31,13 @@ function CarOverview({
 
   return (
     <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
-      <View style={{ width: 180, height: 180, position: "relative" }}>
+      <View
+        style={{
+          width: showDetails ? 180 : "95%",
+          height: showDetails ? 180 : 300,
+          position: "relative",
+        }}
+      >
         <Image
           placeholder={placeholderImage}
           source={{ uri: car?.images[0]?.url }}
@@ -59,19 +67,20 @@ function CarOverview({
           </View>
         </View>
       </View>
-
-      <View style={styles.detailsContainer}>
-        <View style={{ gap: 2 }}>
-          <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
-          <DetailsText text={car.transmission} />
-          <DetailsText text={car.body} />
-          <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
-          {(car?.capacity || car?.fuelType) && (
-            <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
-          )}
+      {showDetails ? (
+        <View style={styles.detailsContainer}>
+          <View style={{ gap: 2 }}>
+            <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
+            <DetailsText text={car.transmission} />
+            <DetailsText text={car.body} />
+            <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
+            {(car?.capacity || car?.fuelType) && (
+              <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
+            )}
+          </View>
+          {children}
         </View>
-        {children}
-      </View>
+      ) : null}
     </AnimatedPressable>
   );
 }
@@ -113,7 +122,7 @@ const styles = StyleSheet.create({
   itemCarImage: {
     minWidth: 140,
     // width: "45%",
-    height: 180,
+    height: "100%",
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
     // borderRadius: 15,

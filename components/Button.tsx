@@ -5,7 +5,7 @@ import Text from "./Text";
 export type ButtonProps = {
   title: string;
   onPress: () => void;
-  type?: "primary" | "secondary" | "disabled" | "border";
+  type?: "primary" | "secondary" | "disabled" | "border" | "circle";
   disabled?: boolean;
   isLoading?: boolean;
   children?: React.ReactNode;
@@ -21,7 +21,11 @@ export default function Button({
   return (
     <Pressable
       disabled={type === "disabled"}
-      style={[styles.container, styles[type], children ? { minHeight: 32, maxHeight: 32 } : {}]}
+      style={[
+        styles.container,
+        styles[type],
+        children && type !== "circle" ? { minHeight: 32, maxHeight: 32 } : {},
+      ]}
       onPress={onPress}
     >
       {isLoading ? (
@@ -75,6 +79,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderWidth: 2,
     borderColor: Colors.primary,
+  },
+  circle: {
+    borderRadius: 25,
+    minWidth: 50,
+    minHeight: 50,
+    backgroundColor: Colors.primary,
+    flex: 0,
   },
   text: {
     color: Colors.textPrimary,
