@@ -122,13 +122,16 @@ export const HideSenderContextProvider: React.FC<HideSenderContextProviderProps>
       return true;
     }
 
+    const allRead = userGroups && Array.from(userGroups.values()).every((group) => group.read);
+    return allRead;
+
     for (let group of userGroups.values()) {
-      if (group.read) {
-        return true;
+      if (!group.read) {
+        return false;
       }
     }
 
-    return false;
+    return true;
   };
 
   return (

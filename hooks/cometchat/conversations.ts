@@ -54,46 +54,33 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
             return acc;
           }, new Map<string, { groupId: string; unreadCount: number }[]>());
 
-          console.log("groupedByUser", groupedByUser);
-          // if (!groupedByUser.size) return;
           const newUsers = new Map(users);
 
           Array.from(newUsers.keys()).forEach((memberId) => {
             if (!groupedByUser.has(memberId)) {
-              // const userGroups = newUsers.get(memberId);
-
-              // Remove user only if all groups are read
-              // const allRead =
-              //   userGroups && Array.from(userGroups.values()).every((group) => group.read);
-              // if (allRead) {
-              console.log("deleting", memberId);
               newUsers.delete(memberId);
-              // }
             }
           });
 
           groupedByUser.forEach((groups, memberId) => {
             const userGroups = newUsers.get(memberId) || new Map<string, { read: boolean }>();
-            console.log("userGroups before update", userGroups);
             groups.forEach(({ groupId, unreadCount }) => {
               if (unreadCount > 0) {
                 userGroups.set(groupId, { read: false });
               }
             });
 
-            console.log("userGroups after update", userGroups);
-
-            const existingGroups = newUsers.get(memberId);
-            console.log("existingGroups", existingGroups);
-            if (existingGroups) {
-              for (const [groupId, groupData] of existingGroups) {
-                const existing = groups.find((g) => g.groupId === groupId);
-                // console.log("existing", existing);
-                if (userGroups.has(groupId) && !existing) {
-                  userGroups.set(groupId, { read: true });
-                }
-              }
-            }
+            // const existingGroups = newUsers.get(memberId);
+            // console.log("existingGroups", existingGroups);
+            // if (existingGroups) {
+            //   for (const [groupId, groupData] of existingGroups) {
+            //     const existing = groups.find((g) => g.groupId === groupId);
+            //     // console.log("existing", existing);
+            //     if (userGroups.has(groupId) && !existing) {
+            //       userGroups.set(groupId, { read: true });
+            //     }
+            //   }
+            // }
 
             // Step 2c: Keep user in state if they have any groups
             if (userGroups.size > 0) {

@@ -537,14 +537,14 @@ const RenderTicks = (props: any) => {
   if (props.sent)
     return (
       <View style={{ margin: 4, justifyContent: "center" }}>
-        <Ionicons name="checkmark-done-sharp" size={18} color={Colors.background} />
+        <Ionicons name="checkmark-done-sharp" size={20} color={Colors.background} />
       </View>
     );
 
   if (props.received)
     return (
       <View style={{ margin: 4 }}>
-        <Ionicons name="checkmark-sharp" size={18} color={Colors.background} />
+        <Ionicons name="checkmark-sharp" size={20} color={Colors.background} />
       </View>
     );
 
@@ -557,7 +557,7 @@ const RenderTime = (props: TimeProps<IMessage>) => {
     <Text
       style={{
         color: props.position === "left" ? Colors.textDark : "#fff",
-        fontSize: 12,
+        fontSize: 14,
         textAlign: "center",
         padding: 5,
       }}
