@@ -171,12 +171,20 @@ export default function UsersListPage() {
     const chatName = String(`${car?.year} ${car?.model}`).toUpperCase();
     const icon = car?.images[0]?.url ?? undefined;
     const owner = currentUser?.id;
-    const metadata = {
+    let metadata: {
+      carId: any;
+      carName: string;
+      price: any;
+      odometer: any;
+      icon: any;
+      members: string[];
+    } = {
       carId: car?.carId,
       carName: `${car?.year} ${car?.make} ${car?.model}`,
       price: car?.price,
       odometer: car?.odometer,
       icon,
+      members: [],
     };
 
     let groupData = selectedUsers.map((user) => {
@@ -186,6 +194,7 @@ export default function UsersListPage() {
 
       const members = [owner, userUID];
       const tags = [userUID, currentUser?.id, car?.carId];
+      metadata = { ...metadata, members };
 
       const group = new CometChat.Group(
         GUID,

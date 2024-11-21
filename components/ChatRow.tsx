@@ -21,6 +21,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useMarkMessageAsRead } from "@/hooks/cometchat/messages";
 import { useDeleteConversation } from "@/hooks/cometchat/conversations";
 import { showToast } from "./Toast";
+import { useHideSenderContext } from "@/context/HideSenderContext";
 
 interface ChatRowProps {
   conversation: CometChat.Conversation;
@@ -29,6 +30,7 @@ interface ChatRowProps {
 }
 
 export default function ChatRow({ conversation, index, refetch }: ChatRowProps) {
+  const { hasReadGroup } = useHideSenderContext();
   const { user } = useAuth();
   const { markAsRead } = useMarkMessageAsRead();
   const { deleteConversation, deletedConversation } = useDeleteConversation();
@@ -80,6 +82,14 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
       showToast("Success", "This conversation has been deleted!", "info");
     }
   }, [deletedConversation]);
+
+  if (
+    !hasReadGroup(userUID as string) &&
+    lastMessage instanceof CometChat.CustomMessage &&
+    !isOutgoingMsg
+  ) {
+    return null;
+  }
 
   const highlightUnread =
     unreadMessageCount > 0 &&

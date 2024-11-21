@@ -18,6 +18,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 export { ErrorBoundary } from "expo-router";
 import "@/components/CustomActionSheet/sheets.tsx";
 import { SheetProvider } from "react-native-actions-sheet";
+import { HideSenderContextProvider } from "@/context/HideSenderContext";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -129,14 +130,16 @@ export default function RootLayoutNav() {
   return (
     <KeyboardProvider>
       <AuthProvider>
-        <MessageContextProvider>
-          <SheetProvider>
-            <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
-              <BaseLayout />
-              <Toast topOffset={top} />
-            </SWRConfig>
-          </SheetProvider>
-        </MessageContextProvider>
+        <HideSenderContextProvider>
+          <MessageContextProvider>
+            <SheetProvider>
+              <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
+                <BaseLayout />
+                <Toast topOffset={top} />
+              </SWRConfig>
+            </SheetProvider>
+          </MessageContextProvider>
+        </HideSenderContextProvider>
       </AuthProvider>
     </KeyboardProvider>
   );

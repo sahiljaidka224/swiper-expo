@@ -32,6 +32,7 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useMessageContext } from "@/context/MessageContext";
+import { useHideSenderContext } from "@/context/HideSenderContext";
 
 const transition = CurvedTransition.delay(100);
 
@@ -89,11 +90,14 @@ export default function Chats() {
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   useNotificationObserver(fetchConversations, fetchGroupConversations);
+  const { setUsers, users: hideSenderUsers } = useHideSenderContext();
 
   const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();
     return unreadCount > 0;
   });
+
+  // console.log(hideSenderUsers);
 
   useFocusEffect(
     useCallback(() => {

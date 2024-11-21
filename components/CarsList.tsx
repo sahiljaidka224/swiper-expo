@@ -153,6 +153,7 @@ export function CarsList({
           price: item?.price,
           odometer: item?.odometer,
           icon,
+          members,
         };
         const tags = [owner, userId, item?.carId];
 

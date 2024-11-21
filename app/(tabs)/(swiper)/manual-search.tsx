@@ -122,6 +122,7 @@ export default function ManualSearch() {
           price: item?.price,
           odometer: item?.odometer,
           icon,
+          members,
         };
         const tags = [owner, item?.organisation?.ownerUserId, item?.carId];
 

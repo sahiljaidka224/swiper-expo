@@ -60,6 +60,7 @@ function ContactCardNew({
       price: car?.price,
       odometer: car?.odometer,
       icon,
+      members,
     };
     const tags = [owner, userId, car?.carId];
 

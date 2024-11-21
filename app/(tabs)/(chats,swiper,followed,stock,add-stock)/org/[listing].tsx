@@ -107,6 +107,7 @@ function CarsListOrgs({
           price: item?.price,
           odometer: item?.odometer,
           icon,
+          members,
         };
         const tags = [owner, userId, item?.carId];
 

@@ -5,9 +5,12 @@ import { useGetUnreadMessages } from "./messages";
 import { showToast } from "@/components/Toast";
 import { usePathname } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { useHideSenderContext } from "@/context/HideSenderContext";
 
 export const useGetConversations = (type: "user" | "group" = "user") => {
   const { getUnreadMessages } = useGetUnreadMessages();
+  const { setUsers, users } = useHideSenderContext();
+
   const { user: currentUser } = useAuth();
   const pathname = usePathname();
 
@@ -24,6 +27,143 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
     try {
       const conversations = await conversationsRequest.fetchNext();
       setConversationList(conversations);
+
+      if (conversations && conversations.length) {
+        if (type === "group") {
+          const groupConversations = conversations.filter((c) => {
+            const unreadCount = c.getUnreadMessageCount();
+            return unreadCount > 0;
+          });
+
+          console.log("conversations", groupConversations.length, type);
+
+          const groupedByUser = groupConversations.reduce((acc, group) => {
+            const conversationWith = group.getConversationWith();
+            if (conversationWith instanceof CometChat.User) return acc;
+            const groupId = conversationWith.getGuid();
+            const unreadCount = group.getUnreadMessageCount();
+            const metadata = conversationWith.getMetadata() as { members: string[] };
+            const members = metadata?.members || [];
+
+            const otherMember = members.find((member: string) => member !== currentUser?.id);
+            if (!otherMember) return acc;
+
+            if (!acc.has(otherMember)) acc.set(otherMember, []);
+            acc.get(otherMember)?.push({ groupId, unreadCount });
+
+            return acc;
+          }, new Map<string, { groupId: string; unreadCount: number }[]>());
+
+          console.log("groupedByUser", groupedByUser);
+          // if (!groupedByUser.size) return;
+          const newUsers = new Map(users);
+
+          Array.from(newUsers.keys()).forEach((memberId) => {
+            if (!groupedByUser.has(memberId)) {
+              // const userGroups = newUsers.get(memberId);
+
+              // Remove user only if all groups are read
+              // const allRead =
+              //   userGroups && Array.from(userGroups.values()).every((group) => group.read);
+              // if (allRead) {
+              console.log("deleting", memberId);
+              newUsers.delete(memberId);
+              // }
+            }
+          });
+
+          groupedByUser.forEach((groups, memberId) => {
+            const userGroups = newUsers.get(memberId) || new Map<string, { read: boolean }>();
+            console.log("userGroups before update", userGroups);
+            groups.forEach(({ groupId, unreadCount }) => {
+              if (unreadCount > 0) {
+                userGroups.set(groupId, { read: false });
+              }
+            });
+
+            console.log("userGroups after update", userGroups);
+
+            const existingGroups = newUsers.get(memberId);
+            console.log("existingGroups", existingGroups);
+            if (existingGroups) {
+              for (const [groupId, groupData] of existingGroups) {
+                const existing = groups.find((g) => g.groupId === groupId);
+                // console.log("existing", existing);
+                if (userGroups.has(groupId) && !existing) {
+                  userGroups.set(groupId, { read: true });
+                }
+              }
+            }
+
+            // Step 2c: Keep user in state if they have any groups
+            if (userGroups.size > 0) {
+              newUsers.set(memberId, userGroups);
+            }
+          });
+
+          setUsers(newUsers);
+
+          // for (let conversation of groupConversations) {
+          //   const conversationWith = conversation.getConversationWith();
+          //   if (conversationWith instanceof CometChat.Group) {
+          //     const groupId = conversationWith.getGuid();
+          //     const unreadCount = conversation.getUnreadMessageCount();
+          //     const metadata = conversationWith.getMetadata() as { members: string[] };
+          //     const members = metadata?.members || [];
+
+          //     const otherMembers = members.filter((member: string) => member !== currentUser?.id);
+
+          //     if (unreadCount > 0) {
+          //       const memberId = otherMembers[0];
+          //       if (!memberId) {
+          //         continue;
+          //       }
+          //       let userGroups = newUsers.get(memberId);
+
+          //       if (!userGroups) {
+          //         userGroups = new Map<string, { read: boolean }>();
+          //         newUsers.set(memberId, userGroups);
+          //       }
+
+          //       // if (userGroups.size !== 0 && userGroups.entries().some(([key, value]) => value.read)) {
+          //       //   // add new group but keep old as well
+          //       //   for (let [key, value] of userGroups.entries()) {
+          //       //     if (key !== groupId) {
+          //       //       userGroups.set(groupId, { read: false });
+          //       //     }
+          //       //   }
+
+          //       // }
+
+          //       // Add or update the group
+          //       if (unreadCount > 0 && !userGroups.has(groupId)) {
+          //         userGroups.set(groupId, { read: false });
+          //       }
+          //     }
+          //   }
+          // }
+          // setUsers(newUsers);
+        }
+      }
+
+      // if (type === "user") {
+      //   if (conversations && conversations.length) {
+      //     const newUsers = new Map<string, Map<string, { read: boolean }>>();
+      //     for (let conversation of conversations) {
+      //       const conversationWith = conversation.getConversationWith();
+      //       if (conversationWith instanceof CometChat.User) {
+      //         const UID = conversationWith.getUid();
+      //         let userGroups = newUsers.get(UID);
+
+      //         if (!userGroups) {
+      //           userGroups = new Map<string, { read: boolean }>();
+      //           newUsers.set(UID, userGroups);
+      //         }
+      //       }
+      //     }
+      //     setUsers(newUsers);
+      //   }
+      // }
     } catch (err) {
       setError(err as CometChat.CometChatException);
     } finally {
