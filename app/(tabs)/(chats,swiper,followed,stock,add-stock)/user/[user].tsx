@@ -24,27 +24,14 @@ export default function UserProfile() {
   };
 
   const organisations = user?.organisations ? user?.organisations : org ? [org] : [];
-
+  // {/* source={placeHolder}
+  //       resizeMode="cover"
+  //       style={{ flex: 1, justifyContent: "center", backgroundColor: Colors.background }}
+  //     > */}
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerTitle: "" }} />
       {isLoading || isOrgLoading ? <ActivityIndicator size="large" color={Colors.primary} /> : null}
-
-      {/* {(organisations ?? []).map((org: any) => {
-        return (
-          <OrganisationCard
-            key={org?.organisationId}
-            orgId={org.organisationId}
-            address={{
-              streetAddress: org?.address ?? null,
-              lat: org?.latitude ?? null,
-              lng: org?.longitude ?? null,
-            }}
-            name={org?.name}
-            phoneNumber={org?.phoneNumber}
-          />
-        );
-      })} */}
       {organisations && organisations.length > 0 ? (
         <CarsListOrgs
           context="search"
@@ -53,40 +40,34 @@ export default function UserProfile() {
           orderDirection="desc"
           children={
             user && (
-              <ImageBackground
-                resizeMode="cover"
-                source={placeHolder}
-                style={{ flex: 1, justifyContent: "center", opacity: 0.9, zIndex: 0 }}
-              >
-                <View style={styles.userContainer}>
-                  <View style={styles.avatarContainer}>
-                    <Avatar userId={id as string} showOnlineIndicator />
-                  </View>
-                  <View>
-                    <Text style={styles.nameText}>{user?.displayName}</Text>
-
-                    <Text
-                      style={[
-                        styles.nameText,
-                        {
-                          fontSize: 20,
-                          fontFamily: "SF_Pro_Display_Medium",
-                        },
-                      ]}
-                    >
-                      {organisations[0]?.name}
-                    </Text>
-
-                    <WatchlistButtonsContainer
-                      carId=""
-                      phoneNumber={user?.phoneNumber}
-                      buttonsType="secondary"
-                      onMessage={onMessagePress}
-                      circularIcons
-                    />
-                  </View>
+              <View style={styles.userContainer}>
+                <View style={styles.avatarContainer}>
+                  <Avatar userId={id as string} showOnlineIndicator />
                 </View>
-              </ImageBackground>
+                <View>
+                  <Text style={styles.nameText}>{user?.displayName}</Text>
+
+                  <Text
+                    style={[
+                      styles.nameText,
+                      {
+                        fontSize: 20,
+                        fontFamily: "SF_Pro_Display_Medium",
+                      },
+                    ]}
+                  >
+                    {organisations[0]?.name}
+                  </Text>
+
+                  <WatchlistButtonsContainer
+                    carId=""
+                    phoneNumber={user?.phoneNumber}
+                    buttonsType="secondary"
+                    onMessage={onMessagePress}
+                    circularIcons
+                  />
+                </View>
+              </View>
             )
           }
         />
@@ -113,11 +94,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  avatarContainer: { width: 80, height: 80, borderRadius: 60 },
+  avatarContainer: { width: 90, height: 90, borderRadius: 45 },
   nameText: {
     textAlign: "left",
     textTransform: "capitalize",
-    color: Colors.background,
+    color: Colors.textDark,
     fontSize: 24,
     fontFamily: "SF_Pro_Display_Bold",
   },

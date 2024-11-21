@@ -222,7 +222,7 @@ export function CarsListOrgs({
         scrollEnabled={true}
         data={watchListData}
         estimatedItemSize={210}
-        ItemSeparatorComponent={ItemSeperator}
+        // ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
         onEndReachedThreshold={0.5}
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   itemSeperator: {
     backgroundColor: Colors.borderGray,
     height: 1,
-    marginTop: 20,
+    // marginTop: 20,
 
     width: "100%",
   },
@@ -328,10 +328,9 @@ const styles = StyleSheet.create({
   //   paddingHorizontal: "10%",
   // },
   itemWrapper: {
-    backgroundColor: Colors.background,
-    borderRadius: 10,
-    paddingRight: 10,
-    paddingVertical: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: "transparent",
   },
   carListContainer: {
     flex: 1,

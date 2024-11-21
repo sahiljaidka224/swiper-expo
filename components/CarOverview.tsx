@@ -29,12 +29,59 @@ function CarOverview({
     });
   };
 
+  if (!showDetails) {
+    return (
+      <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
+        <View
+          style={{
+            width: "100%",
+            height: 300,
+            position: "relative",
+          }}
+        >
+          <Image
+            placeholder={placeholderImage}
+            source={{ uri: car?.images[0]?.url }}
+            style={[
+              styles.itemCarImage,
+              { borderRadius: 15, width: "100%" },
+              !car?.images[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
+            ]}
+            recyclingKey={car?.images[0]?.carImageId}
+            placeholderContentFit="fill"
+          />
+          <View style={styles.priceContainer}>
+            {typeof car?.daysInStock === "number" ? (
+              <View style={styles.daysInStockContainer}>
+                <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
+              </View>
+            ) : (
+              <View />
+            )}
+            <View style={styles.itemPriceTextContainer}>
+              <Text style={styles.itemPriceText}>{`${
+                car?.price && car?.price > 0
+                  ? `$${formatNumberWithCommas(car.price)}`
+                  : context === "followed"
+                  ? "Enquire"
+                  : "No Price"
+              }`}</Text>
+            </View>
+          </View>
+          <Text
+            style={[styles.itemCarTitle, { paddingVertical: 5, textAlign: "center" }]}
+          >{`${car?.year} ${car?.make} ${car?.model}`}</Text>
+        </View>
+      </AnimatedPressable>
+    );
+  }
+
   return (
     <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
       <View
         style={{
-          width: showDetails ? 180 : "95%",
-          height: showDetails ? 180 : 300,
+          width: 180,
+          height: 180,
           position: "relative",
         }}
       >
@@ -98,6 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 5,
     minHeight: 150,
+    paddingBottom: 20,
   },
   itemCarTitle: {
     fontSize: 20,
@@ -121,11 +169,9 @@ const styles = StyleSheet.create({
   },
   itemCarImage: {
     minWidth: 140,
-    // width: "45%",
     height: "100%",
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
-    // borderRadius: 15,
     objectFit: "cover",
     borderWidth: 1,
     borderColor: Colors.lightGray,
