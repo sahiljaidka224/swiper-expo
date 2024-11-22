@@ -65,9 +65,9 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
           groupedByUser.forEach((groups, memberId) => {
             const userGroups = newUsers.get(memberId) || new Map<string, { read: boolean }>();
             groups.forEach(({ groupId, unreadCount }) => {
-              if (unreadCount > 0) {
-                userGroups.set(groupId, { read: false });
-              }
+              // if (unreadCount > 0) {
+              userGroups.set(groupId, { read: false });
+              // }
             });
 
             // const existingGroups = newUsers.get(memberId);
@@ -87,6 +87,8 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
               newUsers.set(memberId, userGroups);
             }
           });
+
+          console.log("newUsers", newUsers);
 
           setUsers(newUsers);
 
