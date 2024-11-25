@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 5,
     minHeight: 150,
-    paddingBottom: 20,
   },
   itemCarTitle: {
     fontSize: 20,

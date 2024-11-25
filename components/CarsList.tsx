@@ -192,7 +192,7 @@ export function CarsList({
                 onDelete={onDeleteFromWatchlistPress}
                 isPrimaryButtonLoading={isGroupLoading}
                 orgId={item?.organisationId}
-                icons
+                circularIcons
               />
             ) : null}
           </CarOverview>

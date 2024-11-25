@@ -14,7 +14,7 @@ export function showToast(textPrimary: string, textSecondary: string, type: Toas
     },
     swipeable: true,
     autoHide: true,
-    visibilityTime: 4000,
+    visibilityTime: 5000,
     props: {
       text2NumberOfLines: 2,
     },
