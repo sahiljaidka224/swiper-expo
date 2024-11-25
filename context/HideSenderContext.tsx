@@ -55,7 +55,6 @@ export const HideSenderContextProvider: React.FC<HideSenderContextProviderProps>
   useEffect(() => {
     const loadUsers = async () => {
       const loadedUsers = await loadUsersFromAsyncStorage();
-      console.log("Saved users", loadedUsers);
 
       setUsers(loadedUsers);
       // const savedUsers = await AsyncStorage.getItem("users");

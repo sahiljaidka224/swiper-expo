@@ -35,8 +35,6 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
             return unreadCount > 0;
           });
 
-          console.log("conversations", groupConversations.length, type);
-
           const groupedByUser = groupConversations.reduce((acc, group) => {
             const conversationWith = group.getConversationWith();
             if (conversationWith instanceof CometChat.User) return acc;
@@ -87,8 +85,6 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
               newUsers.set(memberId, userGroups);
             }
           });
-
-          console.log("newUsers", newUsers);
 
           setUsers(newUsers);
 
