@@ -102,7 +102,7 @@ function WatchlistButtonsContainer({
           isLoading={isSecondaryButtonLoading}
           disabled={isSecondaryButtonLoading}
         >
-          <Ionicons name="call" color={Colors.background} size={22} />
+          <Ionicons name="call" color={Colors.background} size={24} />
         </Button>
         <Button
           onPress={onMessagePress}
@@ -111,7 +111,7 @@ function WatchlistButtonsContainer({
           isLoading={isPrimaryButtonLoading || isLoading}
           disabled={isPrimaryButtonLoading || isLoading}
         >
-          <Ionicons name="chatbubble" color={Colors.background} size={22} />
+          <Ionicons name="chatbubble" color={Colors.background} size={24} />
         </Button>
       </View>
     );

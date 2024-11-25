@@ -81,11 +81,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   circle: {
-    borderRadius: 25,
-    minWidth: 50,
-    minHeight: 50,
+    borderRadius: 30,
+    minWidth: 60,
+    minHeight: 60,
     backgroundColor: Colors.primary,
     flex: 0,
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     color: Colors.textPrimary,

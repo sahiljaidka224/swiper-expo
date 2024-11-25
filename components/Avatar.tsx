@@ -12,19 +12,25 @@ function Avatar({
   source,
   borderRadius = 99999,
   isCar = false,
-  showOnlineIndicator,
+  showOutline = false,
 }: {
   userId?: string;
   source?: string;
   borderRadius?: number;
   isCar?: boolean;
   showOnlineIndicator?: boolean;
+  showOutline?: boolean;
 }) {
   const { user: cometChatUser } = useGetCometChatUser(userId as string);
   const isOnline = useMemo(() => cometChatUser?.getStatus() === "online", [cometChatUser]);
 
   return (
-    <View style={styles.avatarContainer}>
+    <View
+      style={[
+        styles.avatarContainer,
+        showOutline ? { borderWidth: 4, borderRadius: 99999, borderColor: Colors.background } : {},
+      ]}
+    >
       <Image
         placeholder={isCar ? carPlaceholderImage : userPlaceholderImage}
         style={[styles.avatarImage, { borderRadius }]}
@@ -37,9 +43,15 @@ function Avatar({
           uri: userId ? `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` : source,
         }}
       />
+
       {!isCar && isOnline && (
-        <View style={styles.indicatorWrapper}>
-          <View style={styles.onlineIndicator} />
+        <View style={[styles.indicatorWrapper, showOutline ? { right: 0, padding: 2 } : {}]}>
+          <View
+            style={[
+              styles.onlineIndicator,
+              showOutline ? { width: 16, height: 16, borderRadius: 8 } : {},
+            ]}
+          />
         </View>
       )}
     </View>
@@ -57,7 +69,7 @@ const styles = StyleSheet.create({
     padding: 3,
     backgroundColor: Colors.background,
     position: "absolute",
-    bottom: 4,
+    bottom: 2,
     right: -5,
     borderRadius: 999999,
     zIndex: 1,

@@ -31,12 +31,14 @@ function CarOverview({
 
   if (!showDetails) {
     return (
-      <AnimatedPressable style={styles.itemContainer} onPress={() => onAnimatePress(car?.carId)}>
+      <AnimatedPressable
+        style={[styles.itemContainer, { flexDirection: "column" }]}
+        onPress={() => onAnimatePress(car?.carId)}
+      >
         <View
           style={{
             width: "100%",
-            height: 300,
-            position: "relative",
+            height: 238,
           }}
         >
           <Image
@@ -44,33 +46,35 @@ function CarOverview({
             source={{ uri: car?.images[0]?.url }}
             style={[
               styles.itemCarImage,
-              { borderRadius: 15, width: "100%" },
+              { borderRadius: 8, width: "100%" },
               !car?.images[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
             ]}
+            contentFit="cover"
             recyclingKey={car?.images[0]?.carImageId}
             placeholderContentFit="fill"
           />
-          <View style={styles.priceContainer}>
-            {typeof car?.daysInStock === "number" ? (
-              <View style={styles.daysInStockContainer}>
-                <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
-              </View>
-            ) : (
-              <View />
-            )}
-            <View style={styles.itemPriceTextContainer}>
-              <Text style={styles.itemPriceText}>{`${
-                car?.price && car?.price > 0
-                  ? `$${formatNumberWithCommas(car.price)}`
-                  : context === "followed"
-                  ? "Enquire"
-                  : "No Price"
-              }`}</Text>
-            </View>
-          </View>
+        </View>
+        <View style={{ paddingTop: 8 }}>
           <Text
-            style={[styles.itemCarTitle, { paddingVertical: 5, textAlign: "center" }]}
-          >{`${car?.year} ${car?.make} ${car?.model}`}</Text>
+            style={[
+              styles.itemCarTitle,
+              {
+                textAlign: "left",
+                fontSize: 18,
+                fontFamily: "SF_Pro_Display_Medium",
+              },
+            ]}
+          >{`${car?.make} ${car?.model ? car?.model : ""}`}</Text>
+          <Text
+            style={[
+              styles.itemCarTitle,
+              {
+                textAlign: "left",
+                fontSize: 14,
+                fontFamily: "SF_Pro_Display_Light",
+              },
+            ]}
+          >{`${car?.year} ${car?.series ? `- ${car?.series}` : ""}`}</Text>
         </View>
       </AnimatedPressable>
     );

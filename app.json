@@ -64,7 +64,7 @@
       [
         "expo-asset",
         {
-          "assets": ["./assets/images/pattern.png"]
+          "assets": ["./assets/images/pattern.png", "./assets/images/profile-background.png"]
         }
       ],
       [
