@@ -14,7 +14,9 @@ import { Platform, Pressable, StyleSheet, View } from "react-native";
 import AntDesign from "@expo/vector-icons/build/AntDesign";
 import { showToast } from "./Toast";
 import { useState } from "react";
-import { SheetManager } from "react-native-actions-sheet";
+import CameraView from "./CameraView";
+import React from "react";
+import { Portal } from "@gorhom/portal";
 
 const addCarPlaceholder = require("@/assets/images/no-image-new.png");
 const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
@@ -26,6 +28,7 @@ export interface SelectedImage {
   size: number | undefined;
   index: number | undefined;
   isPlaceholder?: boolean;
+  source?: "camera" | "gallery";
 }
 
 const NUM_IMAGES = 20;
@@ -38,6 +41,7 @@ function updatePlaceholderImages(selectedImagesCount: number): SelectedImage[] {
     name: null,
     size: undefined,
     type: undefined,
+    source: undefined,
   }));
 }
 export default function AddStock({
@@ -47,41 +51,13 @@ export default function AddStock({
   selectedImages: SelectedImage[];
   setSelectedImages: (selImage: SelectedImage[]) => void;
 }) {
+  const [isCameraVisible, setCameraVisible] = useState(false);
   const [placeholderImages, setPlaceholderImages] = useState<SelectedImage[]>(
     updatePlaceholderImages(selectedImages.length)
   );
-  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
-  const onShowActionSheet = () => {
-    SheetManager.show("camera-sheet").then((result) => {
-      setTimeout(() => {
-        if (!result) return;
-        if (result === "camera") {
-          onPickImageFromCamera();
-          return;
-        }
-
-        onPickImageFromGallery();
-      }, 100);
-    });
-  };
-
-  const onPickImageFromCamera = async () => {
-    if (cameraStatus) {
-      if (
-        cameraStatus.status === ImagePicker.PermissionStatus.UNDETERMINED ||
-        (cameraStatus.status === ImagePicker.PermissionStatus.DENIED && cameraStatus.canAskAgain)
-      ) {
-        const permission = await requestCameraPermission();
-        if (permission.granted) {
-          await handleLaunchCamera();
-        }
-      } else if (cameraStatus.status === ImagePicker.PermissionStatus.DENIED) {
-        await Linking.openSettings();
-      } else {
-        await handleLaunchCamera();
-      }
-    }
+  const onOpenCamera = () => {
+    setCameraVisible(!isCameraVisible);
   };
 
   const triggerImageSelection = (
@@ -116,6 +92,7 @@ export default function AddStock({
         size: file.fileSize,
         index,
         isPlaceholder: false,
+        source,
       };
       files.push(tempFile);
       index++;
@@ -124,27 +101,6 @@ export default function AddStock({
     setPlaceholderImages(updatePlaceholderImages(selectedImages.length + files.length));
 
     setSelectedImages([...selectedImages, ...files]);
-  };
-
-  const handleLaunchCamera = async () => {
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 0.5,
-        aspect: [4, 3],
-        allowsMultipleSelection: true,
-        selectionLimit: 10,
-        orderedSelection: true,
-      });
-      if (!result.canceled) {
-        if (result.assets.length > 0) {
-          triggerImageSelection(result, "camera");
-        }
-      }
-    } catch (error) {
-      showToast("Error", "Failed to load image from camera", "error");
-    }
   };
 
   const onPickImageFromGallery = async () => {
@@ -193,7 +149,7 @@ export default function AddStock({
             height: 95,
             marginRight: 10,
           }}
-          onPress={onShowActionSheet}
+          onPress={onOpenCamera}
         >
           {item.isPlaceholder ? (
             <Image
@@ -229,9 +185,20 @@ export default function AddStock({
 
   return (
     <View style={styles.container}>
+      {isCameraVisible && (
+        <Portal>
+          <CameraView
+            isCameraVisible={isCameraVisible}
+            closeCamera={() => setCameraVisible(false)}
+            selectedImages={selectedImages}
+            setSelectedImages={(images) => setSelectedImages(images)}
+            onOpenGallery={onPickImageFromGallery}
+          />
+        </Portal>
+      )}
       <Pressable
         style={[styles.bannerImageContainer, { padding: selectedImages.length === 0 ? 5 : 0 }]}
-        onPress={onShowActionSheet}
+        onPress={onOpenCamera}
       >
         <Image
           style={

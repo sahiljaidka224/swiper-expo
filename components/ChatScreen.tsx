@@ -282,7 +282,7 @@ export default function ChatComponent({
 
       return (
         <Pressable
-          style={{ maxWidth: 70, alignItems: "center", marginRight: 15 }}
+          style={{ maxWidth: 70, alignItems: "center", marginRight: 8 }}
           onPress={() => {
             const lastMessage = item.getLastMessage();
             markAsRead(lastMessage);
@@ -291,19 +291,23 @@ export default function ChatComponent({
         >
           <View
             style={{
-              height: 54,
-              width: 54,
+              height: 60,
+              width: 60,
               borderWidth: unreadCount > 0 ? 2 : 0,
               borderColor: unreadCount > 0 ? Colors.primary : undefined,
-              borderRadius: 27,
               padding: 2,
+              borderRadius: 10,
             }}
           >
-            <Avatar source={icon} isCar={Boolean(conversationWith instanceof CometChat.Group)} />
+            <Avatar
+              source={icon}
+              isCar={Boolean(conversationWith instanceof CometChat.Group)}
+              borderRadius={10}
+            />
           </View>
           <Text
-            numberOfLines={3}
-            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 13 }}
+            numberOfLines={1}
+            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 14 }}
           >
             {name}
           </Text>
@@ -460,9 +464,10 @@ export default function ChatComponent({
                   height: 36,
                   width: 36,
                   alignItems: "center",
+                  paddingLeft: 3,
                 }}
               >
-                <Ionicons name="send" color={Colors.background} size={22} />
+                <Ionicons name="send-sharp" color={Colors.background} size={22} />
               </Send>
             )}
             {text.length === 0 && (

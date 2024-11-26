@@ -9,6 +9,7 @@ export type ButtonProps = {
   disabled?: boolean;
   isLoading?: boolean;
   children?: React.ReactNode;
+  size?: "min" | "max";
 };
 
 export default function Button({
@@ -17,6 +18,7 @@ export default function Button({
   type = "primary",
   isLoading,
   children,
+  size = "min",
 }: ButtonProps) {
   return (
     <Pressable
@@ -25,6 +27,9 @@ export default function Button({
         styles.container,
         styles[type],
         children && type !== "circle" ? { minHeight: 32, maxHeight: 32 } : {},
+        type === "circle"
+          ? { width: size === "min" ? 50 : 70, height: size === "min" ? 50 : 70 }
+          : {},
       ]}
       onPress={onPress}
     >
@@ -81,9 +86,11 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   circle: {
-    borderRadius: 30,
-    minWidth: 60,
-    minHeight: 60,
+    borderRadius: 35,
+    minWidth: 50,
+    minHeight: 50,
+    maxHeight: 70,
+    maxWidth: 70,
     backgroundColor: Colors.primary,
     flex: 0,
     justifyContent: "center",

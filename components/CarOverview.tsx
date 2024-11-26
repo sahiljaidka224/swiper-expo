@@ -46,7 +46,12 @@ function CarOverview({
             source={{ uri: car?.images[0]?.url }}
             style={[
               styles.itemCarImage,
-              { borderRadius: 8, width: "100%" },
+              {
+                borderRadius: 0,
+                width: "100%",
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+              },
               !car?.images[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
             ]}
             contentFit="cover"
@@ -54,13 +59,13 @@ function CarOverview({
             placeholderContentFit="fill"
           />
         </View>
-        <View style={{ paddingTop: 8 }}>
+        <View style={{ paddingTop: 4, paddingLeft: 8 }}>
           <Text
             style={[
               styles.itemCarTitle,
               {
                 textAlign: "left",
-                fontSize: 18,
+                fontSize: 22,
                 fontFamily: "SF_Pro_Display_Medium",
               },
             ]}
@@ -70,7 +75,7 @@ function CarOverview({
               styles.itemCarTitle,
               {
                 textAlign: "left",
-                fontSize: 14,
+                fontSize: 18,
                 fontFamily: "SF_Pro_Display_Light",
               },
             ]}
@@ -107,15 +112,11 @@ function CarOverview({
           ) : (
             <View />
           )}
-          <View style={styles.itemPriceTextContainer}>
-            <Text style={styles.itemPriceText}>{`${
-              car?.price && car?.price > 0
-                ? `$${formatNumberWithCommas(car.price)}`
-                : context === "followed"
-                ? "Enquire"
-                : "No Price"
-            }`}</Text>
-          </View>
+          {car?.price && car?.price > 0 ? (
+            <View style={styles.itemPriceTextContainer}>
+              <Text style={styles.itemPriceText}>{formatNumberWithCommas(car.price)}</Text>
+            </View>
+          ) : null}
         </View>
       </View>
       {showDetails ? (

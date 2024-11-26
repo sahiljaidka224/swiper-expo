@@ -28,7 +28,7 @@ function Avatar({
     <View
       style={[
         styles.avatarContainer,
-        showOutline ? { borderWidth: 4, borderRadius: 99999, borderColor: Colors.background } : {},
+        showOutline ? { borderWidth: 3, borderRadius: 99999, borderColor: Colors.background } : {},
       ]}
     >
       <Image
@@ -45,7 +45,7 @@ function Avatar({
       />
 
       {!isCar && isOnline && (
-        <View style={[styles.indicatorWrapper, showOutline ? { right: 0, padding: 2 } : {}]}>
+        <View style={[styles.indicatorWrapper, showOutline ? { right: 4, padding: 2 } : {}]}>
           <View
             style={[
               styles.onlineIndicator,

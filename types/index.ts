@@ -9,4 +9,5 @@ interface SelectedImage {
   size: number | undefined;
   index: number | undefined;
   isPlaceholder?: boolean;
+  source?: "camera" | "gallery";
 }

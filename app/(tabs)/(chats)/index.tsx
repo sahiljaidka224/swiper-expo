@@ -97,8 +97,6 @@ export default function Chats() {
     return unreadCount > 0;
   });
 
-  // console.log(hideSenderUsers);
-
   useFocusEffect(
     useCallback(() => {
       fetchConversations();
@@ -320,7 +318,7 @@ export default function Chats() {
 
       return (
         <Pressable
-          style={{ maxWidth: 80, alignItems: "center", marginRight: 10 }}
+          style={{ maxWidth: 80, alignItems: "center", marginRight: 8 }}
           onPress={() => {
             const lastMessage = item.getLastMessage();
             markAsRead(lastMessage);
@@ -331,17 +329,20 @@ export default function Chats() {
         >
           <View
             style={{
-              height: 54,
-              width: 54,
-              borderWidth: unreadCount > 0 ? 2 : 0,
-              borderColor: unreadCount > 0 ? Colors.primary : undefined,
-              borderRadius: 27,
+              height: 60,
+              width: 60,
+              borderWidth: 2,
+              borderColor: Colors.primary,
               padding: 2,
+              borderRadius: 10,
             }}
           >
-            <Avatar source={icon} isCar />
+            <Avatar source={icon} isCar borderRadius={5} />
           </View>
-          <Text numberOfLines={3} style={{ textAlign: "center" }}>
+          <Text
+            numberOfLines={1}
+            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 14 }}
+          >
             {name}
           </Text>
         </Pressable>
@@ -514,7 +515,7 @@ function ItemSeparator() {
 
 const styles = StyleSheet.create({
   leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
-  avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },
+  avatarContainer: { width: 50, height: 50, overflow: "hidden" },
   userContainer: {
     flexDirection: "row",
     gap: 10,

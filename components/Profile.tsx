@@ -270,7 +270,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
             if (context === "update")
               return (
                 <Pressable onPress={onLogout}>
-                  <SimpleLineIcons name="logout" size={24} color={Colors.primary} />
+                  <Text style={{ color: Colors.primary, fontSize: 20 }}>Logout</Text>
                 </Pressable>
               );
           },

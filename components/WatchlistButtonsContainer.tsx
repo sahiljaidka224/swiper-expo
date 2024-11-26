@@ -22,6 +22,7 @@ interface ButtonsContainerProps {
   orgId?: string;
   icons?: boolean;
   circularIcons?: boolean;
+  size?: "min" | "max";
 }
 
 function WatchlistButtonsContainer({
@@ -36,6 +37,7 @@ function WatchlistButtonsContainer({
   orgId,
   icons = false,
   circularIcons = false,
+  size = "min",
 }: ButtonsContainerProps) {
   const { showActionSheetWithOptions } = useActionSheet();
   const { org, isLoading, error } = useGetOrgDetails(orgId ?? null);
@@ -77,7 +79,9 @@ function WatchlistButtonsContainer({
 
   if (circularIcons) {
     return (
-      <View style={[styles.itemButtonsContainer, { gap: 15, justifyContent: "flex-start" }]}>
+      <View
+        style={[styles.itemButtonsContainer, { justifyContent: "space-between", width: "100%" }]}
+      >
         {onDelete && (
           <TouchableOpacity
             onPress={() => {
@@ -92,7 +96,7 @@ function WatchlistButtonsContainer({
               );
             }}
           >
-            <Ionicons name="ellipsis-horizontal-circle" size={30} color={Colors.primary} />
+            <Ionicons name="ellipsis-horizontal-circle" size={34} color={Colors.primary} />
           </TouchableOpacity>
         )}
         <Button
@@ -101,6 +105,7 @@ function WatchlistButtonsContainer({
           type="circle"
           isLoading={isSecondaryButtonLoading}
           disabled={isSecondaryButtonLoading}
+          size={size}
         >
           <Ionicons name="call" color={Colors.background} size={24} />
         </Button>
@@ -110,6 +115,7 @@ function WatchlistButtonsContainer({
           type="circle"
           isLoading={isPrimaryButtonLoading || isLoading}
           disabled={isPrimaryButtonLoading || isLoading}
+          size={size}
         >
           <Ionicons name="chatbubble" color={Colors.background} size={24} />
         </Button>

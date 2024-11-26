@@ -78,14 +78,16 @@ export default function UserProfile() {
                   >
                     {organisations[0]?.name}
                   </Text>
-
-                  <WatchlistButtonsContainer
-                    carId=""
-                    phoneNumber={user?.phoneNumber}
-                    buttonsType="secondary"
-                    onMessage={onMessagePress}
-                    circularIcons
-                  />
+                  <View style={{ maxWidth: "55%" }}>
+                    <WatchlistButtonsContainer
+                      carId=""
+                      phoneNumber={user?.phoneNumber}
+                      buttonsType="secondary"
+                      onMessage={onMessagePress}
+                      circularIcons
+                      size="max"
+                    />
+                  </View>
                   <Text
                     style={{
                       marginTop: 15,
@@ -114,14 +116,16 @@ export default function UserProfile() {
             }}
           >
             <Text style={styles.nameText}>{user?.displayName}</Text>
-
-            <WatchlistButtonsContainer
-              carId=""
-              phoneNumber={user?.phoneNumber}
-              buttonsType="secondary"
-              onMessage={onMessagePress}
-              circularIcons
-            />
+            <View style={{ maxWidth: "55%" }}>
+              <WatchlistButtonsContainer
+                carId=""
+                phoneNumber={user?.phoneNumber}
+                buttonsType="secondary"
+                onMessage={onMessagePress}
+                circularIcons
+                size="max"
+              />
+            </View>
           </View>
         </View>
       ) : null}
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  avatarContainer: { width: 100, height: 100, borderRadius: 50 },
+  avatarContainer: { width: 110, height: 110, borderRadius: 55 },
   nameText: {
     textAlign: "left",
     textTransform: "capitalize",

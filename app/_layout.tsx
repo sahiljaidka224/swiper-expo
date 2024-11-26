@@ -14,7 +14,7 @@ import Toast from "react-native-toast-message";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { showToast } from "@/components/Toast";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-
+import { PortalProvider } from "@gorhom/portal";
 export { ErrorBoundary } from "expo-router";
 import "@/components/CustomActionSheet/sheets.tsx";
 import { SheetProvider } from "react-native-actions-sheet";
@@ -128,19 +128,21 @@ export default function RootLayoutNav() {
   const { top } = useSafeAreaInsets();
 
   return (
-    <KeyboardProvider>
-      <AuthProvider>
-        <HideSenderContextProvider>
-          <MessageContextProvider>
-            <SheetProvider>
-              <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
-                <BaseLayout />
-                <Toast topOffset={top} />
-              </SWRConfig>
-            </SheetProvider>
-          </MessageContextProvider>
-        </HideSenderContextProvider>
-      </AuthProvider>
-    </KeyboardProvider>
+    <PortalProvider>
+      <KeyboardProvider>
+        <AuthProvider>
+          <HideSenderContextProvider>
+            <MessageContextProvider>
+              <SheetProvider>
+                <SWRConfig value={{ fetcher, dedupingInterval: 2000 }}>
+                  <BaseLayout />
+                  <Toast topOffset={top} />
+                </SWRConfig>
+              </SheetProvider>
+            </MessageContextProvider>
+          </HideSenderContextProvider>
+        </AuthProvider>
+      </KeyboardProvider>
+    </PortalProvider>
   );
 }

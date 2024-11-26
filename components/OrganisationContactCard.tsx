@@ -322,7 +322,6 @@ const styles = StyleSheet.create({
   },
 
   itemWrapper: {
-    paddingHorizontal: 10,
     paddingVertical: 20,
     backgroundColor: "transparent",
   },

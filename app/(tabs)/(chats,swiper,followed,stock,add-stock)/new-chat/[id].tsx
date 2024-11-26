@@ -180,7 +180,7 @@ const GroupInfo = ({
   return (
     <Pressable style={styles.groupInfoContainer} onPress={onPress}>
       <View style={styles.leftContainer}>
-        <View style={{ width: 54, height: 54 }}>
+        <View style={{ width: 60, height: 60 }}>
           <Avatar source={icon} borderRadius={10} isCar />
         </View>
         <View style={styles.textContainer}>
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     gap: 10,
-    paddingBottom: 4,
+    paddingBottom: 1,
     alignItems: "center",
     flex: 1,
   },
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.green,
     zIndex: 1,
   },
-  avatarContainer: { width: 40, height: 40 },
+  avatarContainer: { width: 44, height: 44 },
   name: { fontSize: 16, fontFamily: "SF_Pro_Display_Medium" },
   leftContainer: { flexDirection: "row", gap: 10, flex: 1, alignItems: "center" },
   textContainer: { flexDirection: "column" },

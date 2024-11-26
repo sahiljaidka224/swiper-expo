@@ -118,8 +118,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     gap: 10,
-    paddingBottom: 4,
+    paddingBottom: 1,
     alignItems: "center",
+
     flex: 1,
   },
   onlineIndicator: {
@@ -132,6 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.green,
     zIndex: 1,
   },
-  avatarContainer: { width: 40, height: 40 },
+  avatarContainer: { width: 44, height: 44 },
   name: { fontSize: 16, fontFamily: "SF_Pro_Display_Medium" },
 });
