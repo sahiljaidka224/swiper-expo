@@ -90,7 +90,8 @@ function CarOverview({
       <View
         style={{
           width: 180,
-          height: 180,
+          minHeight: 180,
+          maxHeight: 200,
           position: "relative",
         }}
       >

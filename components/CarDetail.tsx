@@ -334,14 +334,13 @@ function CarDetail({
 
           {isEditing ? (
             <Button onPress={updateStock} title="Update Stock" isLoading={isMutating} />
-          ) : (context && context?.includes("stock")) ||
-            (car?.organisationId === user?.org?.id && !context?.includes("chats")) ? (
+          ) : (context && context?.includes("stock")) || car?.organisationId === user?.org?.id ? (
             <StockButtonContainer
               carId=""
               onPushToSwiperContacts={onSendToPhoneContacts}
               showSMSOption
             />
-          ) : context && !context?.includes("chats") ? (
+          ) : context ? (
             <>
               <ContactCard
                 name={car?.primaryContact?.displayName ?? ""}
