@@ -16,6 +16,7 @@ type FormData = {
   year: string;
   odometer: string;
   transmission: string;
+  price: string;
 };
 
 export default function ManualModeForm({
@@ -110,7 +111,7 @@ export default function ManualModeForm({
               style={[styles.textInput, { flex: 1 }]}
               returnKeyType="next"
               returnKeyLabel="next"
-              onSubmitEditing={() => odometerRef.current?.focus()}
+              onSubmitEditing={() => yearRef.current?.focus()}
             />
           )}
           name="model"
@@ -156,6 +157,27 @@ export default function ManualModeForm({
           />
         )}
         name="odometer"
+      />
+      <Controller
+        control={control}
+        rules={{
+          maxLength: 15,
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="Price"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            maxFontSizeMultiplier={1.3}
+            style={[styles.textInput]}
+            keyboardType="number-pad"
+            returnKeyType="next"
+            returnKeyLabel="next"
+            onSubmitEditing={() => yearRef.current?.focus()}
+          />
+        )}
+        name="price"
       />
 
       <Controller

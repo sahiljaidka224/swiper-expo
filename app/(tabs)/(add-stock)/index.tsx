@@ -31,6 +31,7 @@ export default function AddStockPage() {
       return;
     }
 
+    const price = carDetails?.price ? Number(carDetails?.price) : 0;
     const carModel = {
       organisationId: user.org.id,
       dealerId: user.org.id,
@@ -49,6 +50,7 @@ export default function AddStockPage() {
       odometer: carDetails?.odometer,
       transmission: carDetails?.transmission,
       wholesale: 1,
+      price: typeof price === "number" ? price : undefined,
     };
 
     if (carModel && token) {

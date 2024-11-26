@@ -17,6 +17,7 @@ type FormData = {
   state: string;
   odometer: string;
   transmission: string;
+  price: string;
 };
 
 export default function RegoForm({ setCarDetails }: { setCarDetails: (details: any) => void }) {
@@ -54,6 +55,7 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
         odometer: getValues("odometer"),
         transmission: getValues("transmission"),
         regoState: getValues("state"),
+        price: getValues("price"),
       });
     }
   }, [carData]);
@@ -127,6 +129,9 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
       </View>
       <Controller
         control={control}
+        rules={{
+          maxLength: 100,
+        }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             ref={odometerRef}
@@ -140,6 +145,24 @@ export default function RegoForm({ setCarDetails }: { setCarDetails: (details: a
           />
         )}
         name="odometer"
+      />
+      <Controller
+        control={control}
+        rules={{
+          maxLength: 15,
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            placeholder="Price"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value ? value : ""}
+            style={styles.textInput}
+            maxFontSizeMultiplier={1.3}
+            keyboardType="number-pad"
+          />
+        )}
+        name="price"
       />
       <Controller
         control={control}

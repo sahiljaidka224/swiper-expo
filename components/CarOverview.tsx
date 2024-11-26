@@ -115,7 +115,7 @@ function CarOverview({
           )}
           {car?.price && car?.price > 0 ? (
             <View style={styles.itemPriceTextContainer}>
-              <Text style={styles.itemPriceText}>{formatNumberWithCommas(car.price)}</Text>
+              <Text style={styles.itemPriceText}>{`$${formatNumberWithCommas(car.price)}`}</Text>
             </View>
           ) : null}
         </View>
