@@ -204,13 +204,7 @@ export function CarsListOrgs({
   return (
     <View style={{ flex: 1, zIndex: 10 }}>
       {isLoading && (!cars || cars?.length === 0) && (
-        <View style={{ marginTop: 150 }}>
-          <CarOverviewLoader />
-          <CarOverviewLoader />
-          <CarOverviewLoader />
-          <CarOverviewLoader />
-          <CarOverviewLoader />
-        </View>
+        <ActivityIndicator size="large" color={Colors.primary} />
       )}
       {getError && !isLoading && !cars ? <ErrorView /> : null}
       <AnimatedFlashList
