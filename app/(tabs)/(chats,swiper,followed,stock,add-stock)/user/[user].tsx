@@ -89,6 +89,7 @@ export default function UserProfile() {
                     />
                   </View>
                   <Text
+                    className="animate-pulse"
                     style={{
                       marginTop: 15,
                       color: Colors.primary,

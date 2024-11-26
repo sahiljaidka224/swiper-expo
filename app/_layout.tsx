@@ -1,3 +1,4 @@
+import "../global.css";
 import * as Notifications from "expo-notifications";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";

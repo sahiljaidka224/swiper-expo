@@ -60,6 +60,7 @@
     "expo-system-ui": "~3.0.7",
     "expo-task-manager": "~11.8.2",
     "expo-web-browser": "~13.0.3",
+    "nativewind": "^4.1.23",
     "patch-package": "^8.0.0",
     "react": "18.2.0",
     "react-content-loader": "^7.0.2",
@@ -86,6 +87,7 @@
     "react-native-xml2js": "^1.0.3",
     "rn-swiper-list": "^2.0.2",
     "swr": "^2.2.5",
+    "tailwindcss": "^3.4.15",
     "xml2js": "^0.6.2",
     "zustand": "^5.0.1"
   },
