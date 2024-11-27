@@ -334,10 +334,10 @@ export default function Chats() {
               borderWidth: 2,
               borderColor: Colors.primary,
               padding: 2,
-              borderRadius: 10,
+              borderRadius: 12,
             }}
           >
-            <Avatar source={icon} isCar borderRadius={5} />
+            <Avatar source={icon} isCar borderRadius={8} />
           </View>
           <Text
             numberOfLines={1}

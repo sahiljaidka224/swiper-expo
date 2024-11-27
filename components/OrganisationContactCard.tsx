@@ -20,7 +20,6 @@ import { useState, useEffect, useCallback } from "react";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import CarOverview from "./CarOverview";
 import ErrorView from "./Error";
-import CarOverviewLoader from "./SkeletonLoaders/CarOverviewLoader";
 import StockButtonContainer from "./StockButtonContainer";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import React from "react";
@@ -215,7 +214,7 @@ export function CarsListOrgs({
         keyExtractor={(item) => item.carId}
         scrollEnabled={true}
         data={watchListData}
-        estimatedItemSize={210}
+        estimatedItemSize={329}
         ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
         onEndReached={context === "stock" || context === "search" ? loadMore : null}
@@ -316,7 +315,7 @@ const styles = StyleSheet.create({
   },
 
   itemWrapper: {
-    paddingVertical: 20,
+    marginTop: 20,
     backgroundColor: "transparent",
   },
   carListContainer: {

@@ -302,7 +302,7 @@ export default function ChatComponent({
             <Avatar
               source={icon}
               isCar={Boolean(conversationWith instanceof CometChat.Group)}
-              borderRadius={10}
+              borderRadius={12}
             />
           </View>
           <Text

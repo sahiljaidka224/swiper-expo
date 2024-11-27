@@ -181,7 +181,7 @@ const GroupInfo = ({
     <Pressable style={styles.groupInfoContainer} onPress={onPress}>
       <View style={styles.leftContainer}>
         <View style={{ width: 60, height: 60 }}>
-          <Avatar source={icon} borderRadius={10} isCar />
+          <Avatar source={icon} borderRadius={12} isCar />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.name} allowFontScaling={false}>

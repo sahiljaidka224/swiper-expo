@@ -42,7 +42,7 @@ export default function UserProfile() {
       source={assets && assets.length > 1 ? assets[0] : profileBackground}
       resizeMode="cover"
       style={{ flex: 1, backgroundColor: Colors.background }}
-      imageStyle={{ height: 400, width: "100%" }}
+      imageStyle={{ height: 450, width: "100%" }}
     >
       <Stack.Screen options={{ headerTitle: "", headerShown: false }} />
       {isLoading || isOrgLoading ? <ActivityIndicator size="large" color={Colors.primary} /> : null}
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     flex: 1,
+    marginTop: 20,
   },
   oldUserContainer: {
     gap: 10,

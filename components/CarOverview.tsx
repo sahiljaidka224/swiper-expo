@@ -9,6 +9,7 @@ import Text from "@/components/Text";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
+const carPlaceholder = require("@/assets/images/car-placeholder-new.png");
 
 function CarOverview({
   car,
@@ -32,7 +33,7 @@ function CarOverview({
   if (!showDetails) {
     return (
       <AnimatedPressable
-        style={[styles.itemContainer, { flexDirection: "column" }]}
+        style={[styles.itemContainer, { flexDirection: "column", gap: 0 }]}
         onPress={() => onAnimatePress(car?.carId)}
       >
         <View
@@ -42,7 +43,7 @@ function CarOverview({
           }}
         >
           <Image
-            placeholder={placeholderImage}
+            placeholder={carPlaceholder}
             source={{ uri: car?.images[0]?.url }}
             style={[
               styles.itemCarImage,
@@ -51,6 +52,7 @@ function CarOverview({
                 width: "100%",
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
+                borderWidth: 0,
               },
               !car?.images[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
             ]}
@@ -59,7 +61,9 @@ function CarOverview({
             placeholderContentFit="fill"
           />
         </View>
-        <View style={{ paddingTop: 4, paddingLeft: 8 }}>
+        <View
+          style={{ paddingTop: 8, paddingBottom: 20, paddingLeft: 8, backgroundColor: "white" }}
+        >
           <Text
             style={[
               styles.itemCarTitle,
@@ -120,20 +124,18 @@ function CarOverview({
           ) : null}
         </View>
       </View>
-      {showDetails ? (
-        <View style={styles.detailsContainer}>
-          <View style={{ gap: 2 }}>
-            <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
-            <DetailsText text={car.transmission} />
-            <DetailsText text={car.body} />
-            <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
-            {(car?.capacity || car?.fuelType) && (
-              <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
-            )}
-          </View>
-          {children}
+      <View style={styles.detailsContainer}>
+        <View style={{ gap: 2 }}>
+          <Text style={styles.itemCarTitle}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
+          <DetailsText text={car.transmission} />
+          <DetailsText text={car.body} />
+          <DetailsText text={`${formatNumberWithCommas(Number(car?.odometer))} km`} />
+          {(car?.capacity || car?.fuelType) && (
+            <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
+          )}
         </View>
-      ) : null}
+        {children}
+      </View>
     </AnimatedPressable>
   );
 }
