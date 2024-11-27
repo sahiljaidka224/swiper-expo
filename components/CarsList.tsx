@@ -236,7 +236,7 @@ export function CarsList({
         keyExtractor={(item) => item.carId}
         scrollEnabled={true}
         data={watchListData}
-        estimatedItemSize={210}
+        estimatedItemSize={233}
         ItemSeparatorComponent={ItemSeperator}
         ListFooterComponent={() => (isLoading && cars?.length > 0 ? <Footer /> : null)}
         onEndReached={context === "stock" || context === "search" ? loadMore : null}

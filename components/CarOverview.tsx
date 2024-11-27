@@ -96,7 +96,6 @@ function CarOverview({
           width: 180,
           minHeight: 180,
           maxHeight: 200,
-          position: "relative",
         }}
       >
         <Image
@@ -109,20 +108,6 @@ function CarOverview({
           recyclingKey={car?.images[0]?.carImageId}
           placeholderContentFit="fill"
         />
-        <View style={styles.priceContainer}>
-          {typeof car?.daysInStock === "number" ? (
-            <View style={styles.daysInStockContainer}>
-              <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
-            </View>
-          ) : (
-            <View />
-          )}
-          {car?.price && car?.price > 0 ? (
-            <View style={styles.itemPriceTextContainer}>
-              <Text style={styles.itemPriceText}>{`$${formatNumberWithCommas(car.price)}`}</Text>
-            </View>
-          ) : null}
-        </View>
       </View>
       <View style={styles.detailsContainer}>
         <View style={{ gap: 2 }}>
@@ -133,6 +118,18 @@ function CarOverview({
           {(car?.capacity || car?.fuelType) && (
             <DetailsText text={`${car?.capacity} ${car?.fuelType}`} />
           )}
+        </View>
+        <View style={[styles.priceContainer]}>
+          {typeof car?.daysInStock === "number" && (
+            <View style={styles.daysInStockContainer}>
+              <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
+            </View>
+          )}
+          {car?.price && car?.price > 0 ? (
+            <View style={styles.itemPriceTextContainer}>
+              <Text style={styles.itemPriceText}>{`$${formatNumberWithCommas(car.price)}`}</Text>
+            </View>
+          ) : null}
         </View>
         {children}
       </View>
@@ -165,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    borderBottomRightRadius: 15,
+    borderRadius: 15,
   },
   itemPriceText: {
     fontSize: 18,
@@ -183,7 +180,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.lightGray,
   },
-  detailsContainer: { flex: 1, marginLeft: 5, justifyContent: "space-between" },
+  detailsContainer: {
+    flex: 1,
+    marginLeft: 5,
+    justifyContent: "space-between",
+  },
   detailText: {
     fontSize: 16,
     textTransform: "capitalize",
@@ -192,18 +193,15 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
   },
   priceContainer: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
-
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
     justifyContent: "space-between",
+    marginTop: 10,
   },
   daysInStockContainer: {
     backgroundColor: Colors.primaryLight,
     padding: 5,
+    borderRadius: 15,
   },
   daysInStockText: {
     color: Colors.primary,

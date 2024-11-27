@@ -208,15 +208,12 @@ export default function SwiperPage() {
         />
         <View style={styles.absoluteCenteredViewCopy}>
           <View style={styles.absoluteCenteredView}>
-            <Text maxFontSizeMultiplier={1.1} style={styles.detailsText}>
-              {item?.year}
-            </Text>
             <Text
               style={styles.detailsText}
               maxFontSizeMultiplier={1.1}
               numberOfLines={1}
               ellipsizeMode="tail"
-            >{`${item?.make} ${item?.model}`}</Text>
+            >{`${item?.year} ${item?.make} ${item?.model}`}</Text>
             <Text
               maxFontSizeMultiplier={1.1}
               style={{

@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { useGetOrgDetails } from "@/api/hooks/organisation";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { SheetManager } from "react-native-actions-sheet";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface ButtonsContainerProps {
   onDelete?: (carId: string) => void;
@@ -107,7 +108,7 @@ function WatchlistButtonsContainer({
           disabled={isSecondaryButtonLoading}
           size={size}
         >
-          <Ionicons name="call" color={Colors.background} size={24} />
+          <Ionicons name="call" color={Colors.background} size={size === "min" ? 24 : 30} />
         </Button>
         <Button
           onPress={onMessagePress}
@@ -117,7 +118,11 @@ function WatchlistButtonsContainer({
           disabled={isPrimaryButtonLoading || isLoading}
           size={size}
         >
-          <Ionicons name="chatbubble" color={Colors.background} size={24} />
+          <MaterialCommunityIcons
+            name="chat"
+            color={Colors.background}
+            size={size === "min" ? 24 : 34}
+          />
         </Button>
       </View>
     );

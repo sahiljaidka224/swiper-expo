@@ -22,6 +22,7 @@ import Animated, {
 import { Image } from "expo-image";
 import React from "react";
 import { showToast } from "./Toast";
+import { saveToLibraryAsync } from "expo-media-library";
 
 interface Props {
   isCameraVisible: boolean;
@@ -93,7 +94,7 @@ export default function CameraView({
         .takePictureAsync()
         .then((photo) => {
           if (!photo) return;
-          console.log({ photo });
+          saveToLibraryAsync(photo.uri);
           setSelectedImages([
             ...selectedImages,
             {

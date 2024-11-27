@@ -331,10 +331,6 @@ export default function Chats() {
             style={{
               height: 60,
               width: 60,
-              borderWidth: 2,
-              borderColor: Colors.primary,
-              padding: 2,
-              borderRadius: 12,
             }}
           >
             <Avatar source={icon} isCar borderRadius={8} />

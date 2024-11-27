@@ -1,6 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import * as Linking from "expo-linking";
-import * as MediaLibrary from "expo-media-library";
+import { saveToLibraryAsync } from "expo-media-library";
 
 import {
   RenderItemParams,
@@ -80,7 +79,7 @@ export default function AddStock({
       }
 
       if (source === "camera") {
-        MediaLibrary.saveToLibraryAsync(uri)
+        saveToLibraryAsync(uri)
           .then()
           .catch(() => showToast("Error", "Please allow Swiper to save images.", "error"));
       }
@@ -242,7 +241,7 @@ const styles = StyleSheet.create({
     height: 200,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.primaryLight,
   },
   bannerImageSelected: {
     width: "100%",
