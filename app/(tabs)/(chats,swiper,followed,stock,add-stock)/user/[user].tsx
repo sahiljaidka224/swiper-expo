@@ -17,10 +17,13 @@ import { useAssets } from "expo-asset";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React from "react";
+import Animated, { useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 const profileBackground = require("@/assets/images/profile-background.png");
 
 export default function UserProfile() {
+  const opacity = useSharedValue(0.5);
+  opacity.value = withRepeat(withTiming(1, { duration: 1500 }), 5);
   const insets = useSafeAreaInsets();
   const [assets] = useAssets([profileBackground]);
   const { id, orgId } = useLocalSearchParams();
@@ -88,18 +91,20 @@ export default function UserProfile() {
                       size="max"
                     />
                   </View>
-                  <Text
-                    className="animate-pulse"
+                  <Animated.Text
+                    // className="animate-pulse"
                     style={{
                       marginTop: 15,
                       color: Colors.primary,
                       fontSize: 24,
                       lineHeight: 26,
                       fontFamily: "SF_Pro_Display_Bold",
+                      opacity: opacity,
+                      transform: [{ scale: opacity }],
                     }}
                   >
                     SHOWROOM
-                  </Text>
+                  </Animated.Text>
                 </View>
               </View>
             )
