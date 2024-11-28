@@ -36,17 +36,6 @@ export const useCreateGroup = () => {
       console.log("Group creation failed with error:", error);
     } finally {
       setLoading(false);
-      try {
-        const user: CometChat.User = groupMembers.filter(
-          (member) => member.getUid() !== currentUser?.id
-        )[0];
-        if (user) {
-          const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
-            text: "You have a car message",
-          });
-          CometChat.sendCustomMessage(customMsg);
-        }
-      } catch (error) {}
     }
   };
 
@@ -97,7 +86,7 @@ export const useCreateGroup = () => {
             const user: CometChat.User = groupMembers.filter(
               (member) => member.getUid() !== currentUser?.id
             )[0];
-            if (user) {
+            if (user && text.length > 0) {
               const customMsg = new CometChat.CustomMessage(user?.getUid(), "user", "custom", {
                 text: "You have a car message",
               });
