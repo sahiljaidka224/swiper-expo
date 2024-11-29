@@ -6,20 +6,23 @@ import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
 import Text from "./Text";
 import Gallery from "./Gallery";
+import Animated from "react-native-reanimated";
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 const placeholderImage = require("@/assets/images/no-image-large.png");
 
 interface CarouselProps {
   images: Array<{ url: string; imageIndex: number }>;
   price?: number | null;
+  carId: string;
 }
 
-export default function Carousel({ images, price }: CarouselProps) {
+export default function Carousel({ images, price, carId }: CarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isImageViewerVisible, setImageViewerVisible] = useState<boolean>(false);
 
   return (
-    <View>
+    <Animated.View>
       {images.length === 0 ? (
         <Image
           placeholder={placeholderImage}
@@ -41,7 +44,11 @@ export default function Carousel({ images, price }: CarouselProps) {
                   setImageViewerVisible(true);
                 }}
               >
-                <Image source={{ uri: url }} style={styles.itemCarImage} />
+                <AnimatedImage
+                  source={{ uri: url }}
+                  style={styles.itemCarImage}
+                  sharedTransitionTag={`car-image-${carId}`}
+                />
               </TouchableOpacity>
             );
           })}
@@ -76,7 +83,7 @@ export default function Carousel({ images, price }: CarouselProps) {
         setSelectedIndex={setSelectedIndex}
         selectedIndex={selectedIndex}
       />
-    </View>
+    </Animated.View>
   );
 }
 

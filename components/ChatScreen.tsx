@@ -277,7 +277,12 @@ export default function ChatComponent({
       const name = conversationWith.getName();
       const groupUID =
         conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
+      const lastMessage = item.getLastMessage();
 
+      if (lastMessage instanceof CometChat.Action) {
+        console.log("lastMessage", lastMessage.getAction());
+        if (lastMessage.getAction() === "added") return null;
+      }
       const unreadCount = item.getUnreadMessageCount();
 
       return (

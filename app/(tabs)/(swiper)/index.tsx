@@ -15,7 +15,9 @@ import { useAuth } from "@/context/AuthContext";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
 import { getCanPlaySwiperSound } from "@/context/settings";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 const audioAsset = require("@/assets/audio/swish.mp3");
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -197,7 +199,7 @@ export default function SwiperPage() {
           router.push({ pathname: "/(tabs)/(swiper)/car/[id]", params: { id: item?.carId } })
         }
       >
-        <Image
+        <AnimatedImage
           source={{ uri: item?.images[0]?.url }}
           style={styles.renderCardImage}
           contentFit="cover"
@@ -205,8 +207,13 @@ export default function SwiperPage() {
           recyclingKey={item?.images[0]?.carId}
           placeholder={{ blurhash }}
           placeholderContentFit="cover"
+          sharedTransitionTag={`car-image-${item?.carId}`}
         />
-        <View style={styles.absoluteCenteredViewCopy}>
+        <Animated.View
+          style={styles.absoluteCenteredViewCopy}
+          entering={FadeInDown.delay(150).duration(400)}
+          exiting={FadeInDown.delay(150).duration(400)}
+        >
           <View style={styles.absoluteCenteredView}>
             <Text
               style={styles.detailsText}
@@ -312,7 +319,7 @@ export default function SwiperPage() {
               car={item}
             />
           </View>
-        </View>
+        </Animated.View>
       </Pressable>
     );
   };

@@ -35,6 +35,7 @@ import Button from "./Button";
 import { uploadFilesToStock, useUpdateStock } from "@/api/hooks/add-car";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SelectedImage } from "./AddStock";
+import Animated, { FadeInDown, FadeInLeft } from "react-native-reanimated";
 
 interface CarDetailProps {
   car: any;
@@ -272,7 +273,7 @@ function CarDetail({
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView style={[styles.container, { marginTop: 0 }]} bottomOffset={50}>
-        <View style={styles.detailsContainer}>
+        <Animated.View style={styles.detailsContainer}>
           <TouchableOpacity
             onPress={onAddToWatchlist}
             style={{
@@ -288,108 +289,112 @@ function CarDetail({
               <AntDesign name={carFollowed ? "heart" : "hearto"} size={30} color={Colors.primary} />
             ) : null}
           </TouchableOpacity>
-          <Text style={styles.title}>{`${car?.year} ${car?.make} ${car?.model}`}</Text>
-          <DescriptionView
-            title="Mileage"
-            value={car?.odometer ? `${formatNumberWithCommas(car?.odometer)} km` : ""}
-            uppercase
-            isEditing={isEditing}
-            onFieldChange={(value) => handleFieldChange("odometer", value)}
-          />
-          <DescriptionView
-            title="Transmission"
-            value={car?.transmission}
-            isEditing={isEditing}
-            onFieldChange={(value) => handleFieldChange("transmission", value)}
-          />
-          <DescriptionView
-            title="Registration"
-            value={car?.rego}
-            uppercase
-            isEditing={isEditing}
-            onFieldChange={(value) => handleFieldChange("rego", value)}
-          />
-          <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
-          <DescriptionView
-            title="Registration State"
-            value={car?.regoState}
-            uppercase
-            isEditing={isEditing}
-            onFieldChange={(value) => handleFieldChange("regoState", value)}
-          />
-          <DescriptionView
-            title="Year of manufacture"
-            value={car?.year}
-            isEditing={isEditing}
-            onFieldChange={(value) => handleFieldChange("year", value)}
-          />
-          <DescriptionView title="Compliance Date" value={car?.compliance} />
-          <DescriptionView title="Colour" value={car?.colour} />
-          <DescriptionView title="Body Style" value={car?.body} />
-          <DescriptionView title="Capacity" value={car?.capacity} />
-          <DescriptionView title="Fuel" value={car?.fuelType} />
-          <DescriptionView title="Series" value={car?.series} />
-          <DescriptionView title="VIN" value={car?.vin} uppercase />
-          <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
-
-          {isEditing ? (
-            <Button onPress={updateStock} title="Update Stock" isLoading={isMutating} />
-          ) : (context && context?.includes("stock")) || car?.organisationId === user?.org?.id ? (
-            <StockButtonContainer
-              carId=""
-              onPushToSwiperContacts={onSendToPhoneContacts}
-              showSMSOption
+          <Animated.Text
+            entering={FadeInLeft.delay(200).duration(500)}
+            style={styles.title}
+          >{`${car?.year} ${car?.make} ${car?.model}`}</Animated.Text>
+          <Animated.View entering={FadeInDown.delay(300).duration(750)}>
+            <DescriptionView
+              title="Mileage"
+              value={car?.odometer ? `${formatNumberWithCommas(car?.odometer)} km` : ""}
+              uppercase
+              isEditing={isEditing}
+              onFieldChange={(value) => handleFieldChange("odometer", value)}
             />
-          ) : context ? (
-            <>
-              <ContactCard
-                name={car?.primaryContact?.displayName ?? ""}
-                organisationName={car?.organisation?.name ?? ""}
-                userId={car?.primaryContact?.userId ?? ""}
+            <DescriptionView
+              title="Transmission"
+              value={car?.transmission}
+              isEditing={isEditing}
+              onFieldChange={(value) => handleFieldChange("transmission", value)}
+            />
+            <DescriptionView
+              title="Registration"
+              value={car?.rego}
+              uppercase
+              isEditing={isEditing}
+              onFieldChange={(value) => handleFieldChange("rego", value)}
+            />
+            <DescriptionView title="Registration Expiry" value={car?.regoExpiry} uppercase />
+            <DescriptionView
+              title="Registration State"
+              value={car?.regoState}
+              uppercase
+              isEditing={isEditing}
+              onFieldChange={(value) => handleFieldChange("regoState", value)}
+            />
+            <DescriptionView
+              title="Year of manufacture"
+              value={car?.year}
+              isEditing={isEditing}
+              onFieldChange={(value) => handleFieldChange("year", value)}
+            />
+            <DescriptionView title="Compliance Date" value={car?.compliance} />
+            <DescriptionView title="Colour" value={car?.colour} />
+            <DescriptionView title="Body Style" value={car?.body} />
+            <DescriptionView title="Capacity" value={car?.capacity} />
+            <DescriptionView title="Fuel" value={car?.fuelType} />
+            <DescriptionView title="Series" value={car?.series} />
+            <DescriptionView title="VIN" value={car?.vin} uppercase />
+            <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
+            {isEditing ? (
+              <Button onPress={updateStock} title="Update Stock" isLoading={isMutating} />
+            ) : (context && context?.includes("stock")) || car?.organisationId === user?.org?.id ? (
+              <StockButtonContainer
+                carId=""
+                onPushToSwiperContacts={onSendToPhoneContacts}
+                showSMSOption
               />
-              <WatchlistButtonsContainer
-                onMessage={onMessagePress}
-                phoneNumber={car?.primaryContact?.phoneNumber}
-                carId={car?.carId}
-                isPrimaryButtonLoading={loading}
-                orgId={car?.organisationId}
-              />
-            </>
-          ) : null}
+            ) : context ? (
+              <>
+                <ContactCard
+                  name={car?.primaryContact?.displayName ?? ""}
+                  organisationName={car?.organisation?.name ?? ""}
+                  userId={car?.primaryContact?.userId ?? ""}
+                />
+                <WatchlistButtonsContainer
+                  onMessage={onMessagePress}
+                  phoneNumber={car?.primaryContact?.phoneNumber}
+                  carId={car?.carId}
+                  isPrimaryButtonLoading={loading}
+                  orgId={car?.organisationId}
+                />
+              </>
+            ) : null}
 
-          {context &&
-          context?.includes("(stock)") &&
-          groupConversations &&
-          groupConversations.length > 0 ? (
-            <>
-              <Text
-                style={{
-                  paddingVertical: 10,
-                  fontFamily: "SF_Pro_Display_Medium",
-                  fontSize: 20,
-                  color: Colors.textDark,
-                }}
-              >
-                Active conversations:
-              </Text>
-              {groupConversations && groupConversations.length > 0 ? (
-                <View style={styles.carGroupWrapper}>
-                  <FlatList<CometChat.Conversation>
-                    data={groupConversations}
-                    style={{ paddingHorizontal: 10, paddingVertical: 5 }}
-                    keyExtractor={(item: unknown) => {
-                      const conversation = item as CometChat.Conversation;
-                      return conversation.getConversationId();
-                    }}
-                    renderItem={horizontalRenderItem}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                  />
-                </View>
-              ) : null}
-            </>
-          ) : null}
-        </View>
+            {context &&
+            context?.includes("(stock)") &&
+            groupConversations &&
+            groupConversations.length > 0 ? (
+              <>
+                <Text
+                  style={{
+                    paddingVertical: 10,
+                    fontFamily: "SF_Pro_Display_Medium",
+                    fontSize: 20,
+                    color: Colors.textDark,
+                  }}
+                >
+                  Active conversations:
+                </Text>
+                {groupConversations && groupConversations.length > 0 ? (
+                  <View style={styles.carGroupWrapper}>
+                    <FlatList<CometChat.Conversation>
+                      data={groupConversations}
+                      style={{ paddingHorizontal: 10, paddingVertical: 5 }}
+                      keyExtractor={(item: unknown) => {
+                        const conversation = item as CometChat.Conversation;
+                        return conversation.getConversationId();
+                      }}
+                      renderItem={horizontalRenderItem}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                    />
+                  </View>
+                ) : null}
+              </>
+            ) : null}
+          </Animated.View>
+        </Animated.View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
