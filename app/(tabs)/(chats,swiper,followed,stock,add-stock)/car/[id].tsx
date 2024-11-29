@@ -14,7 +14,7 @@ import CarDetail from "@/components/CarDetail";
 import Carousel from "@/components/Carousel";
 import { useEffect, useState } from "react";
 import { showToast } from "@/components/Toast";
-import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import AddStock, { SelectedImage } from "@/components/AddStock";
 
@@ -72,12 +72,30 @@ export default function CarDetailPage() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {isLoading && <ActivityIndicator color={Colors.primary} size="large" />}
+        <TouchableOpacity
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+          }}
+          style={{
+            margin: 10,
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: Colors.primary,
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            zIndex: 10,
+          }}
+        >
+          <Ionicons name="chevron-back" size={28} color={Colors.background} />
+        </TouchableOpacity>
         {car && (
           <>
             {canEdit && isEdit ? (
               <AddStock selectedImages={selectedImages} setSelectedImages={setSelectedImages} />
             ) : (
-              <Carousel images={images} price={car?.price} />
+              <Carousel images={images} price={car?.price} carId={car?.carId} />
             )}
             {/* <Carousel images={images} price={car?.price} /> */}
             <CarDetail

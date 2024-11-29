@@ -19,13 +19,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React from "react";
 import Animated, { useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
-const profileBackground = require("@/assets/images/profile-background.png");
+const profilebackground = require("@/assets/images/profilebackground.png");
 
 export default function UserProfile() {
   const opacity = useSharedValue(0.5);
   opacity.value = withRepeat(withTiming(1, { duration: 1500 }), 5);
   const insets = useSafeAreaInsets();
-  const [assets] = useAssets([profileBackground]);
+  const [assets] = useAssets([profilebackground]);
   const { id, orgId } = useLocalSearchParams();
   const { user, isLoading, error } = useGetUserDetails(id as string);
   const { org, isLoading: isOrgLoading, error: orgError } = useGetOrgDetails(orgId as string);
@@ -42,7 +42,7 @@ export default function UserProfile() {
 
   return (
     <ImageBackground
-      source={assets && assets.length > 1 ? assets[0] : profileBackground}
+      source={assets && assets.length > 1 ? assets[0] : profilebackground}
       resizeMode="cover"
       style={{ flex: 1, backgroundColor: Colors.background }}
       imageStyle={{ height: 450, width: "100%" }}

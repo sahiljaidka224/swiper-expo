@@ -49,6 +49,8 @@ export default function SwiperLayout() {
           name="car/[id]"
           options={{
             title: "",
+            animation: "fade",
+            headerShown: false,
           }}
         />
         <Stack.Screen

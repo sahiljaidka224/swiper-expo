@@ -7,6 +7,7 @@ import Animated from "react-native-reanimated";
 import { Image } from "expo-image";
 import Text from "@/components/Text";
 
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const placeholderImage = require("@/assets/images/no-image.png");
 const carPlaceholder = require("@/assets/images/car-placeholder-new.png");
@@ -98,7 +99,7 @@ function CarOverview({
           maxHeight: 200,
         }}
       >
-        <Image
+        <AnimatedImage
           placeholder={placeholderImage}
           source={{ uri: car?.images[0]?.url }}
           style={[
@@ -107,6 +108,7 @@ function CarOverview({
           ]}
           recyclingKey={car?.images[0]?.carImageId}
           placeholderContentFit="fill"
+          sharedTransitionTag={`car-image-${car?.carId}`}
         />
       </View>
       <View style={styles.detailsContainer}>

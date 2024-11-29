@@ -20,6 +20,8 @@ export default function WatchlistLayout() {
           name="car/[id]"
           options={{
             title: "",
+            animation: "fade",
+            headerShown: false,
           }}
         />
         <Stack.Screen

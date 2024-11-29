@@ -15,7 +15,7 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "buildNumber": "9",
+      "buildNumber": "10",
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
@@ -44,7 +44,7 @@
         "android.permission.INTERNET",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 9
+      "versionCode": 10
     },
     "web": {
       "bundler": "metro",
@@ -64,7 +64,7 @@
       [
         "expo-asset",
         {
-          "assets": ["./assets/images/pattern.png", "./assets/images/profile-background.png"]
+          "assets": ["./assets/images/pattern.png", "./assets/images/profilebackground.png"]
         }
       ],
       [

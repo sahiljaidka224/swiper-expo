@@ -22,6 +22,8 @@ export default function MyStockLayout() {
           name="car/[id]"
           options={{
             title: "",
+            animation: "fade",
+            headerShown: false,
           }}
         />
         <Stack.Screen

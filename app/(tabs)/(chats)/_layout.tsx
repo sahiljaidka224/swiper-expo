@@ -71,6 +71,8 @@ export default function ChatsLayout() {
           name="car/[id]"
           options={{
             title: "",
+            animation: "fade",
+            headerShown: false,
           }}
         />
         <Stack.Screen

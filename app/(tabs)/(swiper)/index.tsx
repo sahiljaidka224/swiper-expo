@@ -229,6 +229,7 @@ export default function SwiperPage() {
                 fontSize: 24,
                 marginVertical: 5,
                 textAlign: "center",
+                lineHeight: 24,
               }}
             >
               {`$${formatNumberWithCommas(item?.price)}`}
@@ -426,6 +427,7 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     // marginLeft: 10,
     // flex: 0.9,
+    lineHeight: 32,
     textAlign: "center",
   },
   descriptionValue: {
