@@ -291,7 +291,7 @@ export default function ChatComponent({
           onPress={() => {
             const lastMessage = item.getLastMessage();
             markAsRead(lastMessage);
-            router.push(`/(tabs)/(chats)/new-chat/${groupUID}`);
+            router.navigate(`/(tabs)/(chats)/new-chat/${groupUID}`);
           }}
         >
           <View

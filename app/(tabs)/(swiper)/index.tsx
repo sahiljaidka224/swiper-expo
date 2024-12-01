@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   renderCardImage: {
     width: "100%",
     zIndex: 1,
-    flex: 0.5,
+    flex: 1,
   },
   subContainer: {
     flex: 1,
@@ -398,10 +398,10 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   absoluteCenteredViewCopy: {
-    position: "absolute",
-    width: "100%",
-    bottom: 0,
-    zIndex: 100,
+    // position: "absolute",
+    // width: "100%",
+    // bottom: 0,
+    // zIndex: 100,
   },
   absoluteCenteredView: {
     zIndex: 100,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     // flex: 0.6,
     // minHeight: "35%",
     margin: 10,
-    maxHeight: "70%",
+    // maxHeight: "70%",
     borderRadius: 24,
   },
   detailsText: {

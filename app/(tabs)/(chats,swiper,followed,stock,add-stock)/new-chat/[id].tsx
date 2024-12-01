@@ -160,7 +160,7 @@ const GroupInfo = ({
   const onPress = () => {
     if (!metadata?.carId) return;
 
-    router.push({
+    router.navigate({
       pathname: `/(tabs)/${segments[1]}/car/[id]`,
       params: { id: metadata?.carId },
     });

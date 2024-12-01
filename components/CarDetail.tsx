@@ -217,7 +217,7 @@ function CarDetail({
           onPress={() => {
             const lastMessage = item.getLastMessage();
             markAsRead(lastMessage);
-            router.push(`/(tabs)/(stock)/new-chat/${groupUID}`);
+            router.navigate(`/(tabs)/(stock)/new-chat/${groupUID}`);
           }}
         >
           <View
