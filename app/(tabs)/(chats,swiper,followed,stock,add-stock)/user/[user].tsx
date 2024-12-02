@@ -20,6 +20,7 @@ import React from "react";
 import Animated, { useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 const profilebackground = require("@/assets/images/profilebackground.png");
+// const AnimatedText = Animated.createAnimatedComponent(Text);
 
 export default function UserProfile() {
   const opacity = useSharedValue(0.5);
@@ -92,7 +93,7 @@ export default function UserProfile() {
                     />
                   </View>
                   <Animated.Text
-                    // className="animate-pulse"
+                    maxFontSizeMultiplier={1.3}
                     style={{
                       marginTop: 15,
                       color: Colors.primary,

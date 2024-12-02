@@ -290,6 +290,7 @@ function CarDetail({
             ) : null}
           </TouchableOpacity>
           <Animated.Text
+            maxFontSizeMultiplier={1.3}
             entering={FadeInLeft.delay(200).duration(500)}
             style={styles.title}
           >{`${car?.year} ${car?.make} ${car?.model}`}</Animated.Text>
