@@ -17,8 +17,8 @@ import CameraView from "./CameraView";
 import React from "react";
 import { Portal } from "@gorhom/portal";
 
-const addCarPlaceholder = require("@/assets/images/no-image-new.png");
-const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
+const addCarPlaceholder = require("@/assets/images/add-image.png");
+const addCarSmallPlaceholder = require("@/assets/images/add-image-small.png");
 
 export interface SelectedImage {
   name: string | null;
@@ -144,9 +144,9 @@ export default function AddStock({
           onLongPress={item.isPlaceholder ? null : drag}
           disabled={isActive}
           style={{
-            width: 95,
-            height: 95,
-            marginRight: 10,
+            width: 76,
+            height: 76,
+            marginRight: 15,
           }}
           onPress={onOpenCamera}
         >
@@ -195,14 +195,9 @@ export default function AddStock({
           />
         </Portal>
       )}
-      <Pressable
-        style={[styles.bannerImageContainer, { padding: selectedImages.length === 0 ? 5 : 0 }]}
-        onPress={onOpenCamera}
-      >
+      <Pressable style={styles.bannerImageContainer} onPress={onOpenCamera}>
         <Image
-          style={
-            selectedImages.length > 0 ? styles.bannerImageSelected : styles.bannerImagePlaceholder
-          }
+          style={styles.bannerImageSelected}
           placeholder={addCarPlaceholder}
           source={{ uri: selectedImages.length > 0 ? selectedImages[0].uri : undefined }}
           contentFit={selectedImages.length > 0 ? "cover" : "contain"}
@@ -238,7 +233,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   bannerImageContainer: {
     width: "100%",
-    height: 200,
+    height: 225,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primaryLight,
@@ -261,7 +256,7 @@ const styles = StyleSheet.create({
   smallImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "contain",
+    resizeMode: "cover",
     borderRadius: 10,
   },
 });

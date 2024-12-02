@@ -43,6 +43,7 @@ export default function ChatsLayout() {
             headerBlurEffect: "regular",
             headerTitleAlign: "center",
             headerTransparent: Platform.OS === "ios",
+            animation: "fade",
           }}
         />
 
@@ -82,6 +83,7 @@ export default function ChatsLayout() {
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
+            animation: "fade",
           }}
         />
         <Stack.Screen

@@ -14,9 +14,9 @@ import { SheetManager } from "react-native-actions-sheet";
 import { showToast } from "@/components/Toast";
 import Text from "@/components/Text";
 import { router } from "expo-router";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-const addCarSmallPlaceholder = require("@/assets/images/no-image-new-small.png");
+const addCarSmallPlaceholder = require("@/assets/images/add-image-small.png");
 
 type FormData = {
   name: string;
