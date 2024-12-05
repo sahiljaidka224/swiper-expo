@@ -8,7 +8,7 @@ import {
   ListRenderItem,
   TouchableOpacity,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   Bubble,
   Composer,
@@ -41,7 +41,6 @@ import { useChatContext } from "react-native-gifted-chat/lib/GiftedChatContext";
 import { useAssets } from "expo-asset";
 import { useAuth } from "@/context/AuthContext";
 import {
-  useMarkMessageAsRead,
   useSendGroupMessage,
   useSendMessage,
   useTypingIndicator,
@@ -59,6 +58,13 @@ import { Sound } from "expo-av/build/Audio";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { SheetManager } from "react-native-actions-sheet";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
@@ -111,7 +117,6 @@ export default function ChatComponent({
   } = useSendMessage();
   const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
-  const { markAsRead } = useMarkMessageAsRead();
   const [sound, setSound] = useState<Sound>();
 
   useEffect(() => {
@@ -269,59 +274,6 @@ export default function ChatComponent({
     }
   };
 
-  const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
-    ({ item }: { item: CometChat.Conversation }) => {
-      const conversationWith = item.getConversationWith();
-      const icon =
-        conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
-      const name = conversationWith.getName();
-      const groupUID =
-        conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
-      const lastMessage = item.getLastMessage();
-
-      if (lastMessage instanceof CometChat.Action) {
-        console.log("lastMessage", lastMessage.getAction());
-        if (lastMessage.getAction() === "added") return null;
-      }
-      const unreadCount = item.getUnreadMessageCount();
-
-      return (
-        <Pressable
-          style={{ maxWidth: 70, alignItems: "center", marginRight: 8 }}
-          onPress={() => {
-            const lastMessage = item.getLastMessage();
-            markAsRead(lastMessage);
-            router.navigate(`/(tabs)/(chats)/new-chat/${groupUID}`);
-          }}
-        >
-          <View
-            style={{
-              height: 60,
-              width: 60,
-              borderWidth: unreadCount > 0 ? 2 : 0,
-              borderColor: unreadCount > 0 ? Colors.primary : undefined,
-              padding: 2,
-              borderRadius: 10,
-            }}
-          >
-            <Avatar
-              source={icon}
-              isCar={Boolean(conversationWith instanceof CometChat.Group)}
-              borderRadius={12}
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 14 }}
-          >
-            {name}
-          </Text>
-        </Pressable>
-      );
-    },
-    [carGroups]
-  );
-
   const onGalleryOpen = (url: string) => {
     setSelectedImage(url);
     setGalleryVisible(true);
@@ -353,7 +305,7 @@ export default function ChatComponent({
               const conversation = item as CometChat.Conversation;
               return conversation.getConversationId();
             }}
-            renderItem={horizontalRenderItem}
+            renderItem={({ item, index }) => <HorizontalItem item={item} index={index} />}
             horizontal
             showsHorizontalScrollIndicator={false}
           />
@@ -693,6 +645,80 @@ const Day = ({
     </View>
   );
 };
+
+const HorizontalItem = memo(({ item, index }: { item: CometChat.Conversation; index: number }) => {
+  const conversationWith = item.getConversationWith();
+  const icon = conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
+  const name = conversationWith.getName();
+  const groupUID =
+    conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
+  const lastMessage = item.getLastMessage();
+  const unreadCount = item.getUnreadMessageCount();
+
+  if (lastMessage instanceof CometChat.Action && lastMessage.getAction() === "added") {
+    return null;
+  }
+
+  const translateY = useSharedValue(-75);
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
+
+  React.useEffect(() => {
+    translateY.value = translateY.value = withDelay(
+      index * 100,
+      withSpring(0, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      })
+    );
+    opacity.value = withDelay(index * 100, withTiming(1, { duration: 500 }));
+  }, []);
+
+  return (
+    <Animated.View style={[animatedStyle, { maxWidth: 70, alignItems: "center", marginRight: 8 }]}>
+      <Pressable
+        onPress={() => {
+          router.navigate(`/(tabs)/(chats)/new-chat/${groupUID}`);
+        }}
+      >
+        <View
+          style={{
+            height: 60,
+            width: 60,
+            borderWidth: unreadCount > 0 ? 2 : 0,
+            borderColor: unreadCount > 0 ? Colors.primary : undefined,
+            padding: 2,
+            borderRadius: 10,
+          }}
+        >
+          <Avatar
+            source={icon}
+            isCar={Boolean(conversationWith instanceof CometChat.Group)}
+            borderRadius={12}
+          />
+        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            textAlign: "center",
+            fontFamily: "SF_Pro_Display_Regular",
+            fontSize: 14,
+          }}
+        >
+          {name}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+});
 
 const styles = StyleSheet.create({
   carGroupWrapper: {

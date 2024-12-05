@@ -35,7 +35,7 @@ import Button from "./Button";
 import { uploadFilesToStock, useUpdateStock } from "@/api/hooks/add-car";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SelectedImage } from "./AddStock";
-import Animated, { FadeInDown, FadeInLeft } from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInLeft, FadeInRight } from "react-native-reanimated";
 
 interface CarDetailProps {
   car: any;
@@ -294,6 +294,14 @@ function CarDetail({
             entering={FadeInLeft.delay(200).duration(500)}
             style={styles.title}
           >{`${car?.year} ${car?.make} ${car?.model}`}</Animated.Text>
+          {car?.price && car?.price > 0 ? (
+            <Animated.View
+              style={styles.priceContainer}
+              entering={FadeInRight.delay(200).duration(500)}
+            >
+              <Text style={styles.price}>{`$${formatNumberWithCommas(car?.price)}`}</Text>
+            </Animated.View>
+          ) : null}
           <Animated.View entering={FadeInDown.delay(300).duration(750)}>
             <DescriptionView
               title="Mileage"
@@ -335,17 +343,21 @@ function CarDetail({
             <DescriptionView title="Capacity" value={car?.capacity} />
             <DescriptionView title="Fuel" value={car?.fuelType} />
             <DescriptionView title="Series" value={car?.series} />
+            <DescriptionView title="Badge" value={car?.badge} />
             <DescriptionView title="VIN" value={car?.vin} uppercase />
             <DescriptionView title="Engine Number" value={car?.engineNo} uppercase />
             {isEditing ? (
               <Button onPress={updateStock} title="Update Stock" isLoading={isMutating} />
-            ) : (context && context?.includes("stock")) || car?.organisationId === user?.org?.id ? (
+            ) : context &&
+              !context?.includes("chats") &&
+              context?.includes("stock") &&
+              car?.organisationId === user?.org?.id ? (
               <StockButtonContainer
                 carId=""
                 onPushToSwiperContacts={onSendToPhoneContacts}
                 showSMSOption
               />
-            ) : context ? (
+            ) : context && !context?.includes("chats") && car?.organisationId !== user?.org?.id ? (
               <>
                 <ContactCard
                   name={car?.primaryContact?.displayName ?? ""}
@@ -508,5 +520,20 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "100%",
     alignSelf: "center",
+  },
+  priceContainer: {
+    position: "absolute",
+    right: "2%",
+    top: 5,
+    padding: 5,
+    backgroundColor: Colors.primary,
+    borderRadius: 5,
+    minWidth: 100,
+  },
+  price: {
+    color: Colors.textPrimary,
+    textAlign: "center",
+    fontFamily: "SF_Pro_Display_Bold",
+    fontSize: 18,
   },
 });

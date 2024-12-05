@@ -1,10 +1,8 @@
 import Colors from "@/constants/Colors";
-import { formatNumberWithCommas } from "@/utils";
 import { useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Image } from "expo-image";
-import Text from "./Text";
 import Gallery from "./Gallery";
 import Animated from "react-native-reanimated";
 
@@ -55,11 +53,6 @@ export default function Carousel({ images, price, carId }: CarouselProps) {
         </PagerView>
       )}
 
-      {price && price > 0 ? (
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>{`$${formatNumberWithCommas(price)}`}</Text>
-        </View>
-      ) : null}
       <View style={styles.carouselContainer}>
         {images.map(({ imageIndex }: { url: string; imageIndex: number }, index: number) => {
           return (

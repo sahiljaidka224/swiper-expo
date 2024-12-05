@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   AppState,
+  SafeAreaView,
 } from "react-native";
 import { defaultStyles } from "@/constants/Styles";
 import { useGetConversations } from "@/hooks/cometchat/conversations";
@@ -17,7 +18,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Colors from "@/constants/Colors";
 import ChatRow from "@/components/ChatRow";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
-import Animated, { CurvedTransition } from "react-native-reanimated";
+import Animated, {
+  CurvedTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Text from "@/components/Text";
@@ -32,7 +40,6 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useMessageContext } from "@/context/MessageContext";
-import { useHideSenderContext } from "@/context/HideSenderContext";
 
 const transition = CurvedTransition.delay(100);
 
@@ -90,7 +97,6 @@ export default function Chats() {
     useGetConversations("group");
   const { markAsRead } = useMarkMessageAsRead();
   useNotificationObserver(fetchConversations, fetchGroupConversations);
-  const { setUsers, users: hideSenderUsers } = useHideSenderContext();
 
   const groups = groupConversationList.filter((c) => {
     const unreadCount = c.getUnreadMessageCount();
@@ -305,209 +311,253 @@ export default function Chats() {
   );
 
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
-    ({ item }: { item: CometChat.Conversation }) => {
-      const conversationWith = item.getConversationWith();
-      const icon =
-        conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
-      const name = conversationWith.getName();
-      const groupUID =
-        conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
-
-      const unreadCount = item.getUnreadMessageCount();
-      if (unreadCount === 0) return null;
-
-      return (
-        <Pressable
-          style={{ maxWidth: 80, alignItems: "center", marginRight: 8 }}
-          onPress={() => {
-            const lastMessage = item.getLastMessage();
-            markAsRead(lastMessage);
-            fetchConversations();
-            fetchGroupConversations();
-            router.push(`/(tabs)/(chats)/new-chat/${groupUID}`);
-          }}
-        >
-          <View
-            style={{
-              height: 60,
-              width: 60,
-            }}
-          >
-            <Avatar source={icon} isCar borderRadius={8} />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={{ textAlign: "center", fontFamily: "SF_Pro_Display_Regular", fontSize: 14 }}
-          >
-            {name}
-          </Text>
-        </Pressable>
-      );
+    ({ item, index }) => {
+      const onMarkAsRead = async (message: CometChat.BaseMessage) => {
+        markAsRead(message);
+        fetchConversations();
+        fetchGroupConversations();
+      };
+      return <AnimatedItem item={item} index={index} markAsRead={onMarkAsRead} />;
     },
     [groups]
   );
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingBottom: 20,
-        backgroundColor: Colors.background,
-      }}
-    >
-      <Stack.Screen
-        options={{
-          title: "Chats",
-          headerSearchBarOptions: {
-            placeholder: "Search Users",
-            onChangeText: (e) => {
-              setSearchText(e.nativeEvent.text);
-            },
-            onCancelButtonPress: () => {
-              setSearchText(null);
-            },
-            onSearchButtonPress: (e) => {
-              setSearchText(e.nativeEvent.text);
-            },
-          },
-          headerLeft: () => (
-            <View style={{ flexDirection: "row", gap: 25, alignItems: "center" }}>
-              <TouchableOpacity onPress={onProfilePress}>
-                <FontAwesome5 name="user-alt" size={24} s color={Colors.primary} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onFeedPress}>
-                <MaterialIcons name="ondemand-video" size={28} color={Colors.primary} />
-              </TouchableOpacity>
-            </View>
-          ),
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/(chats)/users-list")}
-              style={{ flexDirection: "row" }}
-            >
-              <FontAwesome5 name="users" size={24} color={Colors.primary} />
-            </TouchableOpacity>
-          ),
+    <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={{
+          marginTop: 10,
+          width: "100%",
+          alignSelf: "center",
+          zIndex: 1,
+          height: groups.length > 0 ? undefined : 0,
         }}
-      />
-      {loading && (
-        <>
-          <ChatRowLoader />
-          <ChatRowLoader />
-          <ChatRowLoader />
-          <ChatRowLoader />
-          <ChatRowLoader />
-          <ChatRowLoader />
-          <ChatRowLoader />
-        </>
-      )}
-      {error && <ErrorView />}
-      {groups && groups.length > 0 ? (
-        <View
-          style={{
-            backgroundColor: "white",
-            marginTop: 10,
-            width: "95%",
-            alignSelf: "center",
-            zIndex: 100,
-            borderRadius: 20,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-          }}
-        >
-          <FlatList<CometChat.Conversation>
-            data={groups}
-            style={{ paddingHorizontal: 10, paddingVertical: 10 }}
-            keyExtractor={(item: unknown) => {
-              const conversation = item as CometChat.Conversation;
-              return conversation.getConversationId();
-            }}
-            renderItem={horizontalRenderItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-      ) : null}
-
-      <Animated.View layout={transition}>
-        <Animated.FlatList
-          contentInsetAdjustmentBehavior="automatic"
-          skipEnteringExitingAnimations
-          scrollEnabled={false}
-          data={filteredUserConversations}
-          refreshing={loading}
-          itemLayoutAnimation={transition}
+      >
+        <FlatList<CometChat.Conversation>
+          data={groups ?? []}
+          style={{ paddingHorizontal: 10, paddingVertical: 10 }}
           keyExtractor={(item: unknown) => {
             const conversation = item as CometChat.Conversation;
             return conversation.getConversationId();
           }}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={ItemSeparator}
-          renderItem={renderItem}
-          ListFooterComponent={
-            filteredUserConversations.length <= 3 && !searchText ? <NoConversations /> : null
-          }
+          renderItem={horizontalRenderItem}
+          horizontal
+          showsHorizontalScrollIndicator={false}
         />
-        <Animated.FlatList
-          contentInsetAdjustmentBehavior="automatic"
-          skipEnteringExitingAnimations
-          scrollEnabled={false}
-          data={filteredUsers}
-          refreshing={loading}
-          itemLayoutAnimation={transition}
-          keyExtractor={(item: unknown) => {
-            const user = item as CometChat.User;
-            return user.getUid();
-          }}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={ItemSeparator}
-          renderItem={renderUserItem}
-        />
-        <Animated.FlatList
-          contentInsetAdjustmentBehavior="automatic"
-          skipEnteringExitingAnimations
-          scrollEnabled={false}
-          data={filteredPhoneContacts}
-          ListHeaderComponent={
-            filteredPhoneContacts.length > 0 && searchText ? (
-              <View>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontFamily: "SF_Pro_Display_Bold",
-                    fontSize: 20,
-                    color: Colors.textDark,
-                  }}
-                >
-                  Invite Phone Contacts
-                </Text>
+      </View>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 20,
+          backgroundColor: Colors.background,
+        }}
+        style={{
+          zIndex: 100,
+          shadowColor: Colors.primary,
+          shadowOffset: {
+            width: 0,
+            height: -30,
+          },
+          shadowOpacity: 0.4,
+          shadowRadius: 25,
+          elevation: 5,
+        }}
+      >
+        <Stack.Screen
+          options={{
+            title: "Chats",
+            headerSearchBarOptions: {
+              placeholder: "Search Users",
+              onChangeText: (e) => {
+                setSearchText(e.nativeEvent.text);
+              },
+              onCancelButtonPress: () => {
+                setSearchText(null);
+              },
+              onSearchButtonPress: (e) => {
+                setSearchText(e.nativeEvent.text);
+              },
+            },
+            headerLeft: () => (
+              <View style={{ flexDirection: "row", gap: 25, alignItems: "center" }}>
+                <TouchableOpacity onPress={onProfilePress}>
+                  <FontAwesome5 name="user-alt" size={24} s color={Colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onFeedPress}>
+                  <MaterialIcons name="ondemand-video" size={28} color={Colors.primary} />
+                </TouchableOpacity>
               </View>
-            ) : null
-          }
-          refreshing={loading}
-          itemLayoutAnimation={transition}
-          keyExtractor={(_: Contacts.Contact, index: number) => {
-            return String(index);
+            ),
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/(chats)/users-list")}
+                style={{ flexDirection: "row" }}
+              >
+                <FontAwesome5 name="users" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+            ),
           }}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={ItemSeparator}
-          renderItem={renderPhoneItem}
         />
-      </Animated.View>
-    </ScrollView>
+        {loading && (
+          <>
+            <ChatRowLoader />
+            <ChatRowLoader />
+            <ChatRowLoader />
+            <ChatRowLoader />
+            <ChatRowLoader />
+            <ChatRowLoader />
+            <ChatRowLoader />
+          </>
+        )}
+        {error && <ErrorView />}
+
+        <Animated.View layout={transition} style={{}}>
+          <Animated.FlatList
+            contentInsetAdjustmentBehavior="automatic"
+            skipEnteringExitingAnimations
+            scrollEnabled={false}
+            data={filteredUserConversations}
+            refreshing={loading}
+            itemLayoutAnimation={transition}
+            keyExtractor={(item: unknown) => {
+              const conversation = item as CometChat.Conversation;
+              return conversation.getConversationId();
+            }}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={ItemSeparator}
+            renderItem={renderItem}
+            ListFooterComponent={
+              filteredUserConversations.length <= 3 && !searchText ? <NoConversations /> : null
+            }
+          />
+          <Animated.FlatList
+            contentInsetAdjustmentBehavior="automatic"
+            skipEnteringExitingAnimations
+            scrollEnabled={false}
+            data={filteredUsers}
+            refreshing={loading}
+            itemLayoutAnimation={transition}
+            keyExtractor={(item: unknown) => {
+              const user = item as CometChat.User;
+              return user.getUid();
+            }}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={ItemSeparator}
+            renderItem={renderUserItem}
+          />
+          <Animated.FlatList
+            contentInsetAdjustmentBehavior="automatic"
+            skipEnteringExitingAnimations
+            scrollEnabled={false}
+            data={filteredPhoneContacts}
+            ListHeaderComponent={
+              filteredPhoneContacts.length > 0 && searchText ? (
+                <View>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontFamily: "SF_Pro_Display_Bold",
+                      fontSize: 20,
+                      color: Colors.textDark,
+                    }}
+                  >
+                    Invite Phone Contacts
+                  </Text>
+                </View>
+              ) : null
+            }
+            refreshing={loading}
+            itemLayoutAnimation={transition}
+            keyExtractor={(_: Contacts.Contact, index: number) => {
+              return String(index);
+            }}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={ItemSeparator}
+            renderItem={renderPhoneItem}
+          />
+        </Animated.View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 function ItemSeparator() {
   return <View style={[defaultStyles.separator, { marginLeft: 90 }]} />;
 }
+
+const AnimatedItem = ({
+  item,
+  index,
+  markAsRead,
+}: {
+  item: CometChat.Conversation;
+  index: number;
+  markAsRead: (message: CometChat.BaseMessage) => Promise<void>;
+}) => {
+  const conversationWith = item.getConversationWith();
+  const icon = conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
+  const name = conversationWith.getName();
+  const groupUID =
+    conversationWith instanceof CometChat.Group ? conversationWith.getGuid() : undefined;
+
+  const unreadCount = item.getUnreadMessageCount();
+  if (unreadCount === 0) return null;
+
+  const translateY = useSharedValue(-55);
+  const opacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity: opacity.value,
+  }));
+
+  React.useEffect(() => {
+    translateY.value = withDelay(
+      index * 100,
+      withSpring(0, {
+        damping: 10,
+        stiffness: 100,
+        mass: 1,
+        overshootClamping: false,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      })
+    );
+    opacity.value = withDelay(index * 100, withTiming(1, { duration: 500 }));
+  }, []);
+
+  return (
+    <Animated.View style={[animatedStyle, { maxWidth: 80, alignItems: "center", marginRight: 8 }]}>
+      <Pressable
+        onPress={() => {
+          const lastMessage = item.getLastMessage();
+          markAsRead(lastMessage);
+          router.push(`/(tabs)/(chats)/new-chat/${groupUID}`);
+        }}
+      >
+        <View
+          style={{
+            height: 60,
+            width: 60,
+          }}
+        >
+          <Avatar source={icon} isCar borderRadius={8} />
+        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            textAlign: "center",
+            fontFamily: "SF_Pro_Display_Regular",
+            fontSize: 14,
+          }}
+        >
+          {name}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+};
 
 const styles = StyleSheet.create({
   leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },

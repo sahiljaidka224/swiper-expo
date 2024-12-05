@@ -14,7 +14,13 @@ import CarDetail from "@/components/CarDetail";
 import Carousel from "@/components/Carousel";
 import { useEffect, useState } from "react";
 import { showToast } from "@/components/Toast";
-import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import AddStock, { SelectedImage } from "@/components/AddStock";
 
@@ -42,6 +48,7 @@ export default function CarDetailPage() {
     car?.organisationId === user?.org?.id &&
     segments[1] === "(stock)" &&
     car?.importSource === "regopage";
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -90,6 +97,30 @@ export default function CarDetailPage() {
         >
           <Ionicons name="chevron-back" size={28} color={Colors.background} />
         </TouchableOpacity>
+        {canEdit && (
+          <TouchableOpacity
+            onPress={() => setIsEdit(!isEdit)}
+            style={{
+              margin: 10,
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: Colors.primary,
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              zIndex: 10,
+              right: 5,
+              paddingLeft: 2,
+            }}
+          >
+            {isEdit ? (
+              <MaterialIcons name="done" size={24} color={Colors.background} />
+            ) : (
+              <Feather name="edit" size={24} color={Colors.background} />
+            )}
+          </TouchableOpacity>
+        )}
         {car && (
           <>
             {canEdit && isEdit ? (

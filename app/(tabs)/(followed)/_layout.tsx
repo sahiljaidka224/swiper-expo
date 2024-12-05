@@ -36,12 +36,7 @@ export default function WatchlistLayout() {
             title: "",
             headerBackTitle: "",
             headerBackTitleVisible: false,
-            // presentation: "modal",
-            // headerRight: () => (
-            //   <Pressable onPress={() => router.back()}>
-            //     <AntDesign name="closecircleo" size={24} color="black" />
-            //   </Pressable>
-            // ),
+            animation: "fade",
           }}
         />
       </Stack>

@@ -54,6 +54,7 @@ export default function MyStockLayout() {
             title: "",
             headerBackTitle: "",
             headerBackTitleVisible: false,
+            animation: "fade",
           }}
         />
         <Stack.Screen

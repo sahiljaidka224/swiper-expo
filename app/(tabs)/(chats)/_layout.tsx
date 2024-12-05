@@ -93,6 +93,7 @@ export default function ChatsLayout() {
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
+            animation: "fade",
           }}
         />
         <Stack.Screen
@@ -101,6 +102,7 @@ export default function ChatsLayout() {
             title: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
+            animation: "fade",
           }}
         />
         <Stack.Screen
