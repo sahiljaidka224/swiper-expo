@@ -28,7 +28,7 @@ export default function Button({
         styles[type],
         children && type !== "circle" ? { minHeight: 32, maxHeight: 32 } : {},
         type === "circle"
-          ? { width: size === "min" ? 50 : 70, height: size === "min" ? 50 : 70 }
+          ? { width: size === "min" ? 50 : 65, height: size === "min" ? 50 : 65 }
           : {},
       ]}
       onPress={onPress}

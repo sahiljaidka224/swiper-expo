@@ -320,7 +320,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
   },
-  leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
+  leftContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    maxWidth: "85%",
+    paddingRight: 10,
+  },
   avatarContainer: { width: 50, height: 50, borderRadius: 25, overflow: "hidden" },
   userContainer: {
     flexDirection: "row",

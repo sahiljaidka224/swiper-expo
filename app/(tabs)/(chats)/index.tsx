@@ -326,7 +326,6 @@ export default function Chats() {
     <SafeAreaView style={{ flex: 1 }}>
       <View
         style={{
-          marginTop: 10,
           width: "100%",
           alignSelf: "center",
           zIndex: 1,

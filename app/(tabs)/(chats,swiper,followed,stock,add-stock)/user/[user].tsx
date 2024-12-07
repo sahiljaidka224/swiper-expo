@@ -10,6 +10,8 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
+  Platform,
+  Linking,
 } from "react-native";
 import Text from "@/components/Text";
 import { useGetOrgDetails } from "@/api/hooks/organisation";
@@ -18,6 +20,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React from "react";
 import Animated, { useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import Button from "@/components/Button";
+import { showToast } from "@/components/Toast";
 
 const profilebackground = require("@/assets/images/profilebackground.png");
 // const AnimatedText = Animated.createAnimatedComponent(Text);
@@ -41,6 +45,33 @@ export default function UserProfile() {
 
   const organisations = user?.organisations ? user?.organisations : org ? [org] : [];
 
+  const address = organisations[0]
+    ? {
+        streetAddress: organisations[0]?.address,
+        lat: organisations[0]?.latitude,
+        lng: organisations[0]?.longitude,
+      }
+    : null;
+
+  const onLocate = () => {
+    if (!address) return;
+    const scheme = Platform.select({
+      ios: `maps://0,0?q=${address.streetAddress}`,
+      android: `geo:0,0?q=${address.streetAddress}`,
+    });
+    const latLng = `${address.lat},${address.lng}`;
+    const label = "Custom Label";
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`,
+    });
+
+    if (url) {
+      Linking.openURL(url);
+    } else {
+      showToast("Error", "Unable to open maps", "error");
+    }
+  };
   return (
     <ImageBackground
       source={assets && assets.length > 1 ? assets[0] : profilebackground}
@@ -58,57 +89,60 @@ export default function UserProfile() {
           orderBy="dateCreate"
           orderDirection="desc"
           children={
-            user && (
-              <View style={styles.userContainer}>
-                <View style={styles.avatarContainer}>
-                  <Avatar userId={id as string} showOnlineIndicator showOutline />
+            <View style={styles.userContainer}>
+              <View style={styles.avatarContainer}>
+                <Avatar userId={id as string} showOnlineIndicator showOutline />
+              </View>
+              <View
+                style={{
+                  alignItems: "center",
+                  gap: 3,
+                }}
+              >
+                {user && <Text style={styles.nameText}>{user?.displayName}</Text>}
+                <Text
+                  style={[
+                    styles.nameText,
+                    {
+                      fontSize: 20,
+                      lineHeight: 24,
+                      fontFamily: "SF_Pro_Display_Medium",
+                    },
+                  ]}
+                >
+                  {organisations[0]?.name}
+                </Text>
+                <View style={{ maxWidth: "55%" }}>
+                  <WatchlistButtonsContainer
+                    carId=""
+                    phoneNumber={user?.phoneNumber}
+                    buttonsType="secondary"
+                    onMessage={onMessagePress}
+                    circularIcons
+                    size="max"
+                  />
+                  {address && address.lat && address.lng ? (
+                    <View style={{ height: 50, marginTop: 10 }}>
+                      <Button title="Locate" onPress={onLocate} type="border" />
+                    </View>
+                  ) : null}
                 </View>
-                <View
+                <Animated.Text
+                  maxFontSizeMultiplier={1.3}
                   style={{
-                    alignItems: "center",
-                    gap: 3,
+                    marginTop: 15,
+                    color: Colors.primary,
+                    fontSize: 24,
+                    lineHeight: 26,
+                    fontFamily: "SF_Pro_Display_Bold",
+                    opacity: opacity,
+                    transform: [{ scale: opacity }],
                   }}
                 >
-                  <Text style={styles.nameText}>{user?.displayName}</Text>
-                  <Text
-                    style={[
-                      styles.nameText,
-                      {
-                        fontSize: 20,
-                        lineHeight: 24,
-                        fontFamily: "SF_Pro_Display_Medium",
-                      },
-                    ]}
-                  >
-                    {organisations[0]?.name}
-                  </Text>
-                  <View style={{ maxWidth: "55%" }}>
-                    <WatchlistButtonsContainer
-                      carId=""
-                      phoneNumber={user?.phoneNumber}
-                      buttonsType="secondary"
-                      onMessage={onMessagePress}
-                      circularIcons
-                      size="max"
-                    />
-                  </View>
-                  <Animated.Text
-                    maxFontSizeMultiplier={1.3}
-                    style={{
-                      marginTop: 15,
-                      color: Colors.primary,
-                      fontSize: 24,
-                      lineHeight: 26,
-                      fontFamily: "SF_Pro_Display_Bold",
-                      opacity: opacity,
-                      transform: [{ scale: opacity }],
-                    }}
-                  >
-                    SHOWROOM
-                  </Animated.Text>
-                </View>
+                  SHOWROOM
+                </Animated.Text>
               </View>
-            )
+            </View>
           }
         />
       ) : user ? (
@@ -132,6 +166,11 @@ export default function UserProfile() {
                 circularIcons
                 size="max"
               />
+              {address && (
+                <View style={{}}>
+                  {address.lat && address.lng ? <Button title="Locate" onPress={() => {}} /> : null}
+                </View>
+              )}
             </View>
           </View>
         </View>

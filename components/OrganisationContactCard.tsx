@@ -231,7 +231,6 @@ function ListEmpty() {
   return (
     <View
       style={{
-        height: "100%",
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
