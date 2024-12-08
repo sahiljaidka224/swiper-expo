@@ -91,6 +91,20 @@ function CarOverview({
               },
             ]}
           >{`${car?.year} ${car?.series ? `- ${car?.series}` : ""}`}</Text>
+          <View style={styles.lessDetailsContainer}>
+            {car?.odometer ? (
+              <View style={styles.detailsView}>
+                <Text style={styles.detailText}>
+                  {formatNumberWithCommas(Number(car?.odometer))} km
+                </Text>
+              </View>
+            ) : null}
+            {car?.transmission ? (
+              <View style={styles.detailsView}>
+                <Text style={styles.detailText}>{car?.transmission}</Text>
+              </View>
+            ) : null}
+          </View>
         </View>
       </AnimatedPressable>
     );
@@ -215,5 +229,13 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 12,
+  },
+  lessDetailsContainer: { display: "flex", flexDirection: "row", gap: 5, marginTop: 5 },
+  detailsView: {
+    padding: 5,
+    backgroundColor: Colors.lightGray,
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -10,7 +10,7 @@ import { TouchableOpacity } from "react-native";
 
 export default function SwiperLayout() {
   const { token } = useAuth();
-  const { cars: carsCount, getCarsCount, isMutating: isCarsCountMutating } = useSearchCarsCount();
+  const { cars: carsCount, getCarsCount } = useSearchCarsCount();
 
   useEffect(() => {
     if (!token) return;

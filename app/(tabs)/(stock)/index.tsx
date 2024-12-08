@@ -4,8 +4,10 @@ import { View, StyleSheet, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { CarsList } from "@/components/CarsList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { useSearchCarsCountWithOrg } from "@/api/hooks/car-search";
+import { useAuth } from "@/context/AuthContext";
 
 const options = [
   { name: "Make A - Z", orderBy: "make", orderDirection: "asc" },
@@ -22,11 +24,19 @@ const options = [
 ];
 
 export default function MyStockPage() {
+  const { token, user } = useAuth();
   const { showActionSheetWithOptions } = useActionSheet();
+  const { cars: carsCount, getCarsCount } = useSearchCarsCountWithOrg();
+
   const [orderState, setOrderState] = useState<{ orderBy: string; orderDirection: string }>({
     orderBy: "dateCreate",
     orderDirection: "desc",
   });
+
+  useEffect(() => {
+    if (!token || !user?.org?.id) return;
+    getCarsCount({ token });
+  }, []);
 
   const onShowActionSheet = () => {
     const cancelButtonIndex = options.length - 1;
@@ -51,6 +61,7 @@ export default function MyStockPage() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
+          title: `My Stock ${carsCount && carsCount.length ? `(${carsCount[0].num} Cars)` : ""}`,
           headerRight: () => (
             <Pressable onPress={onShowActionSheet}>
               <MaterialIcons name="sort" size={24} color={Colors.iconGray} />

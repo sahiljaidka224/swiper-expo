@@ -174,6 +174,23 @@ export function useSearchCarsCount() {
   };
 }
 
+export function useSearchCarsCountWithOrg() {
+  const { user } = useAuth();
+  let fetchUrl = `${process.env.EXPO_PUBLIC_API_BASE_URL}/car/search?count=true&includeSeen=false`;
+
+  if (user?.org?.id) {
+    fetchUrl += `&organisationId=${user?.org?.id}`;
+  }
+  const { trigger, data, error, isMutating } = useSWRMutation(fetchUrl, getSwiperCars);
+
+  return {
+    getCarsCount: trigger,
+    cars: data?.data?.cars ?? [],
+    isMutating,
+    error,
+  };
+}
+
 export function useSearchCars(
   make: string | undefined = undefined,
   model: string | undefined = undefined,
