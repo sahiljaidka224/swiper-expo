@@ -5,7 +5,7 @@ import {
   Pressable,
   Platform,
   FlatList,
-  ListRenderItem,
+  Keyboard,
   TouchableOpacity,
 } from "react-native";
 import React, { memo, useEffect, useState } from "react";
@@ -57,7 +57,7 @@ import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { SheetManager } from "react-native-actions-sheet";
+import { ScrollView, SheetManager } from "react-native-actions-sheet";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -284,6 +284,28 @@ export default function ChatComponent({
     setSelectedImage(null);
   };
 
+  const onQuickReply = (text: string) => {
+    if (text.length === 0) return;
+    onSend(
+      [
+        {
+          _id: Math.floor(Math.random() * 100000),
+          text: text,
+          image: undefined,
+          video: undefined,
+          createdAt: new Date(),
+          user: {
+            _id: 1,
+            name: user?.name,
+          },
+          pending: isSendMsgInProgress,
+        },
+      ],
+      text
+    );
+    playSound();
+  };
+
   return (
     <ImageBackground
       source={assets ? assets[0] : backroundPattern}
@@ -321,6 +343,50 @@ export default function ChatComponent({
           selectedIndex={0}
         />
       )}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 60,
+          paddingHorizontal: 10,
+          width: "100%",
+          zIndex: 100,
+        }}
+      >
+        <ScrollView
+          horizontal
+          scrollEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            style={styles.quickReplyContainer}
+            onPress={() => {
+              onQuickReply("👍");
+            }}
+          >
+            <Text style={styles.quickReplyText}>👍</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickReplyContainer}
+            onPress={() => {
+              onQuickReply("I'm interested");
+            }}
+          >
+            <Text style={styles.quickReplyText}>I'm interested</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickReplyContainer}
+            onPress={() => {
+              onQuickReply("I'll get back to you");
+            }}
+          >
+            <Text style={styles.quickReplyText}>I'll get back to you</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
       <GiftedChat
         isKeyboardInternallyHandled={false}
         isTyping={isTyping}
@@ -356,6 +422,7 @@ export default function ChatComponent({
         }}
         messagesContainerStyle={{
           paddingTop: carGroups && carGroups.length > 0 ? 100 : 0,
+          paddingBottom: 40,
         }}
         bottomOffset={0}
         renderAvatar={null}
@@ -472,7 +539,7 @@ export default function ChatComponent({
       />
       <KeyboardAvoidingView
         behavior="padding"
-        keyboardVerticalOffset={Platform.OS === "ios" ? headerHeight : headerHeight + 20}
+        keyboardVerticalOffset={Platform.OS === "ios" ? headerHeight : headerHeight}
       />
     </ImageBackground>
   );
@@ -802,6 +869,22 @@ const styles = StyleSheet.create({
     height: 50,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
-    // zIndex: 1,
+  },
+  quickReplyContainer: {
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    minWidth: 50,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+    backgroundColor: `rgba(255 255 255 / 0.8)`,
+  },
+  quickReplyText: {
+    fontSize: 18,
+    fontFamily: "SF_Pro_Display_Medium",
+    color: Colors.textDark,
   },
 });

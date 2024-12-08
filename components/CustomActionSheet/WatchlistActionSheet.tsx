@@ -33,7 +33,7 @@ export default function WatchlistActionSheet(props: SheetProps<"watchlist-sheet"
         )}
         {props.payload?.deleteVisible && (
           <View style={{ height: 50 }}>
-            <Button onPress={() => ref.current.hide("delete")} title="Delete" type="primary" />
+            <Button onPress={() => ref.current.hide("delete")} title="Delete Car" type="primary" />
           </View>
         )}
 
