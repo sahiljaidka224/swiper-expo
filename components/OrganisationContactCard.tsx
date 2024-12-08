@@ -24,7 +24,6 @@ import StockButtonContainer from "./StockButtonContainer";
 import WatchlistButtonsContainer from "./WatchlistButtonsContainer";
 import React from "react";
 
-const HEADER_HEIGHT = 200;
 interface OrganisationCardProps {
   name: string;
   address: {

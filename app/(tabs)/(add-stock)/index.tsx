@@ -14,7 +14,7 @@ import { useState } from "react";
 import { View, StyleSheet, Platform, SafeAreaView } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-const options = ["Rego Lookup", "Manual Mode"];
+const options = ["Rego Lookup", "Manual mode"];
 
 export default function AddStockPage() {
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -176,7 +176,7 @@ export default function AddStockPage() {
           {mode === "Rego Lookup" && !carDetails ? (
             <RegoForm setCarDetails={setCarDetails} />
           ) : null}
-          {mode === "Manual Mode" && !carDetails ? (
+          {mode === "Manual mode" && !carDetails ? (
             <ManualForm setCarDetails={setCarDetails} />
           ) : null}
         </View>

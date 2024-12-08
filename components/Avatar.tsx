@@ -5,7 +5,7 @@ import Colors from "@/constants/Colors";
 import { useGetCometChatUser } from "@/hooks/cometchat/users";
 
 const userPlaceholderImage = require("@/assets/images/user-placeholder.png");
-const carPlaceholderImage = require("@/assets/images/no-image.png");
+const carPlaceholderImage = require("@/assets/images/car-placeholder-new.png");
 
 function Avatar({
   userId,
@@ -38,7 +38,7 @@ function Avatar({
         alt="User Avatar"
         contentFit="cover"
         priority={userId ? "high" : "low"}
-        placeholderContentFit="contain"
+        placeholderContentFit="cover"
         source={{
           uri: userId ? `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` : source,
         }}

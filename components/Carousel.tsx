@@ -7,7 +7,7 @@ import Gallery from "./Gallery";
 import Animated from "react-native-reanimated";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
-const placeholderImage = require("@/assets/images/no-image-large.png");
+const placeholderImage = require("@/assets/images/car-placeholder-new.png");
 
 interface CarouselProps {
   images: Array<{ url: string; imageIndex: number }>;
@@ -25,6 +25,7 @@ export default function Carousel({ images, price, carId }: CarouselProps) {
         <Image
           placeholder={placeholderImage}
           style={[styles.itemCarImage, { objectFit: "cover" }]}
+          placeholderContentFit="cover"
         />
       ) : (
         <PagerView

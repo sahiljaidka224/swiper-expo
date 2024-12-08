@@ -9,7 +9,6 @@ import Text from "@/components/Text";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const placeholderImage = require("@/assets/images/no-image.png");
 const carPlaceholder = require("@/assets/images/car-placeholder-new.png");
 
 function CarOverview({
@@ -100,14 +99,14 @@ function CarOverview({
         }}
       >
         <AnimatedImage
-          placeholder={placeholderImage}
+          placeholder={carPlaceholder}
           source={{ uri: car?.images[0]?.url }}
           style={[
             styles.itemCarImage,
             !car?.images[0]?.url ? { marginLeft: -12, borderRadius: 0, borderWidth: 0 } : {},
           ]}
           recyclingKey={car?.images[0]?.carImageId}
-          placeholderContentFit="fill"
+          placeholderContentFit="cover"
           sharedTransitionTag={`car-image-${car?.carId}`}
         />
       </View>

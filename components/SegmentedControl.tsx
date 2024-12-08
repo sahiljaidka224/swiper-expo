@@ -1,14 +1,9 @@
 import Colors from "@/constants/Colors";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import Text from "./Text";
 
-const Palette = {
-  baseGray05: Colors.primary,
-  baseGray80: "#ff00ff",
-  background: "#fff",
-};
 type SegmentedControlProps = {
   options: string[];
   selectedOption: string;
@@ -35,7 +30,6 @@ const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
           styles.container,
           {
             width: segmentedControlWidth,
-            borderRadius: 6,
             paddingLeft: internalPadding / 2,
           },
         ]}
@@ -63,7 +57,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
                 styles.labelContainer,
               ]}
             >
-              <Text style={styles.label}>{option}</Text>
+              <Text style={[styles.label, option === selectedOption ? styles.activeLabel : {}]}>
+                {option}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -76,23 +72,29 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     height: 40,
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.background,
     justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: Colors.borderGray,
+    borderRadius: 12,
   },
   activeBox: {
     position: "absolute",
     borderRadius: 6,
     height: "80%",
     top: "10%",
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primary,
     borderColor: Colors.primary,
     borderWidth: 1,
   },
   labelContainer: { justifyContent: "center", alignItems: "center" },
   label: {
     fontSize: 18,
-    fontFamily: "SF_Pro_Display_Regular",
+    fontFamily: "SF_Pro_Display_Medium",
     color: Colors.textDark,
+  },
+  activeLabel: {
+    color: Colors.textPrimary,
   },
 });
 
