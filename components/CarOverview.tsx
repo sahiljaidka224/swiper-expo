@@ -16,11 +16,13 @@ function CarOverview({
   context,
   children,
   showDetails = true,
+  showExtraDetails = false,
 }: {
   car: any;
   context: CarsListContext;
   children?: React.ReactNode;
   showDetails?: boolean;
+  showExtraDetails?: boolean;
 }) {
   const segments = useSegments();
   const onAnimatePress = (carId: string) => {
@@ -62,7 +64,12 @@ function CarOverview({
           />
         </View>
         <View
-          style={{ paddingTop: 8, paddingBottom: 20, paddingLeft: 8, backgroundColor: "white" }}
+          style={{
+            paddingTop: 8,
+            paddingBottom: showExtraDetails ? 4 : 20,
+            paddingLeft: 8,
+            backgroundColor: "white",
+          }}
         >
           <Text
             style={[

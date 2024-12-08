@@ -1,6 +1,6 @@
 import Colors from "@/constants/Colors";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import CarOverview from "@/components/CarOverview";
@@ -12,19 +12,64 @@ import Text from "@/components/Text";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { useSearchCars } from "@/api/hooks/car-search";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+
+const options = [
+  { name: "Make A - Z", orderBy: "make", orderDirection: "asc" },
+  { name: "Make Z - A", orderBy: "make", orderDirection: "desc" },
+  { name: "Newest Year", orderBy: "year", orderDirection: "desc" },
+  { name: "Oldest Year", orderBy: "year", orderDirection: "asc" },
+  { name: "Lowest Price", orderBy: "price", orderDirection: "asc" },
+  { name: "Highest Price", orderBy: "price", orderDirection: "desc" },
+  { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
+  { name: "Highest Mileage", orderBy: "odometer", orderDirection: "desc" },
+  { name: "Reset", orderBy: "dateCreate", orderDirection: "desc" },
+  { name: "Cancel", orderBy: "", orderDirection: "" },
+];
 
 export default function SearchResults() {
   // TODO: use Order state
+  const { showActionSheetWithOptions } = useActionSheet();
+
   const [orderState, setOrderState] = useState<{ orderBy: string; orderDirection: string }>({
     orderBy: "dateCreate",
     orderDirection: "desc",
   });
 
+  const onShowActionSheet = () => {
+    const cancelButtonIndex = options.length - 1;
+
+    showActionSheetWithOptions(
+      {
+        options: options.map((o) => o.name),
+        cancelButtonIndex,
+      },
+      (buttonIndex: any) => {
+        if (buttonIndex !== cancelButtonIndex) {
+          setOrderState({
+            orderBy: options[buttonIndex].orderBy,
+            orderDirection: options[buttonIndex].orderDirection,
+          });
+        }
+      }
+    );
+  };
+
   const { orgId } = useLocalSearchParams();
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: "" }} />
+      <Stack.Screen
+        options={{
+          headerTitle: "",
+          headerRight: () => (
+            <Pressable onPress={onShowActionSheet}>
+              <MaterialIcons name="sort" size={24} color={Colors.iconGray} />
+            </Pressable>
+          ),
+        }}
+      />
       <CarsListOrgs
         context="search"
         orderBy={orderState.orderBy}
@@ -155,7 +200,7 @@ function CarsListOrgs({
           entering={FadeInUp.delay(index * 10)}
           exiting={FadeOutUp}
         >
-          <CarOverview car={item} context={context} />
+          <CarOverview car={item} context={context} showDetails={false} showExtraDetails />
           {/* {item?.organisationId === user?.org?.id ? (
             <StockButtonContainer carId="" onPushToSwiperContacts={onSendToPhoneContacts} />
           ) : (
@@ -255,7 +300,6 @@ const styles = StyleSheet.create({
   itemWrapper: {
     backgroundColor: Colors.background,
     borderRadius: 10,
-    paddingRight: 10,
     paddingVertical: 15,
   },
 });

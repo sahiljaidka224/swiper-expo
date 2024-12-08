@@ -10,8 +10,8 @@ import { useState } from "react";
 const options = [
   { name: "Make A - Z", orderBy: "make", orderDirection: "asc" },
   { name: "Make Z - A", orderBy: "make", orderDirection: "desc" },
-  { name: "Newest", orderBy: "year", orderDirection: "desc" },
-  { name: "Oldest", orderBy: "year", orderDirection: "asc" },
+  { name: "Newest Year", orderBy: "year", orderDirection: "desc" },
+  { name: "Oldest Year", orderBy: "year", orderDirection: "asc" },
   { name: "Lowest Price", orderBy: "price", orderDirection: "asc" },
   { name: "Highest Price", orderBy: "price", orderDirection: "desc" },
   { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
