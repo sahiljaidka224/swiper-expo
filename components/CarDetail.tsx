@@ -387,7 +387,7 @@ function CarDetail({
                     color: Colors.textDark,
                   }}
                 >
-                  Active conversations:
+                  Active chats:
                 </Text>
                 {groupConversations && groupConversations.length > 0 ? (
                   <View style={styles.carGroupWrapper}>

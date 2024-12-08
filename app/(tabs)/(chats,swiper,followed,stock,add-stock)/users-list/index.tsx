@@ -14,7 +14,7 @@ import { formatTimestamp } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -24,6 +24,7 @@ import {
   SectionList,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -41,7 +42,7 @@ export default function UsersListPage() {
     segments.includes("(add-stock)") ||
     (segments.includes("(chats)") && allowMultiple === "true");
   const forwardMediaMode = segments.includes("(chats)") && allowMultiple === "true";
-
+  const sectionListRef = useRef<SectionList<any> | null>(null);
   const { user: currentUser } = useAuth();
 
   const { users, error, loading } = useGetCometChatUsers();
@@ -126,8 +127,6 @@ export default function UsersListPage() {
           return prev.filter((user) => user.getUid() !== userUID);
         });
       } else {
-        // router.push(`/(tabs)/(chats)/${userUID}`);
-
         router.push({
           pathname: `/(tabs)/user/[user]`,
           params: { id: userUID },
@@ -219,6 +218,21 @@ export default function UsersListPage() {
     createMultipleGroups(groupData);
   };
 
+  const alphabet = sections.map((section) => section.title);
+
+  const scrollToSection = (letter: string) => {
+    const sectionIndex = sections.findIndex((section) => section.title === letter);
+    if (sectionIndex !== -1) {
+      sectionListRef.current?.scrollToLocation({
+        sectionIndex: sectionIndex,
+        itemIndex: 0,
+        animated: true,
+        viewPosition: 0.2,
+        viewOffset: styles.userContainer.height * sectionIndex,
+      });
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -239,6 +253,15 @@ export default function UsersListPage() {
       {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
       <SectionList
+        getItemLayout={(data, index) => ({
+          length: styles.userContainer.height,
+          offset: styles.userContainer.height * index,
+          index,
+        })}
+        onScrollToIndexFailed={() => {
+          console.log("onScrollToIndexFailed");
+        }}
+        ref={sectionListRef}
         keyboardShouldPersistTaps="handled"
         sections={sections}
         keyExtractor={keyExtractor}
@@ -251,14 +274,7 @@ export default function UsersListPage() {
         ListHeaderComponent={
           multipleSelectionAllowed && selectedUsers && selectedUsers.length > 0 ? (
             <>
-              <Text
-                style={{
-                  fontFamily: "SF_Pro_Display_Regular",
-                  fontSize: 18,
-                  textAlign: "center",
-                  marginTop: 10,
-                }}
-              >
+              <Text style={styles.forwardText}>
                 {forwardMediaMode
                   ? "Forwarding to these Swiper Users"
                   : "Pushing to these Swiper Users"}
@@ -303,6 +319,17 @@ export default function UsersListPage() {
           ) : null
         }
       />
+      <View style={styles.alphabetContainer}>
+        {alphabet.map((letter) => (
+          <TouchableOpacity
+            key={letter}
+            onPress={() => scrollToSection(letter)}
+            style={styles.alphabetButton}
+          >
+            <Text style={styles.alphabetText}>{letter}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -363,6 +390,7 @@ const styles = StyleSheet.create({
     padding: 5,
     justifyContent: "space-between",
     marginBottom: 5,
+    height: 66,
   },
   name: {
     color: Colors.textDark,
@@ -425,5 +453,32 @@ const styles = StyleSheet.create({
     height: 25,
     justifyContent: "center",
     alignItems: "center",
+    marginRight: 15,
+  },
+  forwardText: {
+    fontFamily: "SF_Pro_Display_Regular",
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 10,
+  },
+
+  alphabetContainer: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "transparent",
+  },
+  alphabetButton: {
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+  },
+  alphabetText: {
+    fontSize: 14,
+    fontFamily: "SF_Pro_Display_Regular",
+    color: Colors.primary,
   },
 });

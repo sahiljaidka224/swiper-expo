@@ -94,14 +94,14 @@ function CarOverview({
           <View style={styles.lessDetailsContainer}>
             {car?.odometer ? (
               <View style={styles.detailsView}>
-                <Text style={styles.detailText}>
+                <Text style={styles.detailsTextNew}>
                   {formatNumberWithCommas(Number(car?.odometer))} km
                 </Text>
               </View>
             ) : null}
             {car?.transmission ? (
               <View style={styles.detailsView}>
-                <Text style={styles.detailText}>{car?.transmission}</Text>
+                <Text style={styles.detailsTextNew}>{car?.transmission}</Text>
               </View>
             ) : null}
           </View>
@@ -116,7 +116,7 @@ function CarOverview({
         style={{
           width: 180,
           minHeight: 180,
-          maxHeight: 200,
+          maxHeight: 220,
         }}
       >
         <AnimatedImage
@@ -144,12 +144,18 @@ function CarOverview({
         <View style={[styles.priceContainer]}>
           {typeof car?.daysInStock === "number" && (
             <View style={styles.daysInStockContainer}>
-              <Text style={styles.daysInStockText}>{`${car?.daysInStock} days`}</Text>
+              <Text
+                style={styles.daysInStockText}
+                maxFontSizeMultiplier={1.1}
+              >{`${car?.daysInStock} days`}</Text>
             </View>
           )}
           {car?.price && car?.price > 0 ? (
             <View style={styles.itemPriceTextContainer}>
-              <Text style={styles.itemPriceText}>{`$${formatNumberWithCommas(car.price)}`}</Text>
+              <Text
+                style={styles.itemPriceText}
+                maxFontSizeMultiplier={1.1}
+              >{`$${formatNumberWithCommas(car.price)}`}</Text>
             </View>
           ) : null}
         </View>
@@ -196,8 +202,7 @@ const styles = StyleSheet.create({
   itemCarImage: {
     minWidth: 140,
     height: "100%",
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
+
     objectFit: "cover",
     borderWidth: 1,
     borderColor: Colors.lightGray,
@@ -230,12 +235,20 @@ const styles = StyleSheet.create({
     fontFamily: "SF_Pro_Display_Medium",
     fontSize: 12,
   },
-  lessDetailsContainer: { display: "flex", flexDirection: "row", gap: 5, marginTop: 5 },
+  lessDetailsContainer: { display: "flex", flexDirection: "row", gap: 8, marginTop: 5 },
   detailsView: {
-    padding: 5,
-    backgroundColor: Colors.lightGray,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    backgroundColor: Colors.lightGrayBackground,
     borderRadius: 6,
     justifyContent: "center",
     alignItems: "center",
+  },
+  detailsTextNew: {
+    fontSize: 16,
+    lineHeight: 20,
+    color: Colors.textDark,
+    fontFamily: "SF_Pro_Display_Medium",
+    textTransform: "capitalize",
   },
 });
