@@ -68,6 +68,7 @@ import Animated, {
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
+const garageAsset = require("@/assets/audio/car-garage.wav");
 
 interface ChatComponentProps {
   userId: string;
@@ -118,6 +119,8 @@ export default function ChatComponent({
   const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const [sound, setSound] = useState<Sound>();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [garageSound, setGarageSound] = useState<Sound>();
 
   useEffect(() => {
     return sound
@@ -126,6 +129,40 @@ export default function ChatComponent({
         }
       : undefined;
   }, [sound]);
+
+  useEffect(() => {
+    return garageSound
+      ? () => {
+          garageSound.unloadAsync();
+        }
+      : undefined;
+  }, [garageSound]);
+
+  async function playGarageSound() {
+    try {
+      if (isPlaying) return;
+      setIsPlaying(true);
+      const { sound } = await Audio.Sound.createAsync(garageAsset);
+      setGarageSound(sound);
+
+      await sound.playAsync();
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) {
+          if (status.error) {
+            console.log(`Encountered a fatal error during playback: ${status.error}`);
+          }
+        } else {
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            sound.unloadAsync();
+          }
+        }
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
 
   async function playSound() {
     try {
@@ -330,6 +367,9 @@ export default function ChatComponent({
             renderItem={({ item, index }) => <HorizontalItem item={item} index={index} />}
             horizontal
             showsHorizontalScrollIndicator={false}
+            onScrollBeginDrag={() => {
+              playGarageSound();
+            }}
           />
         </View>
       ) : null}

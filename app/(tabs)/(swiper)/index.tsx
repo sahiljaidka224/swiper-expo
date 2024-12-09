@@ -18,7 +18,9 @@ import { getCanPlaySwiperSound } from "@/context/settings";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
-const audioAsset = require("@/assets/audio/swish.mp3");
+const audioAssetLeft = require("@/assets/audio/left-swish.wav");
+const audioAssetRight = require("@/assets/audio/right-swish.wav");
+
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
@@ -111,15 +113,24 @@ export default function SwiperPage() {
   const { trigger: addCarToWatchlist } = useAddCarToWatchlist();
   const { trigger: markCarAsSeen } = useMarkCarAsSeen();
 
-  const [sound, setSound] = useState<Sound>();
+  const [leftAudio, setLeftAudio] = useState<Sound>();
+  const [rightAudio, setRightAudio] = useState<Sound>();
 
   useEffect(() => {
-    return sound
+    return leftAudio
       ? () => {
-          sound.unloadAsync();
+          leftAudio.unloadAsync();
         }
       : undefined;
-  }, [sound]);
+  }, [leftAudio]);
+
+  useEffect(() => {
+    return rightAudio
+      ? () => {
+          rightAudio.unloadAsync();
+        }
+      : undefined;
+  }, [rightAudio]);
 
   useFocusEffect(
     useCallback(() => {
@@ -148,11 +159,23 @@ export default function SwiperPage() {
     await analytics().logEvent(action, { userId: user?.id });
   };
 
-  async function playSound() {
+  async function playLeftSound() {
     if (!isSwipeSoundEnabled) return;
     try {
-      const { sound } = await Audio.Sound.createAsync(audioAsset);
-      setSound(sound);
+      const { sound } = await Audio.Sound.createAsync(audioAssetLeft);
+      setLeftAudio(sound);
+
+      await sound.playAsync();
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  async function playRightSound() {
+    if (!isSwipeSoundEnabled) return;
+    try {
+      const { sound } = await Audio.Sound.createAsync(audioAssetRight);
+      setRightAudio(sound);
 
       await sound.playAsync();
     } catch (error) {
@@ -164,7 +187,7 @@ export default function SwiperPage() {
     if (!token) return;
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
-    playSound();
+    playRightSound();
 
     addCarToWatchlist({ carId, token, userId: undefined });
     markCarAsSeen({ carId, token });
@@ -181,7 +204,7 @@ export default function SwiperPage() {
 
     const carId = watchListData[cardIndex]?.carId;
     if (!carId) return;
-    playSound();
+    playLeftSound();
 
     markCarAsSeen({ carId, token });
 
