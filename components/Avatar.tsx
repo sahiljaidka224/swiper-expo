@@ -39,6 +39,7 @@ function Avatar({
         contentFit="cover"
         priority={userId ? "high" : "low"}
         placeholderContentFit="cover"
+        cachePolicy={userId ? "none" : "disk"}
         source={{
           uri: userId ? `${process.env.EXPO_PUBLIC_AVATAR_STORAGE_URL}${userId}.png` : source,
         }}

@@ -45,6 +45,8 @@ interface ProfileProps {
 }
 
 export default function ProfileComponent({ context }: ProfileProps) {
+  const [avatarRefreshKey, setAvatarRefreshKey] = useState(0);
+
   const [isSwipeSoundEnabled, setSwipeSoundEnabled] = useState(false);
   const { logout, user, token, updateUser } = useAuth();
   const { updateUserDetails, updatedUserDetails, isMutating, error } = useUpdateUserDetails();
@@ -90,6 +92,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
   useEffect(() => {
     if (avatarUpdateData && !avatarError && !isUserAvatarMutating) {
       showToast("Success", "Profile Picture Updated Successfully", "success");
+      setAvatarRefreshKey((prev) => prev + 1);
     }
   }, [avatarUpdateData, avatarError, isUserAvatarMutating]);
 
@@ -287,7 +290,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
 
           {user && context === "update" ? (
             <Pressable style={{ height: 125, width: 125 }} onPress={onShowActionSheet}>
-              <Avatar userId={user?.id} showOnlineIndicator />
+              <Avatar userId={user?.id} showOnlineIndicator key={avatarRefreshKey} />
             </Pressable>
           ) : (
             <View style={styles.headingWrapper}>
