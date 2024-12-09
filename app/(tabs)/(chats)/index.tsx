@@ -41,8 +41,10 @@ import * as SMS from "expo-sms";
 import React from "react";
 import { useMessageContext } from "@/context/MessageContext";
 import { Shadow } from "react-native-shadow-2";
+import { Audio } from "expo-av";
 
 const transition = CurvedTransition.delay(100);
+const landingAsset = require("@/assets/audio/car-landing.wav");
 
 function useNotificationObserver(
   fetchConversations: () => void,
@@ -80,6 +82,7 @@ function useNotificationObserver(
   }, []);
 }
 export default function Chats() {
+  const [landingSound, setLandingSound] = useState<Audio.Sound | null>(null);
   const { unreadCount } = useMessageContext();
   const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
   const [searchText, setSearchText] = useState<string | null>(null);
@@ -311,6 +314,17 @@ export default function Chats() {
     [filteredPhoneContacts]
   );
 
+  async function playLandingSound() {
+    try {
+      const { sound } = await Audio.Sound.createAsync(landingAsset);
+      setLandingSound(sound);
+
+      await sound.playAsync();
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
   const horizontalRenderItem: ListRenderItem<CometChat.Conversation> = useCallback(
     ({ item, index }) => {
       const onMarkAsRead = async (message: CometChat.BaseMessage) => {
@@ -318,7 +332,14 @@ export default function Chats() {
         fetchConversations();
         fetchGroupConversations();
       };
-      return <AnimatedItem item={item} index={index} markAsRead={onMarkAsRead} />;
+      return (
+        <AnimatedItem
+          item={item}
+          index={index}
+          markAsRead={onMarkAsRead}
+          onPlayLandingSound={playLandingSound}
+        />
+      );
     },
     [groups]
   );
@@ -494,10 +515,12 @@ const AnimatedItem = ({
   item,
   index,
   markAsRead,
+  onPlayLandingSound,
 }: {
   item: CometChat.Conversation;
   index: number;
   markAsRead: (message: CometChat.BaseMessage) => Promise<void>;
+  onPlayLandingSound?: () => void;
 }) => {
   const conversationWith = item.getConversationWith();
   const icon = conversationWith instanceof CometChat.Group ? conversationWith.getIcon() : undefined;
@@ -529,6 +552,8 @@ const AnimatedItem = ({
       })
     );
     opacity.value = withDelay(index * 100, withTiming(1, { duration: 500 }));
+
+    onPlayLandingSound && onPlayLandingSound();
   }, []);
 
   return (
