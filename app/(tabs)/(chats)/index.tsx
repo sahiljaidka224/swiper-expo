@@ -40,6 +40,7 @@ import { showToast } from "@/components/Toast";
 import * as SMS from "expo-sms";
 import React from "react";
 import { useMessageContext } from "@/context/MessageContext";
+import { Shadow } from "react-native-shadow-2";
 
 const transition = CurvedTransition.delay(100);
 
@@ -324,43 +325,11 @@ export default function Chats() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          width: "100%",
-          alignSelf: "center",
-          zIndex: 1,
-          height: groups.length > 0 ? undefined : 0,
-        }}
-      >
-        <FlatList<CometChat.Conversation>
-          data={groups ?? []}
-          style={{ paddingHorizontal: 10, paddingVertical: 10 }}
-          keyExtractor={(item: unknown) => {
-            const conversation = item as CometChat.Conversation;
-            return conversation.getConversationId();
-          }}
-          renderItem={horizontalRenderItem}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: 20,
-          backgroundColor: Colors.background,
-        }}
-        style={{
-          zIndex: 100,
-          shadowColor: Colors.primary,
-          shadowOffset: {
-            width: 0,
-            height: -30,
-          },
-          shadowOpacity: 0.4,
-          shadowRadius: 25,
-          elevation: 5,
         }}
       >
         <Stack.Screen
@@ -410,8 +379,44 @@ export default function Chats() {
           </>
         )}
         {error && <ErrorView />}
-
-        <Animated.View layout={transition} style={{}}>
+        {groups && groups.length > 0 ? (
+          <View
+            style={{
+              width: "100%",
+              alignSelf: "center",
+              zIndex: 1,
+              height: groups.length > 0 ? undefined : 0,
+              backgroundColor: "transparent",
+              paddingVertical: 10,
+            }}
+          >
+            <FlatList<CometChat.Conversation>
+              data={groups ?? []}
+              style={{ paddingHorizontal: 10, paddingVertical: 10 }}
+              keyExtractor={(item: unknown) => {
+                const conversation = item as CometChat.Conversation;
+                return conversation.getConversationId();
+              }}
+              renderItem={horizontalRenderItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+        ) : null}
+        <Animated.View layout={transition} style={{ backgroundColor: Colors.background }}>
+          <Shadow
+            sides={{ top: true, bottom: false, start: false, end: false }}
+            offset={[0, 0]}
+            distance={70}
+            startColor={"#b9d2fd"}
+            endColor={"#ffffff1a"}
+          >
+            <View
+              style={{
+                width: "100%",
+              }}
+            ></View>
+          </Shadow>
           <Animated.FlatList
             contentInsetAdjustmentBehavior="automatic"
             skipEnteringExitingAnimations
