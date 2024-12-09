@@ -360,7 +360,9 @@ export default function UsersListPage() {
             onPress={() => scrollToSection(letter)}
             style={styles.alphabetButton}
           >
-            <Text style={styles.alphabetText}>{letter}</Text>
+            <Text style={styles.alphabetText} maxFontSizeMultiplier={1}>
+              {letter}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -508,10 +510,10 @@ const styles = StyleSheet.create({
   },
   alphabetButton: {
     paddingVertical: 2,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
   },
   alphabetText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "SF_Pro_Display_Regular",
     color: Colors.primary,
   },
