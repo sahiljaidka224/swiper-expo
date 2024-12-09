@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { useSendMessage } from "@/hooks/cometchat/messages";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
-import { formatTimestamp } from "@/utils/cometchat";
+import { formatTimestamp, isActiveToday } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
@@ -115,23 +115,27 @@ export default function UsersListPage() {
 
   const keyExtractor = (item: CometChat.User) => item.getUid();
 
+  const onPressUser = (user: CometChat.User) => {
+    const userUID = user.getUid();
+    if (multipleSelectionAllowed) {
+      setSelectedUsers((prev) => {
+        const index = prev.findIndex((user) => user.getUid() === userUID);
+        if (index === -1) {
+          return [...prev, user];
+        }
+        return prev.filter((user) => user.getUid() !== userUID);
+      });
+    } else {
+      router.push({
+        pathname: `/(tabs)/user/[user]`,
+        params: { id: userUID },
+      });
+    }
+  };
+
   const renderItem = ({ item }: { item: CometChat.User }) => {
     const onPress = () => {
-      const userUID = item.getUid();
-      if (multipleSelectionAllowed) {
-        setSelectedUsers((prev) => {
-          const index = prev.findIndex((user) => user.getUid() === userUID);
-          if (index === -1) {
-            return [...prev, item];
-          }
-          return prev.filter((user) => user.getUid() !== userUID);
-        });
-      } else {
-        router.push({
-          pathname: `/(tabs)/user/[user]`,
-          params: { id: userUID },
-        });
-      }
+      onPressUser(item);
     };
 
     const isSelected = selectedUsers.find((user) => user.getUid() === item.getUid()) !== undefined;
@@ -233,6 +237,8 @@ export default function UsersListPage() {
     }
   };
 
+  const onlineUsers = users.filter((user) => isActiveToday(user.getLastActiveAt()));
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -252,6 +258,7 @@ export default function UsersListPage() {
       />
       {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
+
       <SectionList
         getItemLayout={(data, index) => ({
           length: styles.userContainer.height,
@@ -315,6 +322,33 @@ export default function UsersListPage() {
                   isLoading={isGroupCreateLoading || isSendingMessage}
                 />
               </View>
+            </>
+          ) : !multipleSelectionAllowed && onlineUsers && onlineUsers.length > 0 ? (
+            <>
+              <Text style={styles.forwardText}>Active Users</Text>
+              <ScrollView
+                style={{ backgroundColor: Colors.background, padding: 10, minHeight: 100 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {onlineUsers.map((user) => {
+                  const userUID = user.getUid();
+                  const userName = user.getName();
+
+                  return (
+                    <Pressable
+                      key={userUID}
+                      style={{ margin: 5, alignItems: "center" }}
+                      onPress={() => onPressUser(user)}
+                    >
+                      <View style={styles.avatarContainer}>
+                        <Avatar userId={userUID} />
+                      </View>
+                      <Text style={styles.name}>{userName.split(" ")[0]}</Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
             </>
           ) : null
         }

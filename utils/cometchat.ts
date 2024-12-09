@@ -1,5 +1,12 @@
 import { differenceInDays, format, isToday, isYesterday } from "date-fns";
 
+export function isActiveToday(timestamp: number): boolean {
+  const date = new Date(timestamp * 1000);
+  const now = new Date();
+
+  return isToday(date) && differenceInDays(now, date) === 0;
+}
+
 export function formatTimestamp(timestamp: number, showRecently?: boolean): string {
   const date = new Date(timestamp * 1000);
   const now = new Date();
