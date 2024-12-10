@@ -42,6 +42,7 @@ import React from "react";
 import { useMessageContext } from "@/context/MessageContext";
 import { Shadow } from "react-native-shadow-2";
 import { Audio } from "expo-av";
+import { useIsFocused } from "@react-navigation/native";
 
 const transition = CurvedTransition.delay(100);
 const landingAsset = require("@/assets/audio/car-landing.wav");
@@ -55,7 +56,7 @@ function useNotificationObserver(
 
     async function handleNotification() {
       fetchConversations();
-      fetchGroupConversations();
+      // fetchGroupConversations();
       try {
         Notifications.setBadgeCountAsync(0);
         Notifications.dismissAllNotificationsAsync();
@@ -82,6 +83,7 @@ function useNotificationObserver(
   }, []);
 }
 export default function Chats() {
+  const isFocused = useIsFocused();
   const [landingSound, setLandingSound] = useState<Audio.Sound | null>(null);
   const { unreadCount } = useMessageContext();
   const [phoneContacts, setPhoneContacts] = useState<Contacts.Contact[]>([]);
@@ -96,9 +98,9 @@ export default function Chats() {
     error,
     loading,
     fetchConversations,
-  } = useGetConversations("user");
+  } = useGetConversations("user", true);
   const { conversationList: groupConversationList, fetchConversations: fetchGroupConversations } =
-    useGetConversations("group");
+    useGetConversations("group", isFocused);
   const { markAsRead } = useMarkMessageAsRead();
   useNotificationObserver(fetchConversations, fetchGroupConversations);
 
@@ -115,6 +117,14 @@ export default function Chats() {
       return () => {};
     }, [])
   );
+
+  useEffect(() => {
+    return landingSound
+      ? () => {
+          landingSound.unloadAsync();
+        }
+      : undefined;
+  }, [landingSound]);
 
   useEffect(() => {
     (async () => {
@@ -173,7 +183,9 @@ export default function Chats() {
 
   useEffect(() => {
     fetchConversations();
-    fetchGroupConversations();
+    if (isFocused) {
+      fetchGroupConversations();
+    }
   }, [unreadCount]);
 
   const filteredPhoneContacts = phoneContacts.filter((contact) => {

@@ -7,7 +7,7 @@ import { usePathname } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { useHideSenderContext } from "@/context/HideSenderContext";
 
-export const useGetConversations = (type: "user" | "group" = "user") => {
+export const useGetConversations = (type: "user" | "group" = "user", isChatsFocused?: boolean) => {
   const { getUnreadMessages } = useGetUnreadMessages();
   const { setUsers, users } = useHideSenderContext();
 
@@ -167,7 +167,9 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
       listenerID,
       new CometChat.MessageListener({
         onTextMessageReceived: (textMessage: CometChat.TextMessage) => {
-          fetchConversations();
+          if (isChatsFocused) {
+            // fetchConversations();
+          }
           getUnreadMessages();
           const sender = textMessage.getSender();
           const senderUID = sender.getUid();
@@ -178,7 +180,9 @@ export const useGetConversations = (type: "user" | "group" = "user") => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
         onMediaMessageReceived: (mediaMessage: CometChat.MediaMessage) => {
-          fetchConversations();
+          if (isChatsFocused) {
+            // fetchConversations();
+          }
           getUnreadMessages();
 
           const sender = mediaMessage.getSender();
