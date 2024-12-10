@@ -57,7 +57,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = React.memo(
                 styles.labelContainer,
               ]}
             >
-              <Text style={[styles.label, option === selectedOption ? styles.activeLabel : {}]}>
+              <Text
+                style={[styles.label, option === selectedOption ? styles.activeLabel : {}]}
+                maxFontSizeMultiplier={1.1}
+              >
                 {option}
               </Text>
             </TouchableOpacity>

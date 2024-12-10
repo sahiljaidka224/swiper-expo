@@ -91,7 +91,10 @@ export default function CameraView({
     if (cameraRef.current) {
       setIsTakingPicture(true);
       cameraRef.current
-        .takePictureAsync()
+        .takePictureAsync({
+          scale: 1,
+          quality: 1,
+        })
         .then((photo) => {
           if (!photo) return;
           saveToLibraryAsync(photo.uri);
@@ -160,7 +163,9 @@ export default function CameraView({
                       typeof photo.index === "number" ? deletePhoto(photo.index) : null
                     }
                   >
-                    <Text style={styles.deleteText}>X</Text>
+                    <Text style={styles.deleteText} allowFontScaling={false}>
+                      X
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ))}
@@ -168,14 +173,17 @@ export default function CameraView({
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                justifyContent: "center",
                 alignItems: "center",
                 backgroundColor: "transparent",
                 paddingHorizontal: 10,
                 width: "100%",
               }}
             >
-              <TouchableOpacity onPress={onOpenGallery} style={{ padding: 5 }}>
+              <TouchableOpacity
+                onPress={onOpenGallery}
+                style={{ padding: 5, position: "absolute", left: 10 }}
+              >
                 <FontAwesome5 name="images" size={24} color="white" />
               </TouchableOpacity>
               <View style={styles.captureButtonContainer}>
@@ -185,8 +193,13 @@ export default function CameraView({
                   disabled={isTakingPicture}
                 />
               </View>
-              <TouchableOpacity onPress={onDone} style={{ padding: 10, zIndex: 10 }}>
-                <Text style={styles.doneText}>DONE</Text>
+              <TouchableOpacity
+                onPress={onDone}
+                style={{ padding: 10, zIndex: 10, position: "absolute", right: 10 }}
+              >
+                <Text style={styles.doneText} maxFontSizeMultiplier={1.2}>
+                  DONE
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -230,7 +243,7 @@ const styles = StyleSheet.create({
     height: 80,
     width: 80,
     borderRadius: 40,
-    borderColor: Colors.primary,
+    borderColor: Colors.background,
     borderWidth: 3,
     padding: 2,
     margin: 10,
@@ -238,7 +251,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   captureButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.background,
     width: "100%",
     height: "100%",
     borderRadius: 999999,
@@ -268,12 +281,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 5,
     right: 5,
-    backgroundColor: "red",
+    width: 24,
+    height: 24,
+    backgroundColor: Colors.red,
     borderRadius: 15,
-    padding: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
   deleteText: {
     color: "#fff",
     fontSize: 12,
+    textAlign: "center",
   },
 });

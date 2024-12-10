@@ -202,6 +202,7 @@ export default function AddStock({
           source={{ uri: selectedImages.length > 0 ? selectedImages[0].uri : undefined }}
           contentFit={selectedImages.length > 0 ? "cover" : "contain"}
           recyclingKey={selectedImages.length > 0 ? selectedImages[0].name : undefined}
+          placeholderContentFit="cover"
         />
         {selectedImages.length > 0 && (
           <Pressable
