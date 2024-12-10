@@ -39,7 +39,8 @@ export default function CameraView({
   setSelectedImages,
   onOpenGallery,
 }: Props) {
-  const [isTakingPicture, setIsTakingPicture] = useState(true);
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [isTakingPicture, setIsTakingPicture] = useState(false);
   const cameraRef = useRef<ExpoCameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const animationProgress = useSharedValue(0);
@@ -118,7 +119,6 @@ export default function CameraView({
   };
 
   const deletePhoto = (index: number) => {
-    console.log("delete photo", index);
     setSelectedImages(selectedImages.filter((img) => img.index !== index));
   };
 
@@ -127,15 +127,15 @@ export default function CameraView({
   };
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={animatedStyle} pointerEvents="box-none">
       <SafeAreaView style={styles.container}>
         <ExpoCameraView
           ref={cameraRef}
           style={styles.camera}
           facing="back"
-          active={isCameraVisible}
+          active={isCameraReady && isCameraVisible}
           onCameraReady={() => {
-            setIsTakingPicture(false);
+            setIsCameraReady(true);
           }}
           mode="picture"
         >
@@ -229,6 +229,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: "100%",
+    zIndex: 100,
   },
   backButton: {
     height: 40,

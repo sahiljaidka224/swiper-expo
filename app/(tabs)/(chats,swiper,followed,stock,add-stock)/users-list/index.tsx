@@ -323,33 +323,6 @@ export default function UsersListPage() {
                 />
               </View>
             </>
-          ) : !multipleSelectionAllowed && onlineUsers && onlineUsers.length > 0 ? (
-            <>
-              <Text style={styles.forwardText}>Active Users</Text>
-              <ScrollView
-                style={{ backgroundColor: Colors.background, padding: 10, minHeight: 100 }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              >
-                {onlineUsers.map((user) => {
-                  const userUID = user.getUid();
-                  const userName = user.getName();
-
-                  return (
-                    <Pressable
-                      key={userUID}
-                      style={{ margin: 5, alignItems: "center" }}
-                      onPress={() => onPressUser(user)}
-                    >
-                      <View style={styles.avatarContainer}>
-                        <Avatar userId={userUID} />
-                      </View>
-                      <Text style={styles.name}>{userName.split(" ")[0]}</Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-            </>
           ) : null
         }
       />
@@ -500,7 +473,7 @@ const styles = StyleSheet.create({
 
   alphabetContainer: {
     position: "absolute",
-    right: 0,
+    right: 8,
     top: 0,
     bottom: 0,
     justifyContent: "center",
@@ -513,7 +486,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   alphabetText: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "SF_Pro_Display_Regular",
     color: Colors.primary,
   },

@@ -462,7 +462,7 @@ export default function ChatComponent({
         }}
         messagesContainerStyle={{
           paddingTop: carGroups && carGroups.length > 0 ? 100 : 0,
-          paddingBottom: 40,
+          paddingBottom: 60,
         }}
         bottomOffset={0}
         renderAvatar={null}

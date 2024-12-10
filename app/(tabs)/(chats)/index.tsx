@@ -56,7 +56,7 @@ function useNotificationObserver(
 
     async function handleNotification() {
       fetchConversations();
-      // fetchGroupConversations();
+      fetchGroupConversations();
       try {
         Notifications.setBadgeCountAsync(0);
         Notifications.dismissAllNotificationsAsync();
@@ -109,6 +109,8 @@ export default function Chats() {
     return unreadCount > 0;
   });
 
+  console.log({ isFocused });
+
   useFocusEffect(
     useCallback(() => {
       fetchConversations();
@@ -146,12 +148,16 @@ export default function Chats() {
   useEffect(() => {
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
       fetchConversations();
-      fetchGroupConversations();
+      if (isFocused) {
+        fetchGroupConversations();
+      }
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       fetchConversations();
-      fetchGroupConversations();
+      if (isFocused) {
+        fetchGroupConversations();
+      }
     });
 
     return () => {
@@ -160,14 +166,16 @@ export default function Chats() {
       responseListener.current &&
         Notifications.removeNotificationSubscription(responseListener.current);
     };
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
         try {
           fetchConversations();
-          fetchGroupConversations();
+          if (isFocused) {
+            fetchGroupConversations();
+          }
           Notifications.setBadgeCountAsync(0);
           Notifications.dismissAllNotificationsAsync();
         } catch (error) {
@@ -179,14 +187,14 @@ export default function Chats() {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
     fetchConversations();
     if (isFocused) {
       fetchGroupConversations();
     }
-  }, [unreadCount]);
+  }, [unreadCount, isFocused]);
 
   const filteredPhoneContacts = phoneContacts.filter((contact) => {
     if (!searchText) return false;
