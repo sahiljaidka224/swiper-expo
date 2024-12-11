@@ -20,6 +20,7 @@ const options = [
   { name: "Highest Price", orderBy: "price", orderDirection: "desc" },
   { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
   { name: "Highest Mileage", orderBy: "odometer", orderDirection: "desc" },
+  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Cancel", orderBy: "", orderDirection: "" },
 ];
 
@@ -33,9 +34,13 @@ export default function MyStockPage() {
     orderDirection: "desc",
   });
 
-  useEffect(() => {
+  const onUpdateCarsCount = () => {
     if (!token || !user?.org?.id) return;
     getCarsCount({ token });
+  };
+
+  useEffect(() => {
+    onUpdateCarsCount();
   }, []);
 
   const onShowActionSheet = () => {
@@ -73,6 +78,7 @@ export default function MyStockPage() {
         context="stock"
         orderBy={orderState.orderBy}
         orderDirection={orderState.orderDirection}
+        onUpdateCarsCount={onUpdateCarsCount}
       />
     </View>
   );

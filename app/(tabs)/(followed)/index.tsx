@@ -17,6 +17,7 @@ const options = [
   { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
   { name: "Highest Mileage", orderBy: "odometer", orderDirection: "desc" },
   { name: "Reset", orderBy: "dateCreate", orderDirection: "desc" },
+  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Cancel", orderBy: "", orderDirection: "" },
 ];
 

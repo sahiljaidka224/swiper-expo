@@ -29,7 +29,7 @@ export default function CarDetailPage() {
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const segments = useSegments();
-  const { id } = useLocalSearchParams();
+  const { id, showMessage } = useLocalSearchParams();
   const { car, isLoading, error, refetch } = useGetCarDetails(id as string);
 
   useEffect(() => {
@@ -136,6 +136,7 @@ export default function CarDetailPage() {
               setIsEdit={setIsEdit}
               refetchCar={refetch}
               selectedImages={selectedImages}
+              showMessageBox={showMessage ? showMessage === "true" : true}
             />
           </>
         )}

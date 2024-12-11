@@ -26,6 +26,7 @@ interface CarsListProps {
   orderBy: string;
   orderDirection: string;
   orgId?: string;
+  onUpdateCarsCount?: () => void;
 }
 
 export function CarsList({
@@ -33,6 +34,7 @@ export function CarsList({
   orderBy = "dateCreate",
   orderDirection = "desc",
   orgId,
+  onUpdateCarsCount,
 }: CarsListProps) {
   const { token, user } = useAuth();
   const {
@@ -62,6 +64,8 @@ export function CarsList({
     useCallback(() => {
       refresh();
 
+      if (onUpdateCarsCount) onUpdateCarsCount();
+
       return () => {};
     }, [])
   );
@@ -69,6 +73,10 @@ export function CarsList({
   useEffect(() => {
     if (watchlistCars || stockCars) {
       showToast("Success", "Updated successfully", "success");
+    }
+
+    if (!isStockDelMutating && stockCars && onUpdateCarsCount) {
+      onUpdateCarsCount();
     }
   }, [watchlistCars, stockCars]);
 

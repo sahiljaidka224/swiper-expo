@@ -162,7 +162,7 @@ const GroupInfo = ({
 
     router.navigate({
       pathname: `/(tabs)/${segments[1]}/car/[id]`,
-      params: { id: metadata?.carId },
+      params: { id: metadata?.carId, showMessage: "false" },
     });
   };
 

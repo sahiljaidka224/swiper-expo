@@ -1,8 +1,10 @@
 import { useGetCarDetails } from "@/api/hooks/car-detail";
+import { useManualSearch } from "@/api/hooks/car-search";
 import { useUserOrgName } from "@/api/hooks/user";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import ErrorView from "@/components/Error";
+import { SegmentedControl } from "@/components/SegmentedControl";
 import Text from "@/components/Text";
 import { showToast } from "@/components/Toast";
 import Colors from "@/constants/Colors";
@@ -10,11 +12,13 @@ import { useAuth } from "@/context/AuthContext";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import { useSendMessage } from "@/hooks/cometchat/messages";
 import { useGetCometChatUsers } from "@/hooks/cometchat/users";
+import { debounce } from "@/utils";
 import { formatTimestamp, isActiveToday } from "@/utils/cometchat";
 import { CometChat } from "@cometchat/chat-sdk-react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, EvilIcons, FontAwesome5 } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import { router, Stack, useLocalSearchParams, useSegments } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -28,6 +32,9 @@ import {
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+
+const options = ["Users", "Dealerships"];
 
 export default function UsersListPage() {
   const segments = useSegments();
@@ -36,6 +43,8 @@ export default function UsersListPage() {
     allowMultiple?: string;
     uri: string;
   }>();
+
+  const [mode, setMode] = useState<string>("Users");
 
   const multipleSelectionAllowed =
     segments.includes("(stock)") ||
@@ -63,6 +72,10 @@ export default function UsersListPage() {
     isLoading: carDetailsLoading,
     error: carDetailsError,
   } = useGetCarDetails(carId as string);
+  const { token } = useAuth();
+  const { triggerManualSearch, organisations, isMutating } = useManualSearch();
+  const [orgsData, setOrgsData] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
 
   const [selectedUsers, setSelectedUsers] = useState<CometChat.User[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -77,6 +90,12 @@ export default function UsersListPage() {
       router.back();
     }
   }, [isGroupCreateLoading, groupCreateError]);
+
+  useEffect(() => {
+    if (!isMutating && organisations && organisations.length > 0) {
+      setOrgsData(organisations);
+    }
+  }, [organisations]);
 
   useEffect(() => {
     if (!isSendingMessage && !sendMessageError && forwardMediaMode && selectedUsers.length) {
@@ -112,6 +131,29 @@ export default function UsersListPage() {
       title: letter,
       data: groupedUsers[letter],
     }));
+
+  const fetchSearchResults = async (searchTerm: string) => {
+    if (!token) return;
+    try {
+      console.log("Fetching data...");
+      triggerManualSearch({ token, searchTerm });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+    }
+  };
+
+  const debouncedSearch = useCallback(debounce(fetchSearchResults, 500), []);
+
+  const handleSearch = (text: string) => {
+    if (text.length === 0) {
+      setOrgsData([]);
+    }
+    setSearchText(text);
+    if (!multipleSelectionAllowed) {
+      debouncedSearch(text);
+    }
+  };
 
   const keyExtractor = (item: CometChat.User) => item.getUid();
 
@@ -237,7 +279,51 @@ export default function UsersListPage() {
     }
   };
 
-  const onlineUsers = users.filter((user) => isActiveToday(user.getLastActiveAt()));
+  const loadMore = () => {
+    if (!isMutating && orgsData?.length > 0) {
+      setPage(page + 1);
+      // fetchMore();
+    }
+  };
+
+  const renderItemOrgs = useCallback(
+    ({ item, index }: { item: any; index: number }) => {
+      return (
+        <Animated.View
+          style={[styles.itemWrapper, { paddingHorizontal: 10 }]}
+          entering={FadeInUp.delay(index * 10)}
+          exiting={FadeOutUp}
+        >
+          <Pressable
+            style={styles.userContainer}
+            onPress={() => {
+              router.push({
+                pathname: `/(tabs)/user/[user]`,
+                params: { id: item.ownerUserId, orgId: item.organisationId },
+              });
+            }}
+          >
+            <View style={styles.leftContainer}>
+              <View style={styles.avatarContainer}>
+                <Avatar userId={""} isCar />
+              </View>
+              <View>
+                <Text style={styles.name}>{item.name}</Text>
+                {item.address && (
+                  <View style={styles.addressContainer}>
+                    <FontAwesome5 name="map-marker-alt" size={16} color={Colors.red} />
+                    <Text style={styles.addressText}>{item?.address}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+            <EvilIcons name="chevron-right" size={24} color={Colors.iconGray} />
+          </Pressable>
+        </Animated.View>
+      );
+    },
+    [orgsData]
+  );
 
   return (
     <KeyboardAvoidingView
@@ -250,95 +336,139 @@ export default function UsersListPage() {
       />
       <TextInput
         style={styles.searchInput}
-        placeholder="Search all Swiper users..."
+        placeholder={`${mode === "Users" ? "Search all Swiper Users..." : "Search Dealerships..."}`}
         value={searchText}
-        onChangeText={setSearchText}
+        onChangeText={handleSearch}
         clearButtonMode="while-editing"
         maxFontSizeMultiplier={1.3}
       />
-      {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
       {error && <ErrorView />}
+      {!multipleSelectionAllowed ? (
+        <View style={{ alignItems: "center" }}>
+          <SegmentedControl
+            options={options}
+            selectedOption={mode}
+            onOptionPress={setMode}
+            width={300}
+          />
+        </View>
+      ) : null}
 
-      <SectionList
-        getItemLayout={(data, index) => ({
-          length: styles.userContainer.height,
-          offset: styles.userContainer.height * index,
-          index,
-        })}
-        onScrollToIndexFailed={() => {
-          console.log("onScrollToIndexFailed");
-        }}
-        ref={sectionListRef}
-        keyboardShouldPersistTaps="handled"
-        sections={sections}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>{title}</Text>
-          </View>
-        )}
-        ListHeaderComponent={
-          multipleSelectionAllowed && selectedUsers && selectedUsers.length > 0 ? (
-            <>
-              <Text style={styles.forwardText}>
-                {forwardMediaMode
-                  ? "Forwarding to these Swiper Users"
-                  : "Pushing to these Swiper Users"}
-              </Text>
-              <ScrollView
-                style={{ backgroundColor: Colors.background, padding: 10, minHeight: 100 }}
-                horizontal
-              >
-                {selectedUsers.map((user) => {
-                  const userUID = user.getUid();
-                  const userName = user.getName();
+      {mode === "Users" && (
+        <SectionList
+          getItemLayout={(data, index) => ({
+            length: styles.userContainer.height,
+            offset: styles.userContainer.height * index,
+            index,
+          })}
+          onScrollToIndexFailed={() => {
+            console.log("onScrollToIndexFailed");
+          }}
+          ref={sectionListRef}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          sections={sections}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          renderSectionHeader={({ section: { title } }) => (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>{title}</Text>
+            </View>
+          )}
+          ListHeaderComponent={
+            multipleSelectionAllowed && selectedUsers && selectedUsers.length > 0 ? (
+              <>
+                <Text style={styles.forwardText}>
+                  {forwardMediaMode
+                    ? "Forwarding to these Swiper Users"
+                    : "Pushing to these Swiper Users"}
+                </Text>
+                <ScrollView
+                  style={{ backgroundColor: Colors.background, padding: 10, minHeight: 100 }}
+                  horizontal
+                >
+                  {selectedUsers.map((user) => {
+                    const userUID = user.getUid();
+                    const userName = user.getName();
 
-                  return (
-                    <View key={userUID} style={{ margin: 5, alignItems: "center" }}>
-                      <View style={styles.avatarContainer}>
-                        <Avatar userId={userUID} />
+                    return (
+                      <View key={userUID} style={{ margin: 5, alignItems: "center" }}>
+                        <View style={styles.avatarContainer}>
+                          <Avatar userId={userUID} />
+                        </View>
+                        <Text style={styles.name}>{userName.split(" ")[0]}</Text>
                       </View>
-                      <Text style={styles.name}>{userName.split(" ")[0]}</Text>
-                    </View>
-                  );
-                })}
-              </ScrollView>
-              {!forwardMediaMode ? (
-                <TextInput
-                  placeholder="Write a message"
-                  style={styles.sendMessageInput}
-                  multiline
-                  value={textInputValue}
-                  onChangeText={setTextInputValue}
-                  maxFontSizeMultiplier={1.3}
-                />
-              ) : null}
-              <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
-                <Button
-                  title="Send Now"
-                  onPress={onPressSendNow}
-                  type="primary"
-                  isLoading={isGroupCreateLoading || isSendingMessage}
-                />
-              </View>
-            </>
-          ) : null
-        }
-      />
-      <View style={styles.alphabetContainer}>
-        {alphabet.map((letter) => (
-          <TouchableOpacity
-            key={letter}
-            onPress={() => scrollToSection(letter)}
-            style={styles.alphabetButton}
-          >
-            <Text style={styles.alphabetText} maxFontSizeMultiplier={1}>
-              {letter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+                    );
+                  })}
+                </ScrollView>
+                {!forwardMediaMode ? (
+                  <TextInput
+                    placeholder="Write a message"
+                    style={styles.sendMessageInput}
+                    multiline
+                    value={textInputValue}
+                    onChangeText={setTextInputValue}
+                    maxFontSizeMultiplier={1.3}
+                  />
+                ) : null}
+                <View style={{ paddingHorizontal: 20, paddingVertical: 10, height: 70 }}>
+                  <Button
+                    title="Send Now"
+                    onPress={onPressSendNow}
+                    type="primary"
+                    isLoading={isGroupCreateLoading || isSendingMessage}
+                  />
+                </View>
+              </>
+            ) : null
+          }
+        />
+      )}
+      {loading && !users.length && <ActivityIndicator size="large" color={Colors.primary} />}
+      {isMutating && <ActivityIndicator size="large" color={Colors.primary} />}
+
+      {mode === "Users" && (
+        <View style={styles.alphabetContainer}>
+          {alphabet.map((letter) => (
+            <TouchableOpacity
+              key={letter}
+              onPress={() => scrollToSection(letter)}
+              style={styles.alphabetButton}
+            >
+              <Text style={styles.alphabetText} maxFontSizeMultiplier={1}>
+                {letter}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+      {mode === "Dealerships" && !multipleSelectionAllowed ? (
+        <FlashList
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{ paddingBottom: 40 }}
+          refreshing={isMutating && !orgsData}
+          keyExtractor={(item) => item.organisationId}
+          scrollEnabled={true}
+          data={orgsData}
+          estimatedItemSize={80}
+          ItemSeparatorComponent={() => (
+            <View style={styles.itemSeperatorContainer}>
+              <View style={styles.itemSeperator} />
+            </View>
+          )}
+          ListFooterComponent={() =>
+            isMutating && orgsData?.length > 0 ? (
+              <ActivityIndicator size="large" color={Colors.primary} />
+            ) : null
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          renderItem={renderItemOrgs}
+          ListEmptyComponent={null}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
@@ -388,7 +518,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     paddingBottom: 60,
   },
-  leftContainer: { flexDirection: "row", alignItems: "center", gap: 10 },
+  leftContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    maxWidth: "85%",
+    paddingRight: 10,
+  },
   avatarContainer: { width: 50, height: 50, borderRadius: 25 },
   userContainer: {
     flexDirection: "row",
@@ -462,7 +598,7 @@ const styles = StyleSheet.create({
     height: 25,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 25,
   },
   forwardText: {
     fontFamily: "SF_Pro_Display_Regular",
@@ -489,5 +625,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "SF_Pro_Display_Regular",
     color: Colors.primary,
+  },
+
+  itemWrapper: {
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    paddingVertical: 15,
+  },
+  addressContainer: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+  },
+  addressText: {
+    color: Colors.textLight,
+    fontSize: 16,
+    fontFamily: "SF_Pro_Display_Regular",
+  },
+
+  itemSeperatorContainer: {
+    paddingHorizontal: 10,
+  },
+  itemSeperator: {
+    borderBottomColor: Colors.borderGray,
+    borderBottomWidth: 1,
+    paddingHorizontal: "10%",
   },
 });

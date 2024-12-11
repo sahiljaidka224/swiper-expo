@@ -44,6 +44,7 @@ interface CarDetailProps {
   setIsEdit?: (isEdit: boolean) => void;
   refetchCar?: () => void;
   selectedImages?: SelectedImage[];
+  showMessageBox?: boolean;
 }
 
 function CarDetail({
@@ -53,6 +54,7 @@ function CarDetail({
   setIsEdit,
   refetchCar,
   selectedImages,
+  showMessageBox = true,
 }: CarDetailProps) {
   const [car, setCarDetails] = React.useState<any>(carDetails);
   const [editedFields, setEditedFields] = React.useState<{ [key: string]: any }>({}); // Track edited values
@@ -349,7 +351,7 @@ function CarDetail({
             {isEditing ? (
               <Button onPress={updateStock} title="Update Stock" isLoading={isMutating} />
             ) : context &&
-              !context?.includes("chats") &&
+              showMessageBox &&
               context?.includes("stock") &&
               car?.organisationId === user?.org?.id ? (
               <StockButtonContainer
@@ -357,7 +359,7 @@ function CarDetail({
                 onPushToSwiperContacts={onSendToPhoneContacts}
                 showSMSOption
               />
-            ) : context && !context?.includes("chats") && car?.organisationId !== user?.org?.id ? (
+            ) : context && showMessageBox && car?.organisationId !== user?.org?.id ? (
               <>
                 <ContactCard
                   name={car?.primaryContact?.displayName ?? ""}

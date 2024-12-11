@@ -23,18 +23,7 @@ import { CometChat } from "@cometchat/chat-sdk-react-native";
 import { useCreateGroup } from "@/hooks/cometchat/groups";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import EvilIcons from "@expo/vector-icons/build/EvilIcons";
-
-const debounce = (func: (...args: any[]) => void, delay: number): ((...args: any[]) => void) => {
-  let timeoutId: NodeJS.Timeout;
-
-  return (...args: any[]) => {
-    clearTimeout(timeoutId);
-
-    timeoutId = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-};
+import { debounce } from "@/utils";
 
 const options = ["Cars", "Dealerships"];
 export default function ManualSearch() {
@@ -85,7 +74,6 @@ export default function ManualSearch() {
     }
   };
 
-  // const debouncedSearch = debounce(fetchSearchResults, 500);
   const debouncedSearch = useCallback(debounce(fetchSearchResults, 500), []);
 
   const handleSearch = (text: string) => {

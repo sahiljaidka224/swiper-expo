@@ -109,8 +109,6 @@ export default function Chats() {
     return unreadCount > 0;
   });
 
-  console.log({ isFocused });
-
   useFocusEffect(
     useCallback(() => {
       fetchConversations();
