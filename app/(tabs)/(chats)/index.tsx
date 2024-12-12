@@ -559,7 +559,7 @@ const AnimatedItem = ({
 
   React.useEffect(() => {
     translateY.value = withDelay(
-      index * 100,
+      250 + index * 100,
       withSpring(0, {
         damping: 10,
         stiffness: 100,
@@ -569,7 +569,7 @@ const AnimatedItem = ({
         restSpeedThreshold: 0.01,
       })
     );
-    opacity.value = withDelay(index * 100, withTiming(1, { duration: 500 }));
+    opacity.value = withDelay(150 + index * 100, withTiming(1, { duration: 500 }));
 
     onPlayLandingSound && onPlayLandingSound();
   }, []);
