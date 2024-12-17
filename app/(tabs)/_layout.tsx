@@ -6,11 +6,13 @@ import { useGetUnreadMessages } from "@/hooks/cometchat/messages";
 import { Image } from "expo-image";
 import { Tabs, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { AppState, Platform, View } from "react-native";
+import { AppState, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import analytics from "@react-native-firebase/analytics";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TabsRootLayout() {
+  const { user } = useAuth();
   const segments = useSegments();
   const { getUnreadMessages } = useGetUnreadMessages();
   const { unreadCount } = useMessageContext();
@@ -22,10 +24,18 @@ export default function TabsRootLayout() {
   useEffect(() => {
     (async () => {
       try {
+        await analytics().setUserId(user?.id ?? "");
+        await analytics().setUserProperties(
+          { userId: user?.id ?? "", userName: user?.name ?? "" },
+          { global: true }
+        );
+
         await analytics().logScreenView({
           screen_name: segments.length > 1 ? segments[1] : segments[0],
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log("Error setting user properties", error);
+      }
     })();
   }, [segments]);
 

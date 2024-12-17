@@ -8,6 +8,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useState } from "react";
 
 const options = [
+  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Make A - Z", orderBy: "make", orderDirection: "asc" },
   { name: "Make Z - A", orderBy: "make", orderDirection: "desc" },
   { name: "Newest Year", orderBy: "year", orderDirection: "desc" },
@@ -17,7 +18,6 @@ const options = [
   { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
   { name: "Highest Mileage", orderBy: "odometer", orderDirection: "desc" },
   { name: "Reset", orderBy: "dateCreate", orderDirection: "desc" },
-  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Cancel", orderBy: "", orderDirection: "" },
 ];
 

@@ -306,11 +306,9 @@ export default function SwiperPage() {
                   >
                     Transmission
                   </Text>
-                  {item?.transmission && (
-                    <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
-                      {checkNull(item?.transmission)}
-                    </Text>
-                  )}
+                  <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
+                    {checkNull(item?.transmission)}
+                  </Text>
                 </View>
 
                 <View>
@@ -325,11 +323,9 @@ export default function SwiperPage() {
                   >
                     Series
                   </Text>
-                  {item?.series && (
-                    <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
-                      {checkNull(item?.series)}
-                    </Text>
-                  )}
+                  <Text maxFontSizeMultiplier={1.1} style={styles.descriptionValue}>
+                    {checkNull(item?.series)}
+                  </Text>
                 </View>
               </View>
             </View>

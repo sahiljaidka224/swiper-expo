@@ -10,6 +10,7 @@ import { useSearchCarsCountWithOrg } from "@/api/hooks/car-search";
 import { useAuth } from "@/context/AuthContext";
 
 const options = [
+  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Make A - Z", orderBy: "make", orderDirection: "asc" },
   { name: "Make Z - A", orderBy: "make", orderDirection: "desc" },
   { name: "Newest in Stock", orderBy: "daysInStock", orderDirection: "asc" },
@@ -20,7 +21,6 @@ const options = [
   { name: "Highest Price", orderBy: "price", orderDirection: "desc" },
   { name: "Lowest Mileage", orderBy: "odometer", orderDirection: "asc" },
   { name: "Highest Mileage", orderBy: "odometer", orderDirection: "desc" },
-  { name: "Active Chats", orderBy: "dateCreate", orderDirection: "desc" },
   { name: "Cancel", orderBy: "", orderDirection: "" },
 ];
 
@@ -66,7 +66,7 @@ export default function MyStockPage() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: `My Stock ${carsCount && carsCount.length ? `(${carsCount[0].num} Cars)` : ""}`,
+          title: `My Stock${carsCount && carsCount.length ? `: ${carsCount[0].num}` : ""}`,
           headerRight: () => (
             <Pressable onPress={onShowActionSheet}>
               <MaterialIcons name="sort" size={24} color={Colors.iconGray} />

@@ -11,6 +11,7 @@ export default function AddStockLayout() {
           name="index"
           options={{
             title: "Add Stock",
+            headerTintColor: Colors.primary,
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
@@ -21,8 +22,8 @@ export default function AddStockLayout() {
           name="users-list/index"
           options={{
             title: "Recipients",
+            headerTintColor: Colors.primary,
             headerBackTitle: "",
-            // presentation: "modal",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
           }}

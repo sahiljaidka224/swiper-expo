@@ -5,10 +5,9 @@ import {
   Pressable,
   Platform,
   FlatList,
-  Keyboard,
   TouchableOpacity,
 } from "react-native";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   Bubble,
   Composer,
@@ -28,7 +27,6 @@ import {
 import TypingIndicator from "react-native-gifted-chat/lib/TypingIndicator";
 import { Image } from "expo-image";
 import dayjs from "dayjs";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
@@ -87,6 +85,7 @@ interface ChatComponentProps {
   groupMembers?: CometChat.User[] | null;
 }
 
+const ITEM_WIDTH = 70;
 export default function ChatComponent({
   userId,
   messages,
@@ -104,7 +103,6 @@ export default function ChatComponent({
 }: ChatComponentProps) {
   const headerHeight = useHeaderHeight();
   const { user } = useAuth();
-  const insets = useSafeAreaInsets();
   const [assets] = useAssets([backroundPattern]);
   const [text, setText] = useState<string>("");
   const [isGalleryVisible, setGalleryVisible] = useState<boolean>(false);
@@ -118,51 +116,76 @@ export default function ChatComponent({
   } = useSendMessage();
   const { sendMediaMessage: sendGroupMediaMessage } = useSendGroupMessage();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
+  const garageSoundRef = useRef<Audio.Sound | null>(null);
   const [sound, setSound] = useState<Sound>();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [garageSound, setGarageSound] = useState<Sound>();
+
+  const [soundQueue, setSoundQueue] = useState([]);
+  const currentVisibleIndices = useRef(new Set());
+  const pendingItems = useRef(new Set());
+  const debounceTimer = useRef<any | null>(null);
+
+  const loadGarageSound = async () => {
+    const { sound } = await Audio.Sound.createAsync(garageAsset);
+    garageSoundRef.current = sound;
+  };
 
   useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+    loadGarageSound();
 
-  useEffect(() => {
-    return garageSound
-      ? () => {
-          garageSound.unloadAsync();
-        }
-      : undefined;
-  }, [garageSound]);
+    return () => {
+      if (garageSoundRef.current) {
+        garageSoundRef.current.unloadAsync();
+      }
 
-  async function playGarageSound() {
+      if (sound) {
+        sound.unloadAsync();
+      }
+
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
+
+  const playGarageSound = async () => {
     try {
-      if (isPlaying) return;
-      setIsPlaying(true);
       const { sound } = await Audio.Sound.createAsync(garageAsset);
-      setGarageSound(sound);
-
-      await sound.playAsync();
-
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (!status.isLoaded) {
-          if (status.error) {
-            console.log(`Encountered a fatal error during playback: ${status.error}`);
-          }
-        } else {
-          if (status.didJustFinish) {
-            setIsPlaying(false);
-            sound.unloadAsync();
-          }
-        }
-      });
+      garageSoundRef.current = sound;
+      console.log("datee", Date.now());
+      await sound.replayAsync();
     } catch (error) {
-      console.log("error", error);
+      console.error("Error playing sound:", error);
     }
-  }
+  };
+
+  useEffect(() => {
+    // const playGarageSound = async () => {
+    //   try {
+    //     const { sound } = await Audio.Sound.createAsync(garageAsset);
+    //     garageSoundRef.current = sound;
+    //     console.log("datee", Date.now());
+    //     await sound.replayAsync();
+    //   } catch (error) {
+    //     console.error("Error playing sound:", error);
+    //   }
+    // };
+    // // Handle sound queue
+    // const processQueue = async () => {
+    //   console.log("processQueue", soundQueue.length);
+    //   if (soundQueue.length > 0) {
+    //     soundQueue.shift();
+    //     setSoundQueue([...soundQueue]);
+    //     await playGarageSound();
+    //     setTimeout(() => processQueue(), 100);
+    //   }
+    // };
+    // if (soundQueue.length > 0) {
+    //   processQueue();
+    // }
+    // return () => {
+    //   if (garageSoundRef.current) {
+    //     garageSoundRef.current.unloadAsync();
+    //   }
+    // };
+  }, [soundQueue]);
 
   async function playSound() {
     try {
@@ -343,6 +366,34 @@ export default function ChatComponent({
     playSound();
   };
 
+  const debounceUpdateQueue = () => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    debounceTimer.current = setTimeout(() => {
+      console.log("debounceUpdateQueue", pendingItems.current.size);
+      setSoundQueue((prevQueue) => {
+        const newItems = Array.from(pendingItems.current);
+        pendingItems.current.clear();
+
+        return [...prevQueue, ...newItems].slice(0, 3);
+      });
+    }, 50);
+  };
+
+  const onViewableItemsChanged = useRef(({ changed }: { changed: any }) => {
+    if (changed.length > 3) return;
+    changed.forEach((item: { isViewable: any; index: unknown; item: any }) => {
+      if (!item.isViewable && !currentVisibleIndices.current.has(item.index)) {
+        currentVisibleIndices.current.add(item.index);
+        pendingItems.current.add(item.item);
+        playGarageSound();
+        // debounceUpdateQueue();
+      } else if (item.isViewable) {
+        currentVisibleIndices.current.delete(item.index);
+      }
+    });
+  });
+
   return (
     <ImageBackground
       source={assets ? assets[0] : backroundPattern}
@@ -358,18 +409,29 @@ export default function ChatComponent({
       {carGroups && carGroups.length > 0 ? (
         <View style={styles.carGroupWrapper}>
           <FlatList<CometChat.Conversation>
-            data={carGroups}
-            style={{ paddingHorizontal: 10, paddingVertical: 5 }}
-            keyExtractor={(item: unknown) => {
+            data={[...carGroups, ...carGroups, ...carGroups]}
+            keyExtractor={(item: unknown, index: number) => {
               const conversation = item as CometChat.Conversation;
-              return conversation.getConversationId();
+              return String(index);
             }}
             renderItem={({ item, index }) => <HorizontalItem item={item} index={index} />}
             horizontal
             showsHorizontalScrollIndicator={false}
-            onScrollBeginDrag={() => {
-              playGarageSound();
+            scrollEventThrottle={16}
+            onMomentumScrollEnd={() => {
+              setSoundQueue([]);
             }}
+            onViewableItemsChanged={onViewableItemsChanged.current}
+            viewabilityConfig={{
+              itemVisiblePercentThreshold: 10,
+              waitForInteraction: true,
+              // minimumViewTime: 100,
+            }}
+            getItemLayout={(data, index) => ({
+              length: ITEM_WIDTH,
+              offset: ITEM_WIDTH * index,
+              index,
+            })}
           />
         </View>
       ) : null}
@@ -841,7 +903,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     elevation: 5,
   },
   composer: {

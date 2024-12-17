@@ -1,3 +1,4 @@
+import Colors from "@/constants/Colors";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { Stack } from "expo-router";
 import { Platform } from "react-native";
@@ -10,6 +11,7 @@ export default function WatchlistLayout() {
           name="index"
           options={{
             title: "Watchlist",
+            headerTintColor: Colors.primary,
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
@@ -20,6 +22,7 @@ export default function WatchlistLayout() {
           name="car/[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
           }}
@@ -28,6 +31,7 @@ export default function WatchlistLayout() {
           name="user/[user]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
           }}
         />
         <Stack.Screen
@@ -35,6 +39,7 @@ export default function WatchlistLayout() {
           options={{
             title: "",
             headerBackTitle: "",
+            headerTintColor: Colors.primary,
             headerBackTitleVisible: false,
             animation: "fade",
           }}

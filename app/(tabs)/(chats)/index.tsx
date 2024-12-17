@@ -268,6 +268,7 @@ export default function Chats() {
             fetchConversations();
             fetchGroupConversations();
           }}
+          searchActive={!!searchText}
         />
       );
     },

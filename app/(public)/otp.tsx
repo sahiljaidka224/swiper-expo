@@ -127,7 +127,7 @@ export default function OTPPage() {
                 styles.input,
                 { color: password.length >= 6 ? Colors.primary : Colors.textDark },
               ]}
-              placeholder="Enter Password"
+              placeholder="Enter a Password"
               secureTextEntry={secureTextEntry}
               onChangeText={setPassword}
               placeholderTextColor={Colors.gray}

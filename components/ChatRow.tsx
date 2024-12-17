@@ -27,9 +27,10 @@ interface ChatRowProps {
   conversation: CometChat.Conversation;
   index: number;
   refetch: () => void;
+  searchActive: boolean;
 }
 
-export default function ChatRow({ conversation, index, refetch }: ChatRowProps) {
+export default function ChatRow({ conversation, index, refetch, searchActive }: ChatRowProps) {
   const { hasReadGroup } = useHideSenderContext();
   const { user } = useAuth();
   const { markAsRead } = useMarkMessageAsRead();
@@ -86,7 +87,8 @@ export default function ChatRow({ conversation, index, refetch }: ChatRowProps) 
   if (
     !hasReadGroup(userUID as string) &&
     lastMessage instanceof CometChat.CustomMessage &&
-    !isOutgoingMsg
+    !isOutgoingMsg &&
+    !searchActive
   ) {
     return null;
   }

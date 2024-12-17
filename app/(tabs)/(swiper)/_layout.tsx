@@ -24,6 +24,7 @@ export default function SwiperLayout() {
           name="index"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerShown: true,
             headerLargeTitle: false,
             headerShadowVisible: false,
@@ -68,6 +69,7 @@ export default function SwiperLayout() {
           name="car/[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
           }}
@@ -76,18 +78,21 @@ export default function SwiperLayout() {
           name="search"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
           }}
         />
         <Stack.Screen
           name="search-results"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
           }}
         />
         <Stack.Screen
           name="manual-search"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
           }}
         />
 
@@ -95,6 +100,7 @@ export default function SwiperLayout() {
           name="new-chat/[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerBackTitle: "",
             headerBackTitleVisible: false,
             animation: "fade",

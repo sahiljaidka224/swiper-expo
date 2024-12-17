@@ -60,18 +60,26 @@ export default function CameraView({
     }
   }, [isCameraVisible]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    flex: 1,
-    ...StyleSheet.absoluteFillObject,
-    bottom: interpolate(animationProgress.value, [0, 1], [20, 0]),
-    right: interpolate(animationProgress.value, [0, 1], [20, 0]),
-    width: interpolate(animationProgress.value, [0, 1], [80, screenWidth]),
-    height: interpolate(animationProgress.value, [0, 1], [80, screenHeight]),
-    borderRadius: interpolate(animationProgress.value, [0, 1], [40, 0]),
-    backgroundColor: "#000",
-    overflow: "hidden",
-    zIndex: 100,
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    const centerX = screenWidth / 2;
+
+    const size = interpolate(animationProgress.value, [0, 1], [80, screenWidth]);
+
+    return {
+      flex: 1,
+      ...StyleSheet.absoluteFillObject,
+      top: interpolate(animationProgress.value, [0, 1], [150, 0]),
+      left: centerX - size / 2,
+      right: centerX - size / 2,
+
+      width: interpolate(animationProgress.value, [0, 1], [80, screenWidth]),
+      height: interpolate(animationProgress.value, [0, 1], [80, screenHeight]),
+      borderRadius: interpolate(animationProgress.value, [0, 1], [40, 0]),
+      backgroundColor: "#000",
+      overflow: "hidden",
+      zIndex: 100,
+    };
+  });
 
   if (!permission) {
     return null;

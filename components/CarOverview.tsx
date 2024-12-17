@@ -32,6 +32,8 @@ function CarOverview({
     });
   };
 
+  const carImages = car?.images ?? [];
+
   if (!showDetails) {
     return (
       <AnimatedPressable
@@ -46,7 +48,9 @@ function CarOverview({
         >
           <Image
             placeholder={carPlaceholder}
-            source={{ uri: car?.images[0]?.url }}
+            source={{
+              uri: carImages.length > 0 ? carImages[0]?.url : undefined,
+            }}
             style={[
               styles.itemCarImage,
               {
@@ -56,10 +60,10 @@ function CarOverview({
                 borderBottomRightRadius: 0,
                 borderWidth: 0,
               },
-              !car?.images[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
+              !carImages[0]?.url ? { borderRadius: 0, borderWidth: 0 } : {},
             ]}
             contentFit="cover"
-            recyclingKey={car?.images[0]?.carImageId}
+            recyclingKey={carImages[0]?.carImageId}
             placeholderContentFit="fill"
           />
         </View>
@@ -121,10 +125,12 @@ function CarOverview({
       >
         <AnimatedImage
           placeholder={carPlaceholder}
-          source={{ uri: car?.images[0]?.url }}
+          source={{ uri: carImages.length > 0 ? carImages[0]?.url : undefined }}
           style={[
             styles.itemCarImage,
-            !car?.images[0]?.url ? { marginLeft: -12, borderRadius: 0, borderWidth: 0 } : {},
+            carImages.length > 0 && carImages[0]?.url
+              ? {}
+              : { marginLeft: -12, borderRadius: 0, borderWidth: 0 },
           ]}
           recyclingKey={car?.images[0]?.carImageId}
           placeholderContentFit="cover"

@@ -273,7 +273,7 @@ export default function ProfileComponent({ context }: ProfileProps) {
             if (context === "update")
               return (
                 <Pressable onPress={onLogout}>
-                  <Text style={{ color: Colors.primary, fontSize: 18 }} maxFontSizeMultiplier={1.1}>
+                  <Text style={{ color: Colors.primary, fontSize: 14 }} maxFontSizeMultiplier={1.1}>
                     Logout
                   </Text>
                 </Pressable>

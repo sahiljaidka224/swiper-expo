@@ -39,6 +39,7 @@ export default function ChatsLayout() {
           name="index"
           options={{
             title: "Chats",
+            headerTintColor: Colors.primary,
             headerLargeTitle: false,
             headerBlurEffect: "regular",
             headerTitleAlign: "center",
@@ -51,6 +52,7 @@ export default function ChatsLayout() {
           name="settings"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
@@ -58,6 +60,7 @@ export default function ChatsLayout() {
           name="feed"
           options={{
             title: "Media",
+            headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
@@ -65,6 +68,7 @@ export default function ChatsLayout() {
           name="feed-readmore"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
           }}
         />
@@ -72,6 +76,7 @@ export default function ChatsLayout() {
           name="car/[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
           }}
@@ -80,6 +85,7 @@ export default function ChatsLayout() {
           name="new-chat/[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
@@ -89,6 +95,7 @@ export default function ChatsLayout() {
         <Stack.Screen
           name="users-list/index"
           options={{
+            headerTintColor: Colors.primary,
             title: "Swiper Users",
             headerBackTitle: "",
             headerBackTitleVisible: false,
@@ -100,6 +107,7 @@ export default function ChatsLayout() {
           name="[id]"
           options={{
             title: "",
+            headerTintColor: Colors.primary,
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
             animation: "fade",
@@ -108,6 +116,7 @@ export default function ChatsLayout() {
         <Stack.Screen
           name="user/[user]"
           options={{
+            headerTintColor: Colors.primary,
             title: "",
             headerBackTitle: "",
             headerBackTitleVisible: false,

@@ -12,6 +12,7 @@ export default function MyStockLayout() {
           name="index"
           options={{
             title: "My Stock",
+            headerTintColor: Colors.primary,
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerBlurEffect: "regular",
@@ -40,6 +41,7 @@ export default function MyStockLayout() {
             headerBackTitle: "",
             presentation: "fullScreenModal",
             headerBackTitleVisible: false,
+            headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
             headerLeft: () => (
               <Pressable onPress={() => router.back()}>
@@ -61,6 +63,7 @@ export default function MyStockLayout() {
           name="test-drive"
           options={{
             title: "Test Drive",
+            headerTintColor: Colors.primary,
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },

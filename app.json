@@ -2,7 +2,7 @@
   "expo": {
     "name": "Swiper",
     "slug": "swiper",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -15,7 +15,7 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "buildNumber": "14",
+      "buildNumber": "2",
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
@@ -44,7 +44,7 @@
         "android.permission.INTERNET",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 14
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",

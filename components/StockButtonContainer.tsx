@@ -42,6 +42,12 @@ function StockButtonContainer({
   };
 
   const onPushToSwiperContactsPress = async () => {
+    try {
+      await analytics().setUserId(user?.id ?? "");
+      await analytics().setUserProperties({ userId: user?.id ?? "", userName: user?.name ?? "" });
+    } catch (error) {
+      console.log("Error setting user properties", error);
+    }
     await analytics().logEvent("push_to_swiper_contacts", { userId: user?.id });
     onPushToSwiperContacts();
   };
