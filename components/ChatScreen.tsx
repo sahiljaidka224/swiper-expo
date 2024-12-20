@@ -66,7 +66,7 @@ import Animated, {
 
 const backroundPattern = require("@/assets/images/pattern.png");
 const audioAsset = require("@/assets/audio/pop-alert.mp3");
-const garageAsset = require("@/assets/audio/car-garage.wav");
+const garageAsset = require("@/assets/audio/car-garage.m4a");
 
 interface ChatComponentProps {
   userId: string;
@@ -119,10 +119,7 @@ export default function ChatComponent({
   const garageSoundRef = useRef<Audio.Sound | null>(null);
   const [sound, setSound] = useState<Sound>();
 
-  const [soundQueue, setSoundQueue] = useState([]);
   const currentVisibleIndices = useRef(new Set());
-  const pendingItems = useRef(new Set());
-  const debounceTimer = useRef<any | null>(null);
 
   const loadGarageSound = async () => {
     const { sound } = await Audio.Sound.createAsync(garageAsset);
@@ -140,8 +137,6 @@ export default function ChatComponent({
       if (sound) {
         sound.unloadAsync();
       }
-
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, []);
 
@@ -149,43 +144,11 @@ export default function ChatComponent({
     try {
       const { sound } = await Audio.Sound.createAsync(garageAsset);
       garageSoundRef.current = sound;
-      console.log("datee", Date.now());
-      await sound.replayAsync();
+      await sound.playAsync();
     } catch (error) {
       console.error("Error playing sound:", error);
     }
   };
-
-  useEffect(() => {
-    // const playGarageSound = async () => {
-    //   try {
-    //     const { sound } = await Audio.Sound.createAsync(garageAsset);
-    //     garageSoundRef.current = sound;
-    //     console.log("datee", Date.now());
-    //     await sound.replayAsync();
-    //   } catch (error) {
-    //     console.error("Error playing sound:", error);
-    //   }
-    // };
-    // // Handle sound queue
-    // const processQueue = async () => {
-    //   console.log("processQueue", soundQueue.length);
-    //   if (soundQueue.length > 0) {
-    //     soundQueue.shift();
-    //     setSoundQueue([...soundQueue]);
-    //     await playGarageSound();
-    //     setTimeout(() => processQueue(), 100);
-    //   }
-    // };
-    // if (soundQueue.length > 0) {
-    //   processQueue();
-    // }
-    // return () => {
-    //   if (garageSoundRef.current) {
-    //     garageSoundRef.current.unloadAsync();
-    //   }
-    // };
-  }, [soundQueue]);
 
   async function playSound() {
     try {
@@ -366,26 +329,11 @@ export default function ChatComponent({
     playSound();
   };
 
-  const debounceUpdateQueue = () => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
-    debounceTimer.current = setTimeout(() => {
-      console.log("debounceUpdateQueue", pendingItems.current.size);
-      setSoundQueue((prevQueue) => {
-        const newItems = Array.from(pendingItems.current);
-        pendingItems.current.clear();
-
-        return [...prevQueue, ...newItems].slice(0, 3);
-      });
-    }, 50);
-  };
-
   const onViewableItemsChanged = useRef(({ changed }: { changed: any }) => {
     if (changed.length > 3) return;
     changed.forEach((item: { isViewable: any; index: unknown; item: any }) => {
       if (!item.isViewable && !currentVisibleIndices.current.has(item.index)) {
         currentVisibleIndices.current.add(item.index);
-        pendingItems.current.add(item.item);
         playGarageSound();
         // debounceUpdateQueue();
       } else if (item.isViewable) {
@@ -409,23 +357,20 @@ export default function ChatComponent({
       {carGroups && carGroups.length > 0 ? (
         <View style={styles.carGroupWrapper}>
           <FlatList<CometChat.Conversation>
-            data={[...carGroups, ...carGroups, ...carGroups]}
+            data={carGroups}
             keyExtractor={(item: unknown, index: number) => {
-              const conversation = item as CometChat.Conversation;
               return String(index);
             }}
             renderItem={({ item, index }) => <HorizontalItem item={item} index={index} />}
             horizontal
+            decelerationRate={0.85}
             showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={16}
-            onMomentumScrollEnd={() => {
-              setSoundQueue([]);
-            }}
+            scrollEventThrottle={10}
             onViewableItemsChanged={onViewableItemsChanged.current}
             viewabilityConfig={{
-              itemVisiblePercentThreshold: 10,
+              itemVisiblePercentThreshold: 100,
               waitForInteraction: true,
-              // minimumViewTime: 100,
+              // minimumViewTime: 50,
             }}
             getItemLayout={(data, index) => ({
               length: ITEM_WIDTH,

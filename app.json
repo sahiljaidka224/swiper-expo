@@ -15,7 +15,7 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "buildNumber": "2",
+      "buildNumber": "3",
       "bundleIdentifier": "com.galaxies.swiper",
       "infoPlist": {
         "NSCameraUsageDescription": "The app uses camera so you can easily share stock with other users.",
@@ -44,7 +44,7 @@
         "android.permission.INTERNET",
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 2
+      "versionCode": 4
     },
     "web": {
       "bundler": "metro",
