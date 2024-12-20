@@ -16,6 +16,10 @@ export default function WatchlistLayout() {
             headerShadowVisible: false,
             headerBlurEffect: "regular",
             headerTransparent: Platform.OS === "ios",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -25,6 +29,10 @@ export default function WatchlistLayout() {
             headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -32,6 +40,10 @@ export default function WatchlistLayout() {
           options={{
             title: "",
             headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -42,6 +54,10 @@ export default function WatchlistLayout() {
             headerTintColor: Colors.primary,
             headerBackTitleVisible: false,
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
       </Stack>

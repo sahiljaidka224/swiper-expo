@@ -17,6 +17,10 @@ export default function MyStockLayout() {
             headerShadowVisible: false,
             headerBlurEffect: "regular",
             headerTransparent: Platform.OS === "ios",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -43,6 +47,10 @@ export default function MyStockLayout() {
             headerBackTitleVisible: false,
             headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
             headerLeft: () => (
               <Pressable onPress={() => router.back()}>
                 <Text style={{ fontFamily: "SF_Pro_Display_Medium", fontSize: 16 }}>Cancel</Text>
@@ -64,6 +72,10 @@ export default function MyStockLayout() {
           options={{
             title: "Test Drive",
             headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },

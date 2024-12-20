@@ -29,6 +29,10 @@ export default function SwiperLayout() {
             headerLargeTitle: false,
             headerShadowVisible: false,
             headerTransparent: true,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
             headerRight: () => (
               <TouchableOpacity
                 activeOpacity={0.2}
@@ -72,6 +76,10 @@ export default function SwiperLayout() {
             headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -79,6 +87,10 @@ export default function SwiperLayout() {
           options={{
             title: "",
             headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -86,6 +98,10 @@ export default function SwiperLayout() {
           options={{
             title: "",
             headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -93,6 +109,10 @@ export default function SwiperLayout() {
           options={{
             title: "",
             headerTintColor: Colors.primary,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
 
@@ -104,6 +124,10 @@ export default function SwiperLayout() {
             headerBackTitle: "",
             headerBackTitleVisible: false,
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
       </Stack>

@@ -45,6 +45,10 @@ export default function ChatsLayout() {
             headerTitleAlign: "center",
             headerTransparent: Platform.OS === "ios",
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
 
@@ -54,6 +58,10 @@ export default function ChatsLayout() {
             title: "",
             headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -62,6 +70,10 @@ export default function ChatsLayout() {
             title: "Media",
             headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -70,6 +82,10 @@ export default function ChatsLayout() {
             title: "",
             headerTintColor: Colors.primary,
             headerStyle: { backgroundColor: Colors.background },
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -79,6 +95,10 @@ export default function ChatsLayout() {
             headerTintColor: Colors.primary,
             animation: "fade",
             headerShown: false,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -90,6 +110,10 @@ export default function ChatsLayout() {
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -101,6 +125,10 @@ export default function ChatsLayout() {
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -111,6 +139,10 @@ export default function ChatsLayout() {
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
             animation: "fade",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -120,6 +152,10 @@ export default function ChatsLayout() {
             title: "",
             headerBackTitle: "",
             headerBackTitleVisible: false,
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
       </Stack>

@@ -16,6 +16,10 @@ export default function AddStockLayout() {
             headerShadowVisible: false,
             headerBlurEffect: "regular",
             headerTransparent: Platform.OS === "ios",
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
         <Stack.Screen
@@ -26,6 +30,10 @@ export default function AddStockLayout() {
             headerBackTitle: "",
             headerBackTitleVisible: false,
             headerStyle: { backgroundColor: Colors.background },
+            headerTitleStyle: {
+              fontSize: 20,
+              fontFamily: "SF_Pro_Display_Regular",
+            },
           }}
         />
       </Stack>
